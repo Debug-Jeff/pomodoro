@@ -20,7 +20,7 @@ function initLandingPage() {
     
     timeline.to(logoCircle, {
       strokeDashoffset: 0,
-      duration: 1.5,
+      duration: 1.0,
       ease: "power2.inOut"
     });
     
@@ -48,9 +48,9 @@ function initLandingPage() {
     timeline.from(enterAppBtn, {
       y: 20,
       opacity: 0,
-      duration: 0.8,
+      duration: 0.3,
       ease: "power2.out"
-    }, "-=0.4");
+    }, "-=0.2");
   }
   
   // Set up enter app button
@@ -91,8 +91,8 @@ function createParticles() {
     const particle = document.createElement('div');
     particle.classList.add('particle');
     
-    // Random size between 2px and 6px
-    const size = Math.floor(Math.random() * 4) + 2;
+    // Random size between 2px and 4px
+    const size = Math.floor(Math.random() * 2) + 2;
     particle.style.width = `${size}px`;
     particle.style.height = `${size}px`;
     
@@ -141,6 +141,29 @@ function setupPageTransitions() {
     });
   });
 }
+
+// Inject animated background (stars and twinkling only)
+function injectAnimatedBackground() {
+  // Remove any existing background-container
+  const oldBg = document.querySelector('.background-container');
+  if (oldBg) oldBg.remove();
+
+  const bgContainer = document.createElement('div');
+  bgContainer.className = 'background-container';
+
+  const stars = document.createElement('div');
+  stars.className = 'stars';
+  bgContainer.appendChild(stars);
+
+  const twinkling = document.createElement('div');
+  twinkling.className = 'twinkling';
+  bgContainer.appendChild(twinkling);
+
+  document.body.appendChild(bgContainer);
+}
+
+// Export for use in HTML inline scripts
+window.injectAnimatedBackground = injectAnimatedBackground;
 
 // Initialize animations
 setupPageTransitions();

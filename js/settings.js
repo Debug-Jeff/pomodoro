@@ -24,9 +24,6 @@ const longBreakDurationSlider = document.getElementById('long-break-duration');
 const sessionsBeforeLongBreakSlider = document.getElementById('sessions-before-long-break');
 const enableNotificationsToggle = document.getElementById('enable-notifications');
 const enableSoundsToggle = document.getElementById('enable-sounds');
-const volumeControlSlider = document.getElementById('volume-control');
-const enableBackgroundSyncToggle = document.getElementById('enable-background-sync');
-const enablePushNotificationsToggle = document.getElementById('enable-push-notifications');
 const themePreviewElements = document.querySelectorAll('.theme-preview');
 const exportSettingsBtn = document.getElementById('export-settings');
 const importSettingsBtn = document.getElementById('import-settings');
@@ -35,135 +32,93 @@ const importFileInput = document.getElementById('import-file');
 
 // Initialize settings
 function initSettings() {
-  // Load settings from localStorage
-  const settings = getSettings();
-  
-  // Apply settings to UI elements
+  const settings = loadData('settings', SCHEMAS.settings);
   if (focusDurationSlider) {
     focusDurationSlider.value = settings.focusDuration;
     updateSliderProgress(focusDurationSlider, 'focus-duration-progress', 'focus-duration-display', 'min');
   }
-  
   if (shortBreakDurationSlider) {
     shortBreakDurationSlider.value = settings.shortBreakDuration;
     updateSliderProgress(shortBreakDurationSlider, 'short-break-duration-progress', 'short-break-duration-display', 'min');
   }
-  
   if (longBreakDurationSlider) {
     longBreakDurationSlider.value = settings.longBreakDuration;
     updateSliderProgress(longBreakDurationSlider, 'long-break-duration-progress', 'long-break-duration-display', 'min');
   }
-  
   if (sessionsBeforeLongBreakSlider) {
     sessionsBeforeLongBreakSlider.value = settings.sessionsBeforeLongBreak;
     updateSliderProgress(sessionsBeforeLongBreakSlider, 'sessions-before-long-break-progress', 'sessions-before-long-break-display', 'sessions');
   }
-  
   if (enableNotificationsToggle) {
     enableNotificationsToggle.checked = settings.enableNotifications;
   }
-  
   if (enableSoundsToggle) {
     enableSoundsToggle.checked = settings.enableSounds;
   }
-  
-  if (volumeControlSlider) {
-    volumeControlSlider.value = settings.soundVolume;
-    updateSliderProgress(volumeControlSlider, 'volume-control-progress', 'volume-display', '%');
-  }
-  
-  if (enableBackgroundSyncToggle) {
-    enableBackgroundSyncToggle.checked = settings.enableBackgroundSync;
-  }
-  
-  if (enablePushNotificationsToggle) {
-    enablePushNotificationsToggle.checked = settings.enablePushNotifications;
-  }
-  
-  // Apply theme
+  // Volume grid
+  setupVolumeGrid(settings.soundVolume, settings.enableSounds);
+  // Theme
   applyTheme(settings.theme);
-  
-  // Set up event listeners
   setupEventListeners();
 }
 
 // Set up event listeners for settings controls
 function setupEventListeners() {
-  // Timer duration sliders
   if (focusDurationSlider) {
     focusDurationSlider.addEventListener('input', () => {
       updateSliderProgress(focusDurationSlider, 'focus-duration-progress', 'focus-duration-display', 'min');
       saveSettings();
     });
   }
-  
   if (shortBreakDurationSlider) {
     shortBreakDurationSlider.addEventListener('input', () => {
       updateSliderProgress(shortBreakDurationSlider, 'short-break-duration-progress', 'short-break-duration-display', 'min');
       saveSettings();
     });
   }
-  
   if (longBreakDurationSlider) {
     longBreakDurationSlider.addEventListener('input', () => {
       updateSliderProgress(longBreakDurationSlider, 'long-break-duration-progress', 'long-break-duration-display', 'min');
       saveSettings();
     });
   }
-  
   if (sessionsBeforeLongBreakSlider) {
     sessionsBeforeLongBreakSlider.addEventListener('input', () => {
       updateSliderProgress(sessionsBeforeLongBreakSlider, 'sessions-before-long-break-progress', 'sessions-before-long-break-display', 'sessions');
       saveSettings();
     });
   }
-  
-  // Notification and sound toggles
-  if (enableNotificationsToggle) {
-    enableNotificationsToggle.addEventListener('change', () => {
-      if (enableNotificationsToggle.checked) {
-        requestNotificationPermission();
-      }
-      saveSettings();
-    });
-  }
-  
   if (enableSoundsToggle) {
-    enableSoundsToggle.addEventListener('change', saveSettings);
-  }
-  
-  if (volumeControlSlider) {
-    volumeControlSlider.addEventListener('input', () => {
-      updateSliderProgress(volumeControlSlider, 'volume-control-progress', 'volume-display', '%');
+    enableSoundsToggle.addEventListener('change', () => {
+      setupVolumeGrid(getCurrentVolume(), enableSoundsToggle.checked);
       saveSettings();
     });
   }
-  
-  if (enableBackgroundSyncToggle) {
-    enableBackgroundSyncToggle.addEventListener('change', saveSettings);
-  }
-  
-  if (enablePushNotificationsToggle) {
-    enablePushNotificationsToggle.addEventListener('change', () => {
-      if (enablePushNotificationsToggle.checked) {
-        requestPushPermission();
+  if (enableNotificationsToggle) {
+    enableNotificationsToggle.addEventListener('change', async () => {
+      if (enableNotificationsToggle.checked) {
+        const granted = await requestNotificationPermission();
+        if (!granted) {
+          enableNotificationsToggle.checked = false;
+          document.getElementById('settings-feedback').textContent = 'Notification permission denied.';
+        } else {
+          document.getElementById('settings-feedback').textContent = 'Notifications enabled.';
+        }
+      } else {
+        document.getElementById('settings-feedback').textContent = 'Notifications disabled.';
       }
       saveSettings();
     });
   }
-  
   // Theme selection
   themePreviewElements.forEach(element => {
     element.addEventListener('click', () => {
       const theme = element.id.replace('theme-', '');
       applyTheme(theme);
       saveSettings();
-      
-      // Update active state
-      themePreviewElements.forEach(el => el.classList.remove('active'));
-      element.classList.add('active');
-      
-      // Animate selection
+      themePreviewElements.forEach(el => el.classList.remove('active', 'ring-4', 'ring-indigo-400'));
+      element.classList.add('active', 'ring-4', 'ring-indigo-400');
+      document.getElementById('settings-feedback').textContent = `Theme set to ${theme}.`;
       if (window.gsap) {
         gsap.fromTo(element,
           { scale: 1 },
@@ -178,72 +133,53 @@ function setupEventListeners() {
       }
     });
   });
-  
-  // Data management buttons
-  if (exportSettingsBtn) {
-    exportSettingsBtn.addEventListener('click', exportSettings);
-  }
-  
-  if (importSettingsBtn) {
-    importSettingsBtn.addEventListener('click', () => {
-      if (importFileInput) {
-        importFileInput.click();
-      }
-    });
-  }
-  
-  if (importFileInput) {
-    importFileInput.addEventListener('change', importSettings);
-  }
-  
   if (resetSettingsBtn) {
     resetSettingsBtn.addEventListener('click', resetSettings);
   }
 }
 
-// Update slider progress
-function updateSliderProgress(slider, progressId, displayId, unit) {
-  const progressElement = document.getElementById(progressId);
-  const displayElement = document.getElementById(displayId);
-  
-  if (!progressElement || !displayElement) return;
-  
-  const value = slider.value;
-  const min = slider.min;
-  const max = slider.max;
-  const percentage = ((value - min) / (max - min)) * 100;
-  
-  progressElement.style.width = `${percentage}%`;
-  displayElement.textContent = `${value} ${unit}`;
-}
-
-// Apply theme
-function applyTheme(theme) {
-  // Remove all theme classes
-  document.body.classList.remove('theme-dark', 'theme-dim', 'theme-purple', 'theme-ocean', 'theme-sunset');
-  
-  // Apply selected theme
-  if (theme === 'auto') {
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.body.classList.add('theme-dark');
-    } else {
-      document.body.classList.add('theme-dim');
+function setupVolumeGrid(selectedVolume, enabled) {
+  const volumeGrid = document.getElementById('volume-grid');
+  if (!volumeGrid) return;
+  volumeGrid.innerHTML = '';
+  for (let i = 0; i <= 100; i += 10) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'volume-btn px-2 py-1 rounded font-semibold text-sm transition-all';
+    btn.textContent = i;
+    btn.setAttribute('aria-label', `Set volume to ${i}`);
+    btn.dataset.value = i;
+    if (i === selectedVolume) {
+      btn.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-indigo-400');
     }
-  } else {
-    document.body.classList.add(`theme-${theme}`);
+    if (!enabled) {
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+    }
+    btn.addEventListener('click', () => {
+      if (enabled) {
+        saveVolume(i);
+      }
+    });
+    volumeGrid.appendChild(btn);
   }
-  
-  // Update active state in theme previews
-  themePreviewElements.forEach(element => {
-    element.classList.remove('active');
-    if (element.id === `theme-${theme}`) {
-      element.classList.add('active');
-    }
-  });
+  // Update display
+  const display = document.getElementById('volume-display');
+  if (display) display.textContent = `${selectedVolume}%`;
 }
 
-// Save settings to localStorage
+function saveVolume(value) {
+  const settings = loadData('settings', SCHEMAS.settings);
+  settings.soundVolume = value;
+  saveData('settings', settings);
+  setupVolumeGrid(value, enableSoundsToggle ? enableSoundsToggle.checked : true);
+}
+
+function getCurrentVolume() {
+  const settings = loadData('settings', SCHEMAS.settings);
+  return settings.soundVolume || 80;
+}
+
 function saveSettings() {
   const settings = {
     focusDuration: focusDurationSlider ? parseInt(focusDurationSlider.value) : DEFAULT_SETTINGS.focusDuration,
@@ -252,13 +188,16 @@ function saveSettings() {
     sessionsBeforeLongBreak: sessionsBeforeLongBreakSlider ? parseInt(sessionsBeforeLongBreakSlider.value) : DEFAULT_SETTINGS.sessionsBeforeLongBreak,
     enableNotifications: enableNotificationsToggle ? enableNotificationsToggle.checked : DEFAULT_SETTINGS.enableNotifications,
     enableSounds: enableSoundsToggle ? enableSoundsToggle.checked : DEFAULT_SETTINGS.enableSounds,
-    soundVolume: volumeControlSlider ? parseInt(volumeControlSlider.value) : DEFAULT_SETTINGS.soundVolume,
-    theme: getActiveTheme(),
-    enableBackgroundSync: enableBackgroundSyncToggle ? enableBackgroundSyncToggle.checked : DEFAULT_SETTINGS.enableBackgroundSync,
-    enablePushNotifications: enablePushNotificationsToggle ? enablePushNotificationsToggle.checked : DEFAULT_SETTINGS.enablePushNotifications
+    soundVolume: getCurrentVolume(),
+    theme: getActiveTheme()
   };
-  
-  localStorage.setItem(`${APP_NAME}_settings`, JSON.stringify(settings));
+  saveData('settings', settings);
+  window.dispatchEvent(new StorageEvent('storage', { key: `${APP_NAME}_settings` }));
+  applyTheme(settings.theme);
+  const themeSwitch = document.getElementById('theme-switch');
+  if (themeSwitch) {
+    themeSwitch.setAttribute('data-theme', settings.theme === 'dark' ? 'dark' : 'light');
+  }
 }
 
 // Get active theme
@@ -272,7 +211,7 @@ function getActiveTheme() {
 
 // Export settings
 function exportSettings() {
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   const dataStr = JSON.stringify(settings, null, 2);
   const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
   
@@ -312,7 +251,7 @@ function importSettings(event) {
       };
       
       // Save settings
-      localStorage.setItem(`${APP_NAME}_settings`, JSON.stringify(validSettings));
+      saveData('settings', validSettings);
       
       // Reload page to apply settings
       window.location.reload();
@@ -328,7 +267,7 @@ function importSettings(event) {
 // Reset settings
 function resetSettings() {
   if (confirm('Are you sure you want to reset all settings to default?')) {
-    localStorage.setItem(`${APP_NAME}_settings`, JSON.stringify(DEFAULT_SETTINGS));
+    saveData('settings', DEFAULT_SETTINGS);
     
     // Reload page to apply settings
     window.location.reload();
@@ -362,19 +301,17 @@ function showToast(message, type = 'success') {
 }
 
 // Request notification permission
-function requestNotificationPermission() {
+async function requestNotificationPermission() {
   if (!('Notification' in window)) {
     console.log('This browser does not support notifications');
-    return;
+    return false;
   }
   
   if (Notification.permission !== 'granted') {
-    Notification.requestPermission().then(permission => {
-      if (permission !== 'granted') {
-        console.log('Notification permission denied');
-      }
-    });
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
   }
+  return true;
 }
 
 // Request push notification permission
@@ -393,7 +330,7 @@ function requestPushPermission() {
       console.log('Push subscription successful:', subscription);
     }).catch(error => {
       console.error('Push subscription failed:', error);
-      enablePushNotificationsToggle.checked = false;
+      enableSoundsToggle.checked = false;
       saveSettings();
     });
   });
@@ -415,5 +352,23 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+// Listen for storage changes to update settings live
+window.addEventListener('storage', function(event) {
+  if (event.key === `${APP_NAME}_settings`) {
+    initSettings();
+  }
+});
+
 // Initialize settings when DOM is loaded
-document.addEventListener('DOMContentLoaded', initSettings);
+document.addEventListener('DOMContentLoaded', () => {
+  initSettings();
+  // Accessibility: aria-live region for feedback
+  let feedback = document.getElementById('settings-feedback');
+  if (!feedback) {
+    feedback = document.createElement('div');
+    feedback.id = 'settings-feedback';
+    feedback.setAttribute('aria-live', 'polite');
+    feedback.className = 'sr-only';
+    document.body.appendChild(feedback);
+  }
+});

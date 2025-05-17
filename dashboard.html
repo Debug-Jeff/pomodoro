@@ -12,73 +12,17 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/animated-background.css">
   <style>
     .glass-card {
       background: rgba(17, 25, 40, 0.75);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       position: relative;
       overflow: hidden;
-    }
-    
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-      );
-      transition: 0.5s;
-      pointer-events: none;
-    }
-    
-    .glass-card:hover::before {
-      left: 100%;
-    }
-    
-    .animated-border {
-      position: relative;
-    }
-    
-    .animated-border::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(
-        45deg,
-        #6366F1,
-        #8B5CF6,
-        #EC4899,
-        #6366F1
-      );
-      background-size: 300% 300%;
-      -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      animation: border-rotate 4s linear infinite;
-    }
-    
-    @keyframes border-rotate {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 130% 50%;
-      }
     }
     
     body {
@@ -336,84 +280,115 @@
   .nav-link:hover {
     transform: scaleX(1);
   }
+  
+  /* Nav-link rectangle animation */
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+  }
+  .nav-link:hover, .nav-link:focus, .nav-link[aria-current="page"] {
+    border-color: rgba(99,102,241,0.5);
+    background: rgba(99,102,241,0.08);
+  }
+  .nav-link .nav-underline { display: none !important; }
+  .nav-link[aria-current="page"] span {
+    color: #fff !important;
+    font-weight: bold;
+  }
+  /* Theme toggle switch */
+  .theme-switch {
+    width: 44px;
+    height: 24px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .theme-switch .switch-thumb {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1), background 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .switch-thumb {
+    left: 22px;
+    background: #6366F1;
+  }
+  .theme-switch .icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  .theme-switch .icon-sun {
+    color: #FBBF24;
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .icon-sun {
+    opacity: 0.3;
+  }
+  .theme-switch .icon-moon {
+    color: #6366F1;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .icon-moon {
+    opacity: 1;
+  }
   </style>
 </head>
 <body class="min-h-screen text-white flex flex-col theme-dark">
-  <!-- Animated background -->
-  <div id="animated-background" aria-hidden="true"></div>
-  
-  <!-- Page transition overlay -->
-  <div id="page-transition" class="page-transition"></div>
-  
   <!-- Navigation -->
-<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 shadow-lg" id="main-navbar">
   <div class="max-w-6xl mx-auto px-4">
     <div class="flex justify-between items-center h-16">
-      <!-- Logo - Simplified version -->
+      <!-- Logo -->
       <a href="index.html" class="flex items-center group">
         <div class="flex flex-col">
           <span class="text-2xl font-bold text-white tracking-tight">POMODORO</span>
           <span class="text-xs text-white text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
         </div>
       </a>
-
-      <!-- Navigation Links - Minimalist style -->
+      <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
-        <a href="home.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-90 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Timer</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Dashboard</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Settings</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
       </div>
-
-      <!-- Theme Toggle - Simplified -->
-<div class="relative group ml-4">
-        <button id="theme-toggle" class="flex items-center justify-center w-9 h-9 rounded-full bg-white bg-opacity-10 hover:bg-opacity-20 transition-all duration-300 focus:outline-none overflow-hidden relative">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
-          </svg>
-          <span class="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 opacity-20"></span>
+      <!-- Theme Toggle Switch -->
+      <div class="relative group ml-4">
+        <button id="theme-switch" class="theme-switch" type="button" aria-label="Toggle theme" data-theme="dark">
+          <span class="switch-thumb">
+            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+          </span>
         </button>
-        
-        <!-- Theme Selector Dropdown -->
-        <div id="theme-dropdown" class="absolute right-0 mt-2 w-48 glass-card border border-white border-opacity-10 rounded-lg shadow-lg z-50 transform scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 origin-top-right">
-          <div class="p-3 space-y-2">
-            <h3 class="text-white text-sm font-medium mb-2">Select Theme</h3>
-            
-            <button data-theme="theme-dark" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dark</span>
-            </button>
-            
-            <button data-theme="theme-dim" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-800 to-blue-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dim</span>
-            </button>
-            
-            <button data-theme="theme-purple" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-900 to-violet-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Purple</span>
-            </button>
-            
-            <button data-theme="theme-ocean" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-900 to-cyan-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Ocean</span>
-            </button>
-            
-            <button data-theme="theme-sunset" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-orange-500 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Sunset</span>
-            </button>
-
-
-      <!-- Mobile menu button -->
+      </div>
+      <!-- Mobile menu button (optional, can be improved in next steps) -->
       <button class="md:hidden text-white focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -421,8 +396,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Subtle bottom border -->
   <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
 </nav>
 
@@ -481,7 +454,7 @@
                 <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
                   <div id="focus-time-bar" class="h-full bg-indigo-500" style="width: 0%"></div>
                 </div>
-                              </div>
+              </div>
               <div>
                 <h3 class="text-sm text-gray-400 mb-1">Task Completion</h3>
                 <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -524,141 +497,22 @@
         </div>
       </div>
       
-      <!-- Productivity heatmap -->
-      <div class="glass-card animated-border rounded-xl p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Productivity Heatmap</h2>
-        <div class="flex items-center mb-4">
-          <div class="mr-4">
-            <select id="heatmap-view" class="bg-gray-800 border border-gray-700 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-            </select>
-          </div>
-          <div class="heatmap-legend">
-            <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background-color: rgba(99, 102, 241, 0.1);"></div>
-              <span class="text-xs">Low</span>
-            </div>
-            <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background-color: rgba(99, 102, 241, 0.4);"></div>
-              <span class="text-xs">Medium</span>
-            </div>
-            <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background-color: rgba(99, 102, 241, 0.7);"></div>
-              <span class="text-xs">High</span>
-            </div>
-            <div class="heatmap-legend-item">
-              <div class="heatmap-legend-color" style="background-color: rgba(99, 102, 241, 1);"></div>
-              <span class="text-xs">Very High</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="overflow-x-auto">
-          <div class="min-w-max">
-            <div class="flex mb-1">
-              <div class="w-12"></div>
-              <div class="flex-grow grid grid-cols-7 gap-4">
-                <div class="text-xs text-center text-gray-400">Mon</div>
-                <div class="text-xs text-center text-gray-400">Tue</div>
-                <div class="text-xs text-center text-gray-400">Wed</div>
-                <div class="text-xs text-center text-gray-400">Thu</div>
-                <div class="text-xs text-center text-gray-400">Fri</div>
-                <div class="text-xs text-center text-gray-400">Sat</div>
-                <div class="text-xs text-center text-gray-400">Sun</div>
-              </div>
-            </div>
-            
-            <div class="flex">
-              <div class="w-12 flex flex-col justify-between py-1">
-                <div class="text-xs text-gray-400">12am</div>
-                <div class="text-xs text-gray-400">6am</div>
-                <div class="text-xs text-gray-400">12pm</div>
-                <div class="text-xs text-gray-400">6pm</div>
-                <div class="text-xs text-gray-400">11pm</div>
-              </div>
-              <div id="heatmap" class="flex-grow heatmap-container h-64">
-                <!-- Heatmap will be populated by JavaScript -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Monthly calendar -->
-      <div class="glass-card animated-border rounded-xl p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Monthly Activity</h2>
-        <div id="calendar-header" class="flex justify-between items-center mb-4">
-          <button id="prev-month" class="p-1 rounded-full hover:bg-gray-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h3 id="calendar-title" class="text-lg font-medium">May 2023</h3>
-          <button id="next-month" class="p-1 rounded-full hover:bg-gray-700 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-7 gap-1 mb-2 text-center">
-          <div class="text-xs text-gray-400">Sun</div>
-          <div class="text-xs text-gray-400">Mon</div>
-          <div class="text-xs text-gray-400">Tue</div>
-          <div class="text-xs text-gray-400">Wed</div>
-          <div class="text-xs text-gray-400">Thu</div>
-          <div class="text-xs text-gray-400">Fri</div>
-          <div class="text-xs text-gray-400">Sat</div>
-        </div>
-        
-        <div id="calendar-grid" class="calendar-container">
-          <!-- Calendar will be populated by JavaScript -->
-        </div>
-        
-        <div class="flex justify-between mt-4 text-sm text-gray-400">
-          <div>
-            <span class="inline-block w-3 h-3 rounded-sm bg-indigo-500 opacity-20 mr-1"></span>
-            <span>1-2 sessions</span>
-          </div>
-          <div>
-            <span class="inline-block w-3 h-3 rounded-sm bg-indigo-500 opacity-40 mr-1"></span>
-            <span>3-4 sessions</span>
-          </div>
-          <div>
-            <span class="inline-block w-3 h-3 rounded-sm bg-indigo-500 opacity-70 mr-1"></span>
-            <span>5-7 sessions</span>
-          </div>
-          <div>
-            <span class="inline-block w-3 h-3 rounded-sm bg-indigo-500 mr-1"></span>
-            <span>8+ sessions</span>
-          </div>
-        </div>
-      </div>
-      
       <!-- Recent sessions -->
       <div class="glass-card animated-border rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Recent Sessions</h2>
         <div class="overflow-x-auto">
-          <table class="w-full">
+          <table class="min-w-full leading-normal">
             <thead>
               <tr class="text-left text-gray-400 border-b border-gray-700">
-                <th class="pb-3 font-medium">Date</th>
-                <th class="pb-3 font-medium">Time</th>
-                <th class="pb-3 font-medium">Mode</th>
-                <th class="pb-3 font-medium">Duration</th>
-                <th class="pb-3 font-medium">Task</th>
+                <th class="py-3">Date</th>
+                <th class="py-3">Time</th>
+                <th class="py-3">Mode</th>
+                <th class="py-3">Duration</th>
+                <th class="py-3">Task</th>
               </tr>
             </thead>
             <tbody id="sessions-table">
-              <!-- Sessions will be populated by JavaScript -->
-              <tr class="text-gray-300 border-b border-gray-800">
-                <td class="py-3">Loading...</td>
-                <td class="py-3"></td>
-                <td class="py-3"></td>
-                <td class="py-3"></td>
-                <td class="py-3"></td>
-              </tr>
+              <!-- Session data will be loaded here by JavaScript -->
             </tbody>
           </table>
         </div>
@@ -669,10 +523,10 @@
   <script src="js/main.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/animations.js"></script>
   <script>
-    // Create animated background bubbles
-    document.addEventListener('DOMContentLoaded', () => {
-      createAnimatedBackground();
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.injectAnimatedBackground) injectAnimatedBackground();
       
       // Initialize active nav link
       const navLinks = document.querySelectorAll('.nav-link');
@@ -693,51 +547,33 @@
           }
         });
       });
+      
+      // Nav-bar entrance animation
+      if (window.gsap) {
+        gsap.from('#main-navbar', { y: -60, opacity: 0, duration: 0.7, ease: 'power2.out' });
+      }
+      // Theme toggle logic
+      const themeSwitch = document.getElementById('theme-switch');
+      let currentTheme = localStorage.getItem('pomodoro-theme') || 'dark';
+      function updateToggleUI(theme) {
+        themeSwitch.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+      }
+      updateToggleUI(currentTheme);
+      themeSwitch.addEventListener('click', function() {
+        currentTheme = (currentTheme === 'dark') ? 'dim' : 'dark';
+        window.setAndApplyTheme(currentTheme);
+        updateToggleUI(currentTheme);
+      });
+      // Active nav link highlight
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        if (window.location.pathname.endsWith(link.getAttribute('href'))) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
     });
-    
-    function createAnimatedBackground() {
-      const background = document.getElementById('animated-background');
-      if (!background) return;
-      
-      // Check if user prefers reduced motion
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        return;
-      }
-      
-      for (let i = 0; i < 15; i++) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('floating-bubble');
-        
-        // Random size between 50px and 200px
-        const size = Math.floor(Math.random() * 150) + 50;
-        bubble.style.width = `${size}px`;
-        bubble.style.height = `${size}px`;
-        
-        // Random position
-        bubble.style.left = `${Math.random() * 100}%`;
-        bubble.style.top = `${Math.random() * 100}%`;
-        
-        // Random animation properties
-        bubble.style.setProperty('--duration', `${Math.random() * 20 + 15}s`);
-        bubble.style.setProperty('--delay', `-${Math.random() * 10}s`);
-        
-        // Random movement patterns
-        bubble.style.setProperty('--x1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x3', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y3', `${(Math.random() - 0.5) * 200}px`);
-        
-        // Random scale changes
-        bubble.style.setProperty('--scale1', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale2', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale3', `${Math.random() * 0.5 + 0.7}`);
-        
-        // Add to background
-        background.appendChild(bubble);
-      }
-    }
   </script>
 </body>
 </html>

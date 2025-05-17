@@ -12,7 +12,7 @@ const SCHEMAS = {
     sessionsBeforeLongBreak: 4,
     enableNotifications: true,
     enableSounds: true,
-    volume: 80,
+    soundVolume: 80,
     theme: 'dark' // 'dark', 'dim', or 'auto'
   },
   sessions: [], // Array of session objects

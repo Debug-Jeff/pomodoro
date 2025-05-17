@@ -11,73 +11,17 @@
   <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <link rel="stylesheet" href="css/animated-background.css">
   <style>
     .glass-card {
       background: rgba(17, 25, 40, 0.75);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       position: relative;
       overflow: hidden;
-    }
-    
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-      );
-      transition: 0.5s;
-      pointer-events: none;
-    }
-    
-    .glass-card:hover::before {
-      left: 100%;
-    }
-    
-    .animated-border {
-      position: relative;
-    }
-    
-    .animated-border::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(
-        45deg,
-        #6366F1,
-        #8B5CF6,
-        #EC4899,
-        #6366F1
-      );
-      background-size: 300% 300%;
-      -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      animation: border-rotate 4s linear infinite;
-    }
-    
-    @keyframes border-rotate {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 130% 50%;
-      }
     }
     
     body {
@@ -199,44 +143,44 @@
     .slider {
       -webkit-appearance: none;
       width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.2);
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
       outline: none;
       position: relative;
       z-index: 1;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.10);
     }
     
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: rgb(var(--primary));
+      background: #fff;
+      border: 3px solid #6366f1;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.20);
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(var(--primary), 0.5);
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
     
-    .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(var(--primary), 0.7);
+    .slider:focus::-webkit-slider-thumb {
+      border-color: #8b5cf6;
     }
     
     .slider::-moz-range-thumb {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: rgb(var(--primary));
+      background: #fff;
+      border: 3px solid #6366f1;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.20);
       cursor: pointer;
-      border: none;
-      box-shadow: 0 0 10px rgba(var(--primary), 0.5);
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
     
-    .slider::-moz-range-thumb:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(var(--primary), 0.7);
+    .slider:focus::-moz-range-thumb {
+      border-color: #8b5cf6;
     }
     
     .slider-progress {
@@ -324,6 +268,8 @@
       border-radius: 0.75rem;
       transition: all 0.3s ease;
       cursor: pointer;
+      background: #181a20 !important;
+      border: 2px solid transparent;
     }
     
     .theme-preview:hover {
@@ -332,7 +278,7 @@
     }
     
     .theme-preview.active {
-      border: 2px solid rgb(var(--primary));
+      border: 2.5px solid #6366f1 !important;
     }
     
     .theme-preview-check {
@@ -353,6 +299,20 @@
     .theme-preview.active .theme-preview-check {
       opacity: 1;
     }
+    
+    .theme-preview .theme-color-box {
+      width: 100%;
+      height: 48px;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    #theme-dark .theme-color-box { background: #6366f1; }
+    #theme-dim .theme-color-box { background: #7c3aed; }
+    #theme-purple .theme-color-box { background: #8b5cf6; }
+    #theme-ocean .theme-color-box { background: #0ea5e9; }
+    #theme-sunset .theme-color-box { background: #f97316; }
+    #theme-auto .theme-color-box { background: linear-gradient(90deg,#6366f1 0%,#7c3aed 100%); }
     
     /* Settings section animation */
     .settings-section {
@@ -387,84 +347,111 @@
   .nav-link:hover {
     transform: scaleX(1);
   }
+  
+  /* Nav-link rectangle animation */
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+  }
+  .nav-link:hover, .nav-link:focus, .nav-link[aria-current="page"] {
+    border-color: rgba(99,102,241,0.5);
+    background: rgba(99,102,241,0.08);
+  }
+  .nav-link .nav-underline { display: none !important; }
+  /* Theme toggle switch */
+  .theme-switch {
+    width: 44px;
+    height: 24px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .theme-switch .switch-thumb {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1), background 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .switch-thumb {
+    left: 22px;
+    background: #6366F1;
+  }
+  .theme-switch .icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  .theme-switch .icon-sun {
+    color: #FBBF24;
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .icon-sun {
+    opacity: 0.3;
+  }
+  .theme-switch .icon-moon {
+    color: #6366F1;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+  .theme-switch[data-theme="dark"] .icon-moon {
+    opacity: 1;
+  }
   </style>
 </head>
 <body class="min-h-screen text-white flex flex-col theme-dark">
-  <!-- Animated background -->
-  <div id="animated-background" aria-hidden="true"></div>
-  
-  <!-- Page transition overlay -->
-  <div id="page-transition" class="page-transition"></div>
-  
   <!-- Navigation -->
-<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 shadow-lg" id="main-navbar">
   <div class="max-w-6xl mx-auto px-4">
     <div class="flex justify-between items-center h-16">
-      <!-- Logo - Simplified version -->
+      <!-- Logo -->
       <a href="index.html" class="flex items-center group">
         <div class="flex flex-col">
           <span class="text-2xl font-bold text-white tracking-tight">POMODORO</span>
           <span class="text-xs text-white text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
         </div>
       </a>
-
-      <!-- Navigation Links - Minimalist style -->
+      <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
-        <a href="home.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-90 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Timer</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Dashboard</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Settings</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
       </div>
-
-      <!-- Theme Toggle - Simplified -->
-<div class="relative group ml-4">
-        <button id="theme-toggle" class="flex items-center justify-center w-9 h-9 rounded-full bg-white bg-opacity-10 hover:bg-opacity-20 transition-all duration-300 focus:outline-none overflow-hidden relative">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
-          </svg>
-          <span class="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 opacity-20"></span>
+      <!-- Theme Toggle Switch -->
+      <div class="relative group ml-4">
+        <button id="theme-switch" class="theme-switch" type="button" aria-label="Toggle theme" data-theme="dark">
+          <span class="switch-thumb">
+            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+          </span>
         </button>
-        
-        <!-- Theme Selector Dropdown -->
-        <div id="theme-dropdown" class="absolute right-0 mt-2 w-48 glass-card border border-white border-opacity-10 rounded-lg shadow-lg z-50 transform scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 origin-top-right">
-          <div class="p-3 space-y-2">
-            <h3 class="text-white text-sm font-medium mb-2">Select Theme</h3>
-            
-            <button data-theme="theme-dark" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dark</span>
-            </button>
-            
-            <button data-theme="theme-dim" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-800 to-blue-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dim</span>
-            </button>
-            
-            <button data-theme="theme-purple" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-900 to-violet-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Purple</span>
-            </button>
-            
-            <button data-theme="theme-ocean" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-900 to-cyan-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Ocean</span>
-            </button>
-            
-            <button data-theme="theme-sunset" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-orange-500 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Sunset</span>
-            </button>
-
-
-      <!-- Mobile menu button -->
+      </div>
+      <!-- Mobile menu button (optional, can be improved in next steps) -->
       <button class="md:hidden text-white focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -472,8 +459,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Subtle bottom border -->
   <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
 </nav>
 
@@ -483,8 +468,10 @@
       <h1 class="text-3xl font-bold mb-8">Settings</h1>
       
       <div class="glass-card animated-border rounded-xl p-6 mb-8 settings-section">
-        <h2 class="text-xl font-semibold mb-6">Timer Settings</h2>
-        
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"/></svg>
+          Timer Settings
+        </h2>
         <div class="space-y-8">
           <div>
             <div class="flex justify-between mb-2">
@@ -496,8 +483,8 @@
               <div class="slider-ticks" id="focus-duration-ticks"></div>
               <input type="range" id="focus-duration" min="5" max="60" step="5" value="25" class="slider">
             </div>
+            <p class="text-xs text-gray-400 mt-1">How long each focus session lasts.</p>
           </div>
-          
           <div>
             <div class="flex justify-between mb-2">
               <label for="short-break-duration" class="text-gray-300">Short Break Duration</label>
@@ -508,8 +495,8 @@
               <div class="slider-ticks" id="short-break-duration-ticks"></div>
               <input type="range" id="short-break-duration" min="1" max="15" step="1" value="5" class="slider">
             </div>
+            <p class="text-xs text-gray-400 mt-1">Break time after each focus session.</p>
           </div>
-          
           <div>
             <div class="flex justify-between mb-2">
               <label for="long-break-duration" class="text-gray-300">Long Break Duration</label>
@@ -520,8 +507,8 @@
               <div class="slider-ticks" id="long-break-duration-ticks"></div>
               <input type="range" id="long-break-duration" min="5" max="30" step="5" value="15" class="slider">
             </div>
+            <p class="text-xs text-gray-400 mt-1">Take a longer break after several sessions.</p>
           </div>
-          
           <div>
             <div class="flex justify-between mb-2">
               <label for="sessions-before-long-break" class="text-gray-300">Sessions Before Long Break</label>
@@ -532,149 +519,101 @@
               <div class="slider-ticks" id="sessions-before-long-break-ticks"></div>
               <input type="range" id="sessions-before-long-break" min="2" max="6" step="1" value="4" class="slider">
             </div>
-          </div>
-          
-          <div>
-            <button id="manage-custom-sequences" class="px-4 py-2 bg-indigo-600 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
-              Manage Custom Sequences
-            </button>
+            <p class="text-xs text-gray-400 mt-1">How many focus sessions before a long break.</p>
           </div>
         </div>
       </div>
-      
+      <div class="border-t border-gray-800 my-8"></div>
       <div class="glass-card animated-border rounded-xl p-6 mb-8 settings-section">
-        <h2 class="text-xl font-semibold mb-6">Notification Settings</h2>
-        
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          Notification Settings
+        </h2>
         <div class="space-y-6">
           <div class="flex items-center justify-between">
-            <label for="enable-notifications" class="text-gray-300">Desktop Notifications</label>
-            <label class="toggle-container">
+            <label for="enable-notifications" class="text-gray-300">Desktop Notifications
+              <span class="ml-1 text-xs text-gray-400" title="Show browser notifications when a session ends.">(?)</span>
+            </label>
+            <label class="toggle-container" aria-label="Toggle desktop notifications">
               <input type="checkbox" id="enable-notifications" checked>
-              <span class="toggle-slider"></span>
+              <span class="toggle-slider flex items-center justify-center">
+                <span class="absolute left-2 text-xs font-bold" style="color:#10b981;">On</span>
+                <span class="absolute right-2 text-xs font-bold" style="color:#ef4444;">Off</span>
+              </span>
             </label>
           </div>
-          
           <div class="flex items-center justify-between">
-            <label for="enable-sounds" class="text-gray-300">Sound Effects</label>
-            <label class="toggle-container">
+            <label for="enable-sounds" class="text-gray-300">Sound Effects
+              <span class="ml-1 text-xs text-gray-400" title="Play a sound when a session ends.">(?)</span>
+            </label>
+            <label class="toggle-container" aria-label="Toggle sound effects">
               <input type="checkbox" id="enable-sounds" checked>
-              <span class="toggle-slider"></span>
+              <span class="toggle-slider flex items-center justify-center">
+                <span class="absolute left-2 text-xs font-bold" style="color:#10b981;">On</span>
+                <span class="absolute right-2 text-xs font-bold" style="color:#ef4444;">Off</span>
+              </span>
             </label>
           </div>
-          
           <div>
             <div class="flex justify-between mb-2">
               <label for="volume-control" class="text-gray-300">Sound Volume</label>
               <span id="volume-display" class="text-indigo-400 font-medium">80%</span>
             </div>
-            <div class="slider-container">
-              <div class="slider-progress" id="volume-control-progress"></div>
-              <input type="range" id="volume-control" min="0" max="100" step="10" value="80" class="slider">
+            <div id="volume-grid" class="grid grid-cols-6 gap-2 mt-2 mb-1" aria-label="Sound volume buttons">
+              <!-- Buttons will be generated by JS -->
             </div>
-          </div>
-          
-          <div class="flex items-center justify-between">
-            <label for="enable-background-sync" class="text-gray-300">Background Sync</label>
-            <label class="toggle-container">
-              <input type="checkbox" id="enable-background-sync" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          
-          <div class="flex items-center justify-between">
-            <label for="enable-push-notifications" class="text-gray-300">Push Notifications</label>
-            <label class="toggle-container">
-              <input type="checkbox" id="enable-push-notifications">
-              <span class="toggle-slider"></span>
-            </label>
+            <p class="text-xs text-gray-400 mt-1">Tap a value to set the sound volume.</p>
           </div>
         </div>
       </div>
-      
+      <div class="border-t border-gray-800 my-8"></div>
       <div class="glass-card animated-border rounded-xl p-6 mb-8 settings-section">
-        <h2 class="text-xl font-semibold mb-6">Theme Settings</h2>
-        
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Theme Settings
+        </h2>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div id="theme-dark" class="theme-preview p-4 rounded-lg bg-gray-900 h-32 flex flex-col justify-between active">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-gray-800 mb-2"></div>
+          <div id="theme-dark" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Dark theme" title="Dark theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Dark</span>
           </div>
-          
-          <div id="theme-dim" class="theme-preview p-4 rounded-lg bg-gray-800 h-32 flex flex-col justify-between">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-gray-700 mb-2"></div>
+          <div id="theme-dim" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Dim theme" title="Dim theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Dim</span>
           </div>
-          
-          <div id="theme-purple" class="theme-preview p-4 rounded-lg bg-purple-900 h-32 flex flex-col justify-between">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-purple-800 mb-2"></div>
+          <div id="theme-purple" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Purple theme" title="Purple theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Purple</span>
           </div>
-          
-          <div id="theme-ocean" class="theme-preview p-4 rounded-lg bg-blue-900 h-32 flex flex-col justify-between">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-blue-800 mb-2"></div>
+          <div id="theme-ocean" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Ocean theme" title="Ocean theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Ocean</span>
           </div>
-          
-          <div id="theme-sunset" class="theme-preview p-4 rounded-lg bg-orange-900 h-32 flex flex-col justify-between">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-orange-800 mb-2"></div>
+          <div id="theme-sunset" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Sunset theme" title="Sunset theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Sunset</span>
           </div>
-          
-          <div id="theme-auto" class="theme-preview p-4 rounded-lg bg-gradient-to-r from-gray-900 to-gray-700 h-32 flex flex-col justify-between">
-            <div class="theme-preview-check">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="h-12 rounded bg-gradient-to-r from-gray-900 to-gray-700 mb-2"></div>
+          <div id="theme-auto" class="theme-preview p-4 rounded-lg h-32 flex flex-col justify-between" aria-label="Auto theme" title="Auto (System) theme">
+            <div class="theme-preview-check"></div>
+            <div class="theme-color-box"></div>
             <span class="text-sm">Auto (System)</span>
           </div>
         </div>
       </div>
-      
+      <div class="border-t border-gray-800 my-8"></div>
       <div class="glass-card animated-border rounded-xl p-6 settings-section">
-        <h2 class="text-xl font-semibold mb-6">Data Management</h2>
-        
-        <div class="flex flex-wrap gap-4">
-          <button id="export-settings" class="px-4 py-2 bg-indigo-600 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
-            Export Settings
-          </button>
-          
-          <button id="import-settings" class="px-4 py-2 bg-gray-700 rounded-lg text-white hover:bg-gray-600 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
-            Import Settings
-          </button>
-          
-          <button id="reset-settings" class="px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
-            Reset to Default
-          </button>
-        </div>
-        
-        <input type="file" id="import-file" class="hidden" accept=".json">
+        <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          Data Management
+        </h2>
+        <button id="reset-settings" class="px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 w-full">
+          Reset to Default
+        </button>
       </div>
     </div>
   </main>
@@ -711,78 +650,38 @@
   <script src="js/storage.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/custom-sequences.js"></script>
+  <script src="js/animations.js"></script>
   <script>
-    // Create animated background bubbles
-    document.addEventListener('DOMContentLoaded', () => {
-      createAnimatedBackground();
-      
-      // Initialize active nav link
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.injectAnimatedBackground) injectAnimatedBackground();
+      // Nav-bar entrance animation
+      if (window.gsap) {
+        gsap.from('#main-navbar', { y: -60, opacity: 0, duration: 0.7, ease: 'power2.out' });
+      }
+      // Theme toggle logic
+      const themeSwitch = document.getElementById('theme-switch');
+      let currentTheme = localStorage.getItem('pomodoro-theme') || 'dark';
+      function updateToggleUI(theme) {
+        themeSwitch.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+      }
+      updateToggleUI(currentTheme);
+      themeSwitch.addEventListener('click', function() {
+        currentTheme = (currentTheme === 'dark') ? 'dim' : 'dark';
+        window.setAndApplyTheme(currentTheme);
+        updateToggleUI(currentTheme);
+      });
+      // Active nav link highlight
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-          const line = link.querySelector('span');
-          if (line) {
-            line.classList.remove('scale-x-0');
-            line.classList.add('scale-x-100');
-          }
-        });
-        
-        link.addEventListener('mouseleave', () => {
-          const line = link.querySelector('span');
-          if (line && !link.hasAttribute('aria-current')) {
-            line.classList.remove('scale-x-100');
-            line.classList.add('scale-x-0');
-          }
-        });
+        if (window.location.pathname.endsWith(link.getAttribute('href'))) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
       });
-      
       // Initialize sliders
       initSliders();
     });
-    
-    function createAnimatedBackground() {
-      const background = document.getElementById('animated-background');
-      if (!background) return;
-      
-      // Check if user prefers reduced motion
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        return;
-      }
-      
-      for (let i = 0; i < 15; i++) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('floating-bubble');
-        
-        // Random size between 50px and 200px
-        const size = Math.floor(Math.random() * 150) + 50;
-        bubble.style.width = `${size}px`;
-        bubble.style.height = `${size}px`;
-        
-        // Random position
-        bubble.style.left = `${Math.random() * 100}%`;
-        bubble.style.top = `${Math.random() * 100}%`;
-        
-        // Random animation properties
-        bubble.style.setProperty('--duration', `${Math.random() * 20 + 15}s`);
-        bubble.style.setProperty('--delay', `-${Math.random() * 10}s`);
-        
-        // Random movement patterns
-        bubble.style.setProperty('--x1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x3', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y3', `${(Math.random() - 0.5) * 200}px`);
-        
-        // Random scale changes
-        bubble.style.setProperty('--scale1', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale2', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale3', `${Math.random() * 0.5 + 0.7}`);
-        
-        // Add to background
-        background.appendChild(bubble);
-      }
-    }
     
     function initSliders() {
       // Focus duration slider
@@ -965,6 +864,13 @@
         volumeControlSlider.addEventListener('input', updateVolumeControl);
         updateVolumeControl();
       }
+    }
+
+    function setupVolumeGrid(selectedVolume, enabled) {
+      const volumeGrid = document.getElementById('volume-grid');
+      console.log('setupVolumeGrid called. volumeGrid:', volumeGrid);
+      if (!volumeGrid) return;
+      // ...rest of the function...
     }
   </script>
 </body>

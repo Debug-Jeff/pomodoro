@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
   enableNotifications: true,
   enableSounds: true,
   volume: 80,
-  theme: 'dark' // 'dark', 'dim', or 'auto'
+  theme: 'dark' 
 };
 
 // Utility functions
@@ -194,12 +194,87 @@ function initLandingPage() {
   }
 }
 
+function setAndApplyTheme(theme) {
+  document.body.classList.remove('theme-dark', 'theme-dim', 'theme-purple', 'theme-ocean', 'theme-sunset');
+  document.body.classList.add('theme-' + theme);
+  localStorage.setItem('pomodoro-theme', theme);
+}
+window.setAndApplyTheme = setAndApplyTheme;
+
 // Initialize app on DOM content loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Set active navigation link
   setActiveNavLink();
-  
-  // Apply theme from settings
-  const settings = JSON.parse(localStorage.getItem(`${APP_NAME}_settings`)) || DEFAULT_SETTINGS;
-  applyTheme(settings.theme);
+  // Apply theme from localStorage (pomodoro-theme)
+  const theme = localStorage.getItem('pomodoro-theme') || 'dark';
+  setAndApplyTheme(theme);
+
+  // Pop-out timer logic (Removed - handled in js/timer.js)
+  // const popOutBtn = document.getElementById('pop-out-btn');
+  // const popOutTimer = document.getElementById('pop-out-timer');
+  // const closePopOut = document.getElementById('close-pop-out');
+  // if (popOutBtn && popOutTimer && closePopOut) {
+  //   popOutBtn.addEventListener('click', function() {
+  //     popOutTimer.classList.remove('hidden');
+  //     popOutTimer.classList.add('animate__fadeIn');
+  //   });
+  //   closePopOut.addEventListener('click', function() {
+  //     popOutTimer.classList.add('hidden');
+  //     popOutTimer.classList.remove('animate__fadeIn');
+  //   });
+  // }
+  // if (popOutTimer) popOutTimer.classList.add('hidden');
+
+  // Animated Quotes logic
+  const quotes = [
+    "Stay focused and never give up.",
+    "Small steps every day lead to big results.",
+    "Breaks are part of the process, not a distraction.",
+    "You are capable of amazing things.",
+    "Discipline is the bridge between goals and accomplishment.",
+    "Progress, not perfection.",
+    "The secret of getting ahead is getting started.",
+    "Your future is created by what you do today."
+  ];
+  let quoteIndex = 0;
+  const quoteText = document.getElementById('quote-text');
+  function showQuote(index) {
+    if (!quoteText) return;
+    quoteText.style.opacity = 0;
+    setTimeout(() => {
+      quoteText.textContent = quotes[index];
+      quoteText.style.opacity = 1;
+    }, 400);
+  }
+  function nextQuote() {
+    quoteIndex = (quoteIndex + 1) % quotes.length;
+    showQuote(quoteIndex);
+  }
+  if (quoteText) {
+    showQuote(quoteIndex);
+    setInterval(nextQuote, 10000);
+  }
+
+  // Timer pulse animation helper
+  window.pulseTimerDisplay = function() {
+    const timerDisplay = document.getElementById('timer-display');
+    if (timerDisplay) {
+      timerDisplay.classList.add('animate-timer-pulse');
+      setTimeout(() => timerDisplay.classList.remove('animate-timer-pulse'), 350);
+    }
+  };
 });
+
+// Timer pulse animation CSS
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes timer-pulse-anim {
+  0% { text-shadow: 0 0 0 #6366f1, 0 0 0 #fff; }
+  50% { text-shadow: 0 0 12px #6366f1, 0 0 8px #fff; }
+  100% { text-shadow: 0 0 0 #6366f1, 0 0 0 #fff; }
+}
+.animate-timer-pulse {
+  animation: timer-pulse-anim 0.35s cubic-bezier(.4,0,.2,1);
+}
+`;
+document.head.appendChild(style);

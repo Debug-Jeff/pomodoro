@@ -24,9 +24,9 @@ async function initAudio() {
     
     // Load sound files
     await Promise.all([
-      loadSound('start', 'assets/sounds/start.wav'),
-      loadSound('break', 'assets/sounds/break.wav'),
-      loadSound('complete', 'assets/sounds/complete.wav')
+      loadSound('start', 'assets/audio/intro-transition.wav'),
+      loadSound('break', 'assets/audio/retro-game-notification.wav'),
+      loadSound('complete', 'assets/audio/classic-alarm.wav')
     ]);
     
     return true;

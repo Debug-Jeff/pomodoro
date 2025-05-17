@@ -36,15 +36,9 @@ const popStartBtn = document.getElementById('pop-start-btn');
 const popResetBtn = document.getElementById('pop-reset-btn');
 const closePopOutBtn = document.getElementById('close-pop-out');
 
-// Get settings from localStorage
-function getSettings() {
-  const settings = JSON.parse(localStorage.getItem(`${APP_NAME}_settings`)) || DEFAULT_SETTINGS;
-  return settings;
-}
-
 // Initialize timer
 function initTimer() {
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   
   // Set initial timer duration based on mode
   timerState.sessionsUntilLongBreak = settings.sessionsBeforeLongBreak;
@@ -124,12 +118,12 @@ function initTimer() {
 // Make an element draggable
 function makeElementDraggable(element) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  
-  element.addEventListener('mousedown', dragMouseDown);
+  const header = element.querySelector('.pop-out-header') || element;
+  header.style.cursor = 'move';
+  header.addEventListener('mousedown', dragMouseDown);
   
   function dragMouseDown(e) {
     e.preventDefault();
-    // Get the mouse cursor position at startup
     pos3 = e.clientX;
     pos4 = e.clientY;
     document.addEventListener('mouseup', closeDragElement);
@@ -138,18 +132,15 @@ function makeElementDraggable(element) {
   
   function elementDrag(e) {
     e.preventDefault();
-    // Calculate the new cursor position
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // Set the element's new position
     element.style.top = (element.offsetTop - pos2) + "px";
     element.style.left = (element.offsetLeft - pos1) + "px";
   }
   
   function closeDragElement() {
-    // Stop moving when mouse button is released
     document.removeEventListener('mouseup', closeDragElement);
     document.removeEventListener('mousemove', elementDrag);
   }
@@ -269,7 +260,7 @@ function switchMode(mode) {
   }
   
   timerState.mode = mode;
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   
   // Set time based on mode
   switch (mode) {
@@ -410,9 +401,9 @@ function startTimer() {
     requestAnimationFrame(updateTimer);
     
     // Add pulse animation to timer
-    if (timerContainer && window.gsap) {
-      timerContainer.classList.add('timer-pulse');
-    }
+    // if (timerContainer && window.gsap) {
+    //   timerContainer.classList.add('timer-pulse');
+    // }
   }
 }
 
@@ -423,9 +414,9 @@ function stopTimer() {
   timerState.timerId = null;
   
   // Remove pulse animation
-  if (timerContainer) {
-    timerContainer.classList.remove('timer-pulse');
-  }
+  // if (timerContainer) {
+  //   timerContainer.classList.remove('timer-pulse');
+  // }
 }
 
 // Reset the timer
@@ -457,7 +448,7 @@ function updateTimer(timestamp) {
 
 // Get total duration for current mode
 function getTimerDuration() {
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   switch (timerState.mode) {
     case 'focus':
       return settings.focusDuration * 60;
@@ -477,6 +468,7 @@ function updateTimerDisplay() {
   
   if (timerDisplay) {
     timerDisplay.textContent = formatTime(minutes, seconds);
+    if (window.pulseTimerDisplay) window.pulseTimerDisplay();
   }
   
   // Update document title
@@ -491,7 +483,8 @@ function updateTimerProgress() {
   const progress = timerState.timeRemaining / totalDuration;
   const circumference = 2 * Math.PI * 45; // 2πr where r=45
   
-  timerProgress.style.strokeDashoffset = circumference * (1 - progress);
+  // Call animateTimerRing to use GSAP for smooth animation
+  animateTimerRing(circumference * (1 - progress));
 }
 
 // Reset timer progress circle
@@ -507,7 +500,7 @@ function timerComplete() {
   stopTimer();
   
   // Play sound
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   if (settings.enableSounds) {
     playSound(timerState.mode === 'focus' ? 'complete' : 'break');
   }
@@ -594,7 +587,7 @@ function saveSession() {
   sessions.push(session);
   
   // Save back to localStorage
-  localStorage.setItem(`${APP_NAME}_sessions`, JSON.stringify(sessions));
+  saveData('sessions', sessions);
   
   // Update streak data
   updateStreak();
@@ -637,7 +630,7 @@ function updateStreak() {
   }
   
   // Save back to localStorage
-  localStorage.setItem(`${APP_NAME}_streak`, JSON.stringify(streakData));
+  saveData('streak', streakData);
 }
 
 // Load and display completed sessions for today
@@ -667,8 +660,34 @@ document.addEventListener('DOMContentLoaded', () => {
   initTimer();
   
   // Request notification permission if enabled in settings
-  const settings = getSettings();
+  const settings = loadData('settings', SCHEMAS.settings);
   if (settings.enableNotifications) {
     requestNotificationPermission();
   }
 });
+
+// Listen for storage changes to settings and update timer
+window.addEventListener('storage', function(event) {
+  if (event.key === `${APP_NAME}_settings`) {
+    // Reload settings and update timer durations and theme
+    const settings = loadData('settings', SCHEMAS.settings);
+    timerState.sessionsUntilLongBreak = settings.sessionsBeforeLongBreak;
+    // If timer is not running, update the current mode duration
+    if (!timerState.isRunning) {
+      switchMode(timerState.mode);
+    }
+    // Apply theme
+    if (window.setAndApplyTheme) window.setAndApplyTheme(settings.theme);
+  }
+});
+
+// In your timer tick/update logic, replace direct timerDisplay.textContent = ... with updateTimerDisplay(...)
+// For timer ring animation, if using GSAP:
+function animateTimerRing(progress) {
+  const ring = document.getElementById('timer-progress');
+  if (ring && window.gsap) {
+    gsap.to(ring, { strokeDashoffset: progress, duration: 0.5, ease: 'power1.out' });
+  } else if (ring) {
+    ring.style.strokeDashoffset = progress;
+  }
+}

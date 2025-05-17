@@ -1,4 +1,4 @@
-s/**
+/**
  * Dashboard functionality for the Pomodoro app
  * Handles statistics and data visualization
  */
@@ -178,8 +178,9 @@ function loadRecentSessions() {
     return;
   }
   
-  // Get all sessions
+  // Get all sessions and tasks
   const allSessions = loadData('sessions', []);
+  const allTasks = loadData('tasks', []);
   
   // Sort by timestamp (newest first)
   const sortedSessions = allSessions
@@ -195,7 +196,7 @@ function loadRecentSessions() {
     const emptyRow = document.createElement('tr');
     emptyRow.className = 'text-gray-300 border-b border-gray-800';
     emptyRow.innerHTML = `
-      <td class="py-3" colspan="4">No sessions recorded yet.</td>
+      <td class="py-3" colspan="5">No sessions recorded yet.</td>
     `;
     sessionsTableElement.appendChild(emptyRow);
   } else {
@@ -213,11 +214,16 @@ function loadRecentSessions() {
         'longBreak': 'Long Break'
       }[session.mode] || session.mode;
       
+      // Find the associated task
+      const associatedTask = allTasks.find(task => task.id === session.taskId);
+      const taskTitle = associatedTask ? associatedTask.text : 'N/A';
+      
       row.innerHTML = `
         <td class="py-3">${formattedDate}</td>
         <td class="py-3">${formattedTime}</td>
         <td class="py-3">${modeLabel}</td>
         <td class="py-3">${session.duration} min</td>
+        <td class="py-3">${taskTitle}</td>
       `;
       
       sessionsTableElement.appendChild(row);
@@ -227,3 +233,10 @@ function loadRecentSessions() {
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', initDashboard);
+
+// Listen for storage changes to update dashboard live
+window.addEventListener('storage', function(event) {
+  if (event.key === `${APP_NAME}_sessions` || event.key === `${APP_NAME}_streak`) {
+    initDashboard();
+  }
+});

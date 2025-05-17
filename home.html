@@ -11,73 +11,17 @@
   <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <link rel="stylesheet" href="css/animated-background.css">
   <style>
     .glass-card {
       background: rgba(17, 25, 40, 0.75);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       position: relative;
       overflow: hidden;
-    }
-    
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-      );
-      transition: 0.5s;
-      pointer-events: none;
-    }
-    
-    .glass-card:hover::before {
-      left: 100%;
-    }
-    
-    .animated-border {
-      position: relative;
-    }
-    
-    .animated-border::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(
-        45deg,
-        #6366F1,
-        #8B5CF6,
-        #EC4899,
-        #6366F1
-      );
-      background-size: 300% 300%;
-      -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      animation: border-rotate 4s linear infinite;
-    }
-    
-    @keyframes border-rotate {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 130% 50%;
-      }
     }
     
     body {
@@ -91,19 +35,6 @@
       transform: rotate(-90deg);
       transform-origin: center;
       transition: stroke-dashoffset 1s linear;
-    }
-    
-    .timer-pulse {
-      animation: timer-pulse 1s infinite alternate;
-    }
-    
-    @keyframes timer-pulse {
-      0% {
-        transform: scale(1);
-      }
-      100% {
-        transform: scale(1.03);
-      }
     }
     
     .floating-bubble {
@@ -208,32 +139,134 @@
     }
     
     .task-item {
-      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      background: rgba(24, 28, 40, 0.85);
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.06);
+      border-left: 6px solid transparent;
+      transition: background 0.3s, border-color 0.3s;
+      min-height: 56px;
     }
-    
     .task-item.completed {
-      text-decoration: line-through;
-      opacity: 0.6;
+      background: rgba(34,197,94,0.13) !important;
+      border-left: 8px solid #22c55e !important;
+    }
+    .task-item .task-text {
+      font-size: 1.08rem;
+      color: #e0e7ef;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: color 0.3s;
+    }
+    .task-item.completed .task-text {
+      color: #22c55e;
+      font-weight: 600;
+    }
+    .task-checkbox:checked {
+      accent-color: #22c55e;
     }
     
     .task-item:hover {
-      transform: translateX(5px);
+      /* transform: translateX(5px); */ /* Remove or comment out the problematic transform */
+      position: relative; /* Add relative positioning */
+      left: 5px; /* Use left property for subtle shift */
     }
     
     .pop-out-timer {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 40px;
+      right: 40px;
       z-index: 100;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
+      width: 320px;
+      min-height: 160px;
+      border-radius: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+      background: rgba(24, 28, 40, 0.85);
+      border: 1.5px solid rgba(99,102,241,0.12);
+      padding: 0;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: box-shadow 0.2s;
+    }
+    .pop-out-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+      cursor: move;
+      background: rgba(30, 41, 59, 0.92);
+      border-radius: 1.25rem 1.25rem 0 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fff;
+      border-bottom: 1px solid rgba(99,102,241,0.10);
+    }
+    .pop-out-header button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: #a3a3a3;
+      transition: color 0.2s;
+    }
+    .pop-out-header button:hover {
+      color: #fff;
+    }
+    .pop-out-content {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      cursor: move;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      padding: 1.5rem 1rem 1rem 1rem;
+      gap: 0.5rem;
+    }
+    .pop-timer-display {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #fff;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      text-shadow: 0 2px 8px rgba(99,102,241,0.10);
+    }
+    .pop-timer-label {
+      font-size: 1rem;
+      color: #a3a3a3;
+      margin-bottom: 0.5rem;
+    }
+    .pop-timer-controls {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .pop-timer-controls button {
+      padding: 0.5rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      background: linear-gradient(90deg, #6366F1 60%, #8B5CF6 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.10);
+      transition: background 0.2s, transform 0.1s;
+    }
+    .pop-timer-controls button:last-child {
+      background: #23272f;
+      color: #fff;
+    }
+    .pop-timer-controls button:hover {
+      transform: translateY(-2px) scale(1.04);
+      background: linear-gradient(90deg, #6366F1 80%, #EC4899 100%);
     }
     
     .time-edit-input {
@@ -295,84 +328,163 @@
   .nav-link:hover {
     transform: scaleX(1);
   }
+  
+  /* Nav-link rectangle animation */
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+  }
+  .nav-link:hover, .nav-link:focus, .nav-link[aria-current="page"] {
+    border-color: rgba(99,102,241,0.5);
+    background: rgba(99,102,241,0.08);
+  }
+  .nav-link .nav-underline { display: none !important; }
+  .nav-link[aria-current="page"] span {
+    color: #fff !important;
+    font-weight: bold;
+  }
+  /* Styles for the new theme select dropdown */
+  .glass-dropdown {
+    background: rgba(24, 24, 27, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e0e7ef;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.2s ease-in-out;
+  }
+  .glass-dropdown:hover {
+     border-color: rgba(99,102,241,0.5);
+  }
+  .glass-dropdown:focus {
+    border-color: rgba(99,102,241,0.8);
+    box-shadow: 0 0 0 2px rgba(99,102,241,0.4);
+  }
+  .glass-dropdown option {
+      background: #1a202c; /* Dark background for options */
+      color: #e0e7ef; /* Light text for options */
+  }
+  /* Custom scrollbar for task list */
+  #task-list {
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 #23272f;
+  }
+  #task-list::-webkit-scrollbar {
+    width: 8px;
+    background: #23272f;
+    border-radius: 8px;
+  }
+  #task-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #6366f1 60%, #8b5cf6 100%);
+    border-radius: 8px;
+    min-height: 24px;
+  }
+  #task-list:hover::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #6366f1 80%, #8b5cf6 100%);
+  }
+  /* Center cards vertically and equal spacing */
+  .grid-cols-1.md\:grid-cols-3 > div { display: flex; flex-direction: column; justify-content: center; }
+  /* Timer mode selector improvements */
+  .mode-btn {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    background: none;
+    color: #fff;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .mode-btn[aria-pressed="true"] {
+    background: linear-gradient(90deg, #6366f1 60%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.10);
+  }
+  .mode-btn:not([aria-pressed="true"]):hover {
+    background: rgba(99,102,241,0.08);
+    color: #c7d2fe;
+  }
+  /* Animated underline for active mode */
+  .mode-btn[aria-pressed="true"]::after {
+    content: '';
+    display: block;
+    margin: 0 auto;
+    width: 60%;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #6366f1 60%, #8b5cf6 100%);
+    margin-top: 0.25rem;
+    animation: underlineIn 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes underlineIn {
+    from { width: 0; opacity: 0; }
+    to { width: 60%; opacity: 1; }
+  }
+  @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .animate-bounce-slow { animation: bounce-slow 2.8s infinite; }
+  .quote-anim { transition: opacity 0.7s, transform 0.7s; }
+  .timer-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .timer-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 70%);
+    animation: rotate-bg 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes rotate-bg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  /* Glow effect for timer display when running */
+  .timer-pulse #timer-display { animation: none; }
   </style>
 </head>
 <body class="min-h-screen text-white flex flex-col theme-dark">
-  <!-- Animated background -->
-  <div id="animated-background" aria-hidden="true"></div>
-  
-  <!-- Page transition overlay -->
-  <div id="page-transition" class="page-transition"></div>
-  
   <!-- Navigation -->
-<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 shadow-lg" id="main-navbar">
   <div class="max-w-6xl mx-auto px-4">
     <div class="flex justify-between items-center h-16">
-      <!-- Logo - Simplified version -->
+      <!-- Logo -->
       <a href="index.html" class="flex items-center group">
         <div class="flex flex-col">
           <span class="text-2xl font-bold text-white tracking-tight">POMODORO</span>
           <span class="text-xs text-white text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
         </div>
       </a>
-
-      <!-- Navigation Links - Minimalist style -->
+      <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
-        <a href="home.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
           <span class="text-white text-opacity-90 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Timer</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Dashboard</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
-        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg">
+        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
           <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Settings</span>
-          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+          <div class="nav-underline"></div>
         </a>
       </div>
-
-      <!-- Theme Toggle - Simplified -->
-<div class="relative group ml-4">
-        <button id="theme-toggle" class="flex items-center justify-center w-9 h-9 rounded-full bg-white bg-opacity-10 hover:bg-opacity-20 transition-all duration-300 focus:outline-none overflow-hidden relative">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
-          </svg>
-          <span class="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 opacity-20"></span>
-        </button>
-        
-        <!-- Theme Selector Dropdown -->
-        <div id="theme-dropdown" class="absolute right-0 mt-2 w-48 glass-card border border-white border-opacity-10 rounded-lg shadow-lg z-50 transform scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 origin-top-right">
-          <div class="p-3 space-y-2">
-            <h3 class="text-white text-sm font-medium mb-2">Select Theme</h3>
-            
-            <button data-theme="theme-dark" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dark</span>
-            </button>
-            
-            <button data-theme="theme-dim" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-800 to-blue-900 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Dim</span>
-            </button>
-            
-            <button data-theme="theme-purple" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-900 to-violet-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Purple</span>
-            </button>
-            
-            <button data-theme="theme-ocean" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-900 to-cyan-700 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Ocean</span>
-            </button>
-            
-            <button data-theme="theme-sunset" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
-              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-orange-500 mr-3 border border-white border-opacity-20"></div>
-              <span class="text-white text-sm">Sunset</span>
-            </button>
-
-
-      <!-- Mobile menu button -->
+      <!-- Theme Selection Dropdown -->
+      <div class="relative group ml-4">
+        <select id="theme-select" class="p-2 rounded-md bg-black/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 glass-dropdown">
+          <option value="dark">Dark</option>
+          <option value="dim">Dim</option>
+          <option value="purple">Purple</option>
+          <option value="ocean">Ocean</option>
+          <option value="sunset">Sunset</option>
+        </select>
+      </div>
+      <!-- Mobile menu button (optional, can be improved in next steps) -->
       <button class="md:hidden text-white focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -380,113 +492,97 @@
       </button>
     </div>
   </div>
-
-  <!-- Subtle bottom border -->
   <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
 </nav>
 
   <!-- Main content -->
-  <main class="flex-grow flex flex-col md:flex-row pt-20 pb-10 px-4">
-    <!-- Timer section -->
-    <div class="md:w-1/2 flex items-center justify-center p-4">
-      <div class="glass-card animated-border rounded-3xl p-8 max-w-md w-full mx-auto">
-        <!-- Timer mode selector -->
-        <div class="flex justify-center mb-8 bg-black bg-opacity-30 rounded-full p-1">
-          <button id="focus-btn" class="mode-btn flex-1 py-2 px-4 rounded-full text-center text-white bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300" aria-pressed="true">Focus</button>
-          <button id="short-break-btn" class="mode-btn flex-1 py-2 px-4 rounded-full text-center text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300">Short Break</button>
-          <button id="long-break-btn" class="mode-btn flex-1 py-2 px-4 rounded-full text-center text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300">Long Break</button>
-        </div>
-        
-        <!-- Custom sequence selector (hidden by default) -->
-        <div id="custom-sequence-selector" class="hidden mb-8">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="text-lg font-medium">Custom Sequence</h3>
-            <button id="edit-sequence-btn" class="text-sm text-indigo-300 hover:text-indigo-200 transition-colors">Edit</button>
-          </div>
-          <div id="sequence-steps" class="flex overflow-x-auto pb-2 space-x-2">
-            <!-- Sequence steps will be populated by JavaScript -->
-          </div>
-        </div>
-        
-        <!-- Timer display -->
-        <div class="relative flex justify-center items-center mb-8">
-          <svg class="w-64 h-64" viewBox="0 0 100 100">
-            <!-- Background circle -->
-            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
-            <!-- Progress circle -->
-            <circle id="timer-progress" class="timer-ring" cx="50" cy="50" r="45" fill="none" stroke="rgb(var(--primary))" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="0" />
-          </svg>
-          <div id="timer-container" class="absolute flex flex-col items-center">
-            <div id="timer-display-container" class="cursor-pointer" title="Click to edit time">
-              <span id="timer-display" class="text-6xl font-bold">25:00</span>
-              <input type="text" id="timer-edit" class="time-edit-input hidden" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="25:00" maxlength="5">
+  <main class="z-10 flex-grow flex flex-col items-center pt-20 pb-2 px-4 min-h-[calc(100vh-64px)]">
+    <div class="w-full max-w-6xl flex flex-col md:grid md:grid-cols-3 gap-6 items-start justify-start h-full">
+      <!-- Quotes/Quick Tips Column -->
+      <div class="flex flex-col items-center justify-center h-full">
+        <div class="glass-card animated-border rounded-2xl p-6 w-full max-w-xs flex flex-col items-center justify-start h-full motivation-card relative overflow-hidden shadow-xl">
+          <div class="absolute top-0 left-0 w-full h-full pointer-events-none" style="background: radial-gradient(circle at 70% 20%, rgba(139,92,246,0.10) 0%, transparent 70%);"></div>
+          <div class="flex flex-col items-center z-10 flex-grow">
+            <div class="mb-2 animate-bounce-slow">
+              <svg class="h-10 w-10 text-indigo-400 opacity-80 drop-shadow-lg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             </div>
-            <span id="timer-label" class="text-xl text-gray-300 mt-2">Focus Time</span>
+            <h3 class="text-lg font-semibold mb-2 text-indigo-300 tracking-wide">Motivation</h3>
+            <div id="quote-text" class="text-base text-gray-200 text-center opacity-0 transition-all duration-700 transform translate-y-2 quote-anim" style="font-family: 'Georgia', serif; letter-spacing: 0.01em;"></div>
           </div>
-        </div>
-        
-        <!-- Timer controls -->
-        <div class="flex justify-center space-x-4">
-          <button id="start-btn" class="px-6 py-3 bg-indigo-600 rounded-full text-white font-medium hover:bg-indigo-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" aria-label="Start timer">
-            Start
-          </button>
-          <button id="reset-btn" class="px-6 py-3 bg-gray-700 rounded-full text-white font-medium hover:bg-gray-600 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" aria-label="Reset timer">
-            Reset
-          </button>
-        </div>
-        
-        <!-- Pop-out option -->
-        <div class="mt-6 flex justify-center">
-          <button id="pop-out-btn" class="flex items-center text-sm text-gray-300 hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            Pop-out Timer
-          </button>
-        </div>
-        
-        <!-- Session counter -->
-        <div class="mt-6 text-center">
-          <p class="text-gray-300">Completed today: <span id="completed-count" class="font-bold">0</span></p>
         </div>
       </div>
-    </div>
-    
-    <!-- Tasks section -->
-    <div class="md:w-1/2 p-4 mt-8 md:mt-0">
-      <div class="glass-card animated-border rounded-3xl p-8 max-w-md w-full mx-auto">
-        <h2 class="text-2xl font-bold mb-6">Current Tasks</h2>
-        
-        <!-- Add task form -->
-        <form id="add-task-form" class="mb-6">
-          <div class="flex">
-            <input type="text" id="task-input" placeholder="What are you working on?" class="flex-grow px-4 py-2 bg-black bg-opacity-30 rounded-l-lg border-0 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <button type="submit" class="px-4 py-2 bg-indigo-600 rounded-r-lg text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              Add
-            </button>
+      <!-- Timer Column -->
+      <div class="flex flex-col items-center justify-start h-full">
+        <div class="glass-card animated-border rounded-3xl p-6 w-full max-w-md flex flex-col items-center justify-between h-full timer-card">
+          <!-- Timer mode selector -->
+          <div class="flex justify-center mb-6 bg-black bg-opacity-30 rounded-full p-0.5 w-full max-w-[280px]">
+            <button id="focus-btn" class="mode-btn flex-1 py-1.5 px-3 rounded-full text-center text-white bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300" aria-pressed="true">Focus</button>
+            <button id="short-break-btn" class="mode-btn flex-1 py-1.5 px-3 rounded-full text-center text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300">Short Break</button>
+            <button id="long-break-btn" class="mode-btnflex-1 py-1.5 px-3 rounded-full text-center text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 transition-all duration-300">Long Break</button>
           </div>
-        </form>
-        
-        <!-- Task list -->
-        <div id="task-list" class="space-y-2 max-h-96 overflow-y-auto pr-2">
-          <!-- Tasks will be populated by JavaScript -->
-          <div class="task-item flex items-center justify-between p-3 bg-black bg-opacity-30 rounded-lg">
-            <div class="flex items-center">
-              <input type="checkbox" class="task-checkbox mr-3 h-5 w-5 rounded border-gray-600 text-indigo-600 focus:ring-indigo-500">
-              <span class="task-text">Complete project proposal</span>
+          <!-- Timer display -->
+          <div class="relative flex justify-center items-center mb-6 flex-grow">
+            <svg class="w-56 h-56" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" />
+              <circle id="timer-progress" class="timer-ring" cx="50" cy="50" r="45" fill="none" stroke="rgb(var(--primary))" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="0" />
+            </svg>
+            <div id="timer-container" class="absolute flex flex-col items-center">
+              <div id="timer-display-container" class="cursor-pointer" title="Click to edit time">
+                <span id="timer-display" class="text-6xl font-bold">25:00</span>
+                <input type="text" id="timer-edit" class="time-edit-input hidden text-6xl" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="25:00" maxlength="5">
+              </div>
+              <span id="timer-label" class="text-xl text-gray-300 mt-2">Focus Time</span>
             </div>
-            <button class="task-delete text-gray-400 hover:text-red-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </div>
+          <!-- Timer controls -->
+          <div class="flex justify-center space-x-4 mb-6">
+            <button id="start-btn" class="px-8 py-3 bg-indigo-600 rounded-full text-white font-bold text-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" aria-label="Start timer">Start</button>
+            <button id="reset-btn" class="px-8 py-3 bg-gray-700 rounded-full text-white font-bold text-lg hover:bg-gray-600 transition-all duration-300 hover:scale-none focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" aria-label="Reset timer">Reset</button>
+          </div>
+          <!-- Today's Progress & Session Counter -->
+          <div class="w-full flex flex-col items-center mb-6">
+            <div class="w-full bg-black bg-opacity-40 rounded-xl p-3 flex flex-col items-center mb-2">
+              <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-sm text-gray-300">Today's Progress</span>
+                <span class="text-sm text-indigo-400 font-bold" id="progress-label">0/4></span>
+              </div>
+              <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-gray-300 text-sm">Completed today: <span id="completed-count" class="font-bold">0</span></p>
+            </div>
+          </div>
+          <!-- Pop-out option -->
+          <div class="flex justify-center">
+            <button id="pop-out-btn" class="flex items-center text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 rounded-full shadow-lg hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
+              Pop-out Timer
             </button>
           </div>
         </div>
-        
-        <!-- Task stats -->
-        <div class="mt-6 pt-4 border-t border-gray-700">
-          <div class="flex justify-between text-sm text-gray-400">
-            <span>Completed: <span id="completed-tasks">0</span>/<span id="total-tasks">1</span></span>
+      </div>
+      <!-- Tasks Column -->
+      <div class="flex flex-col items-center justify-center h-full">
+        <div class="glass-card animated-border rounded-3xl p-6 w-full max-w-md flex flex-col h-full">
+          <h2 class="text-xl font-bold mb-4">Current Tasks</h2>
+          <!-- Add task form -->
+          <form id="add-task-form" class="mb-4">
+            <div class="flex">
+              <input type="text" id="task-input" placeholder="What are you working on?" class="flex-grow px-3 py-2 bg-black bg-opacity-30 rounded-l-lg border-0 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button type="submit" class="px-3 py-2 bg-indigo-600 rounded-r-lg text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500">Add</button>
+            </div>
+          </form>
+          <!-- Task list: vertical scroll -->
+          <div id="task-list" class="flex flex-col gap-y-3 min-h-[220px] flex-grow overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-800">
+            <!-- Tasks will be populated by JavaScript -->
+          </div>
+          <!-- Task stats -->
+          <div class="mt-4 pt-2 border-t border-gray-700 text-xs flex justify-between text-gray-400">
+            <span>Completed: <span id="completed-tasks">0</span>/<span id="total-tasks">0</span></span>
             <button id="clear-completed-btn" class="text-indigo-400 hover:text-indigo-300 transition-colors">Clear completed</button>
           </div>
         </div>
@@ -495,23 +591,22 @@
   </main>
   
   <!-- Pop-out timer (hidden by default) -->
-  <div id="pop-out-timer" class="glass-card animated-border pop-out-timer hidden">
-    <div class="absolute top-2 right-2">
-      <button id="close-pop-out" class="text-gray-400 hover:text-white transition-colors">
+  <div id="pop-out-timer" class="glass-card pop-out-timer hidden">
+    <div class="pop-out-header">
+      <span>Floating Timer</span>
+      <button id="close-pop-out" aria-label="Close floating timer">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
-    <span id="pop-timer-display" class="text-4xl font-bold">25:00</span>
-    <span id="pop-timer-label" class="text-sm text-gray-300 mt-1">Focus Time</span>
-    <div class="mt-3 flex space-x-2">
-      <button id="pop-start-btn" class="px-3 py-1 bg-indigo-600 rounded-full text-white text-sm hover:bg-indigo-700 transition-colors">
-        Start
-      </button>
-      <button id="pop-reset-btn" class="px-3 py-1 bg-gray-700 rounded-full text-white text-sm hover:bg-gray-600 transition-colors">
-        Reset
-      </button>
+    <div class="pop-out-content">
+      <span id="pop-timer-display" class="pop-timer-display">25:00</span>
+      <span id="pop-timer-label" class="pop-timer-label">Focus Time</span>
+      <div class="pop-timer-controls">
+        <button id="pop-start-btn">Start</button>
+        <button id="pop-reset-btn">Reset</button>
+      </div>
     </div>
   </div>
   
@@ -560,108 +655,45 @@
   <script src="js/storage.js"></script>
   <script src="js/tasks.js"></script>
   <script src="js/custom-sequences.js"></script>
+  <script src="js/animations.js"></script>
   <script>
-    // Create animated background bubbles
-    document.addEventListener('DOMContentLoaded', () => {
-      //createAnimatedBackground();
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.injectAnimatedBackground) injectAnimatedBackground();
+      if (window.gsap) {
+        gsap.from('#main-navbar', { y: -60, opacity: 0, duration: 0.7, ease: 'power2.out' });
+      }
+      // Theme selection dropdown logic
+      const themeSelect = document.getElementById('theme-select');
+      let currentTheme = localStorage.getItem('pomodoro-theme') || 'dark';
       
-      // Initialize active nav link
+      // Set initial dropdown value
+      if (themeSelect) {
+          themeSelect.value = currentTheme;
+          themeSelect.addEventListener('change', function() {
+              currentTheme = this.value;
+              window.setAndApplyTheme(currentTheme);
+          });
+      }
+      
+      // Update dropdown UI when theme changes (e.g., from other pages)
+      window.addEventListener('storage', function(event) {
+          if (event.key === 'pomodoro-theme') {
+              const storedTheme = localStorage.getItem('pomodoro-theme') || 'dark';
+              if (themeSelect) {
+                  themeSelect.value = storedTheme;
+              }
+          }
+      });
+      
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-          const line = link.querySelector('span');
-          if (line) {
-            line.classList.remove('scale-x-0');
-            line.classList.add('scale-x-100');
-          }
-        });
-        
-        link.addEventListener('mouseleave', () => {
-          const line = link.querySelector('span');
-          if (line && !link.hasAttribute('aria-current')) {
-            line.classList.remove('scale-x-100');
-            line.classList.add('scale-x-0');
-          }
-        });
+        if (window.location.pathname.endsWith(link.getAttribute('href'))) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
       });
     });
-    
-    function createAnimatedBackground() {
-      const background = document.getElementById('animated-background');
-      if (!background) return;
-      
-      // Check if user prefers reduced motion
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        return;
-      }
-      
-      for (let i = 0; i < 15; i++) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('floating-bubble');
-        
-        // Random size between 50px and 200px
-        const size = Math.floor(Math.random() * 150) + 50;
-        bubble.style.width = `${size}px`;
-        bubble.style.height = `${size}px`;
-        
-        // Random position
-        bubble.style.left = `${Math.random() * 100}%`;
-        bubble.style.top = `${Math.random() * 100}%`;
-        
-        // Random animation properties
-        bubble.style.setProperty('--duration', `${Math.random() * 20 + 15}s`);
-        bubble.style.setProperty('--delay', `-${Math.random() * 10}s`);
-        
-        // Random movement patterns
-        bubble.style.setProperty('--x1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y1', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y2', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--x3', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y3', `${(Math.random() - 0.5) * 200}px`);
-        
-        // Random scale changes
-        bubble.style.setProperty('--scale1', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale2', `${Math.random() * 0.5 + 0.7}`);
-        bubble.style.setProperty('--scale3', `${Math.random() * 0.5 + 0.7}`);
-        
-        // Add to background
-        background.appendChild(bubble);
-      }
-    }
-    // Theme-toggle
-    document.addEventListener('DOMContentLoaded', function() {
-    // Check for saved theme or set default
-    const savedTheme = localStorage.getItem('pomodoro-theme') || 'theme-dark';
-    document.documentElement.className = savedTheme;
-    
-    // Get all theme option buttons
-    const themeButtons = document.querySelectorAll('.theme-option');
-    
-    // Add click event for each theme button
-    themeButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const selectedTheme = button.getAttribute('data-theme');
-        document.documentElement.className = selectedTheme;
-        localStorage.setItem('pomodoro-theme', selectedTheme);
-        
-        // Optional: Add active state to selected theme
-        themeButtons.forEach(btn => btn.classList.remove('bg-opacity-20'));
-        button.classList.add('bg-opacity-20');
-      });
-    });
-    
-    // Optional: Make dropdown close when clicking outside
-    document.addEventListener('click', (e) => {
-      const dropdown = document.getElementById('theme-dropdown');
-      const themeToggle = document.getElementById('theme-toggle');
-      
-      if (!themeToggle.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('opacity-100', 'pointer-events-auto');
-        dropdown.classList.add('opacity-0', 'pointer-events-none');
-      }
-    });
-  });
   </script>
 </body>
 </html>
