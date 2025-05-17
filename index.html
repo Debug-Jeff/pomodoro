@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A professional Pomodoro timer application to boost your productivity">
+  <meta name="theme-color" content="#121212">
+  <title>Pomodoro Timer</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <style>
+    .glass {
+      background: rgba(17, 25, 40, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    
+    .glass-card {
+      background: rgba(17, 25, 40, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+      pointer-events: none;
+    }
+    
+    .glass-card:hover::before {
+      left: 100%;
+    }
+    
+    .animated-border {
+      position: relative;
+    }
+    
+    .animated-border::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(
+        45deg,
+        #6366F1,
+        #8B5CF6,
+        #EC4899,
+        #6366F1
+      );
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      animation: border-rotate 4s linear infinite;
+    }
+    
+    @keyframes border-rotate {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 130% 50%;
+      }
+    }
+    
+    body {
+      background-color: #121212;
+      background-image: 
+        radial-gradient(at 47% 33%, hsl(262.00, 83%, 3%) 0, transparent 59%), 
+        radial-gradient(at 82% 65%, hsl(218.00, 39%, 11%) 0, transparent 55%);
+    }
+    
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+    
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: float 15s infinite ease-in-out;
+    }
+    
+    .floating-bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.1) 30%,
+        rgba(255, 255, 255, 0.05) 60%
+      );
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      animation: float-bubble var(--duration, 20s) infinite ease-in-out;
+      animation-delay: var(--delay, 0s);
+    }
+    
+    @keyframes float-bubble {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        transform: translate(var(--x1, 50px), var(--y1, -50px)) scale(var(--scale1, 0.8));
+      }
+      50% {
+        transform: translate(var(--x2, 100px), var(--y2, 50px)) scale(var(--scale2, 1.2));
+      }
+      75% {
+        transform: translate(var(--x3, 50px), var(--y3, 100px)) scale(var(--scale3, 0.9));
+      }
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(-30px) translateX(15px);
+      }
+      50% {
+        transform: translateY(-15px) translateX(-15px);
+      }
+      75% {
+        transform: translateY(30px) translateX(10px);
+      }
+    }
+    
+    .theme-dark {
+      --primary: rgba(99, 102, 241);
+      --primary-foreground: rgba(255, 255, 255);
+      --background: rgba(18, 18, 18);
+      --foreground: rgba(255, 255, 255);
+      --card: rgba(24, 24, 27);
+      --card-foreground: rgba(255, 255, 255);
+      --accent: rgba(39, 39, 42);
+      --accent-foreground: rgba(255, 255, 255);
+    }
+    
+    .theme-dim {
+      --primary: rgba(124, 58, 237);
+      --primary-foreground: rgba(255, 255, 255);
+      --background: rgba(31, 41, 55);
+      --foreground: rgba(255, 255, 255);
+      --card: rgba(55, 65, 81);
+      --card-foreground: rgba(255, 255, 255);
+      --accent: rgba(75, 85, 99);
+      --accent-foreground: rgba(255, 255, 255);
+    }
+    
+    .theme-purple {
+      --primary: rgba(139, 92, 246);
+      --primary-foreground: rgba(255, 255, 255);
+      --background: rgba(30, 20, 60);
+      --foreground: rgba(255, 255, 255);
+      --card: rgba(49, 46, 81);
+      --card-foreground: rgba(255, 255, 255);
+      --accent: rgba(91, 33, 182);
+      --accent-foreground: rgba(255, 255, 255);
+    }
+    
+    .theme-ocean {
+      --primary: rgba(14, 165, 233);
+      --primary-foreground: rgba(255, 255, 255);
+      --background: rgba(15, 23, 42);
+      --foreground: rgba(255, 255, 255);
+      --card: rgba(30, 41, 59);
+      --card-foreground: rgba(255, 255, 255);
+      --accent: rgba(56, 189, 248);
+      --accent-foreground: rgba(255, 255, 255);
+    }
+    
+    .theme-sunset {
+      --primary: rgba(249, 115, 22);
+      --primary-foreground: rgba(255, 255, 255);
+      --background: rgba(20, 14, 25);
+      --foreground: rgba(255, 255, 255);
+      --card: rgba(41, 20, 30);
+      --card-foreground: rgba(255, 255, 255);
+      --accent: rgba(251, 146, 60);
+      --accent-foreground: rgba(255, 255, 255);
+    }
+    
+    .page-transition {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121212;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .page-transition.active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white flex items-center justify-center overflow-hidden theme-dark">
+  <!-- Animated background -->
+  <div class="particles" aria-hidden="true" id="particles"></div>
+  <div id="animated-background" aria-hidden="true"></div>
+  
+  <!-- Page transition overlay -->
+  <div id="page-transition" class="page-transition"></div>
+  
+  <!-- Landing page content -->
+  <div id="landing" class="z-10 flex flex-col items-center justify-center text-center">
+    <div class="logo-container mb-8">
+      <svg id="logo" class="w-32 h-32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle class="logo-circle" cx="50" cy="50" r="45" stroke="white" stroke-width="2" />
+        <line class="logo-hand" x1="50" y1="50" x2="50" y2="25" stroke="white" stroke-width="2" stroke-linecap="round" />
+        <line class="logo-hand" x1="50" y1="50" x2="75" y2="50" stroke="white" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+    <h1 class="text-4xl font-bold mb-4 tracking-wider">POMODORO</h1>
+    <p class="text-xl text-gray-300 mb-8">Focus. Break. Repeat.</p>
+    <button id="enter-app" class="glass px-8 py-3 rounded-full text-lg font-medium transition-all duration-300 hover:bg-opacity-30 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" aria-label="Enter application">
+      Get Started
+    </button>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service worker registered'))
+          .catch(err => console.log('Service worker registration failed:', err));
+      });
+    }
+    
+    // Initialize landing page
+    document.addEventListener('DOMContentLoaded', () => {
+      initLandingPage();
+      createAnimatedBackground();
+    });
+    
+    // Create animated background bubbles
+    function createAnimatedBackground() {
+      const background = document.getElementById('animated-background');
+      if (!background) return;
+      
+      // Check if user prefers reduced motion
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+      
+      for (let i = 0; i < 15; i++) {
+        const bubble = document.createElement('div');
+        bubble.classList.add('floating-bubble');
+        
+        // Random size between 50px and 200px
+        const size = Math.floor(Math.random() * 150) + 50;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        
+        // Random position
+        bubble.style.left = `${Math.random() * 100}%`;
+        bubble.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation properties
+        bubble.style.setProperty('--duration', `${Math.random() * 20 + 15}s`);
+        bubble.style.setProperty('--delay', `-${Math.random() * 10}s`);
+        
+        // Random movement patterns
+        bubble.style.setProperty('--x1', `${(Math.random() - 0.5) * 200}px`);
+        bubble.style.setProperty('--y1', `${(Math.random() - 0.5) * 200}px`);
+        bubble.style.setProperty('--x2', `${(Math.random() - 0.5) * 200}px`);
+        bubble.style.setProperty('--y2', `${(Math.random() - 0.5) * 200}px`);
+        bubble.style.setProperty('--x3', `${(Math.random() - 0.5) * 200}px`);
+        bubble.style.setProperty('--y3', `${(Math.random() - 0.5) * 200}px`);
+        
+        // Random scale changes
+        bubble.style.setProperty('--scale1', `${Math.random() * 0.5 + 0.7}`);
+        bubble.style.setProperty('--scale2', `${Math.random() * 0.5 + 0.7}`);
+        bubble.style.setProperty('--scale3', `${Math.random() * 0.5 + 0.7}`);
+        
+        // Add to background
+        background.appendChild(bubble);
+      }
+    }
+  </script>
+</body>
+</html>
