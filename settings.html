@@ -12,14 +12,6 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <style>
-    .glass {
-      background: rgba(17, 25, 40, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
-    
     .glass-card {
       background: rgba(17, 25, 40, 0.75);
       backdrop-filter: blur(20px);
@@ -370,6 +362,31 @@
     .settings-section:hover {
       transform: translateX(5px);
     }
+            .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* For subtle floating animation of the navbar */
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  nav {
+    animation: float 8s ease-in-out infinite;
+  }
+
+    .glass-nav {
+    background: rgba(15, 23, 42, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .nav-link:hover {
+    transform: scaleX(1);
+  }
   </style>
 </head>
 <body class="min-h-screen text-white flex flex-col theme-dark">
@@ -380,30 +397,85 @@
   <div id="page-transition" class="page-transition"></div>
   
   <!-- Navigation -->
-  <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center">
-    <a href="index.html" class="flex items-center group">
-      <svg class="w-8 h-8 mr-2 transition-transform duration-300 group-hover:rotate-90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" stroke="white" stroke-width="2" />
-        <line x1="50" y1="50" x2="50" y2="25" stroke="white" stroke-width="2" stroke-linecap="round" />
-        <line x1="50" y1="50" x2="75" y2="50" stroke="white" stroke-width="2" stroke-linecap="round" />
-      </svg>
-      <span class="text-xl font-bold">Pomodoro</span>
-    </a>
-    <div class="flex items-center space-x-6">
-      <a href="home.html" class="nav-link relative text-white text-opacity-70 hover:text-opacity-100 transition-opacity">
-        Timer
-        <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-white transform scale-x-0 transition-transform origin-left group-hover:scale-x-100"></span>
+<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo - Simplified version -->
+      <a href="index.html" class="flex items-center group">
+        <div class="flex flex-col">
+          <span class="text-2xl font-bold text-white tracking-tight">POMODORO</span>
+          <span class="text-xs text-white text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
+        </div>
       </a>
-      <a href="dashboard.html" class="nav-link relative text-white text-opacity-70 hover:text-opacity-100 transition-opacity">
-        Dashboard
-        <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-white transform scale-x-0 transition-transform origin-left group-hover:scale-x-100"></span>
-      </a>
-      <a href="settings.html" class="nav-link relative text-white hover:text-opacity-80 transition-opacity" aria-current="page">
-        Settings
-        <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-white transform scale-x-0 transition-transform origin-left group-hover:scale-x-100"></span>
-      </a>
+
+      <!-- Navigation Links - Minimalist style -->
+      <div class="hidden md:flex items-center space-x-1">
+        <a href="home.html" class="nav-link px-4 py-2 rounded-lg">
+          <span class="text-white text-opacity-90 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Timer</span>
+          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+        </a>
+        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg">
+          <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Dashboard</span>
+          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+        </a>
+        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg">
+          <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Settings</span>
+          <div class="h-0.5 bg-white bg-opacity-80 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+        </a>
+      </div>
+
+      <!-- Theme Toggle - Simplified -->
+<div class="relative group ml-4">
+        <button id="theme-toggle" class="flex items-center justify-center w-9 h-9 rounded-full bg-white bg-opacity-10 hover:bg-opacity-20 transition-all duration-300 focus:outline-none overflow-hidden relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z" />
+          </svg>
+          <span class="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 opacity-20"></span>
+        </button>
+        
+        <!-- Theme Selector Dropdown -->
+        <div id="theme-dropdown" class="absolute right-0 mt-2 w-48 glass-card border border-white border-opacity-10 rounded-lg shadow-lg z-50 transform scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 origin-top-right">
+          <div class="p-3 space-y-2">
+            <h3 class="text-white text-sm font-medium mb-2">Select Theme</h3>
+            
+            <button data-theme="theme-dark" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 mr-3 border border-white border-opacity-20"></div>
+              <span class="text-white text-sm">Dark</span>
+            </button>
+            
+            <button data-theme="theme-dim" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-800 to-blue-900 mr-3 border border-white border-opacity-20"></div>
+              <span class="text-white text-sm">Dim</span>
+            </button>
+            
+            <button data-theme="theme-purple" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-900 to-violet-700 mr-3 border border-white border-opacity-20"></div>
+              <span class="text-white text-sm">Purple</span>
+            </button>
+            
+            <button data-theme="theme-ocean" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-900 to-cyan-700 mr-3 border border-white border-opacity-20"></div>
+              <span class="text-white text-sm">Ocean</span>
+            </button>
+            
+            <button data-theme="theme-sunset" class="theme-option flex items-center w-full p-2 rounded-md hover:bg-white hover:bg-opacity-10 transition-colors duration-200">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-red-900 to-orange-500 mr-3 border border-white border-opacity-20"></div>
+              <span class="text-white text-sm">Sunset</span>
+            </button>
+
+
+      <!-- Mobile menu button -->
+      <button class="md:hidden text-white focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
     </div>
-  </nav>
+  </div>
+
+  <!-- Subtle bottom border -->
+  <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+</nav>
 
   <!-- Main content -->
   <main class="flex-grow pt-24 pb-10 px-4">
