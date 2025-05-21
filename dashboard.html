@@ -1,540 +1,220 @@
-<!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A professional Pomodoro timer application to boost your productivity">
-  <meta name="theme-color" content="#121212">
-  <title>Pomodoro Timer</title>
+  <meta name="theme-color" content="#121214">
+  <title>Dashboard - Pomodoro Timer</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/logo.png">
   <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/animated-background.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> <!-- Chart.js specific to dashboard -->
   <style>
+    body {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
     .glass-card {
-      background: rgba(17, 25, 40, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: var(--glass-card-bg, rgba(17, 25, 40, 0.75));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-card-border, rgba(255,255,255,0.08));
       border-radius: 1rem;
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+      color: rgb(var(--card-foreground-rgb));
       position: relative;
       overflow: hidden;
     }
-    
-    body {
-      background-color: #121212;
-      background-image: 
-        radial-gradient(at 47% 33%, hsl(262.00, 83%, 3%) 0, transparent 59%), 
-        radial-gradient(at 82% 65%, hsl(218.00, 39%, 11%) 0, transparent 55%);
-    }
-    
-    .floating-bubble {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(
-        circle at 30% 30%,
-        rgba(255, 255, 255, 0.3),
-        rgba(255, 255, 255, 0.1) 30%,
-        rgba(255, 255, 255, 0.05) 60%
-      );
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-      animation: float-bubble var(--duration, 20s) infinite ease-in-out;
-      animation-delay: var(--delay, 0s);
-    }
-    
-    @keyframes float-bubble {
-      0%, 100% {
-        transform: translate(0, 0) scale(1);
-      }
-      25% {
-        transform: translate(var(--x1, 50px), var(--y1, -50px)) scale(var(--scale1, 0.8));
-      }
-      50% {
-        transform: translate(var(--x2, 100px), var(--y2, 50px)) scale(var(--scale2, 1.2));
-      }
-      75% {
-        transform: translate(var(--x3, 50px), var(--y3, 100px)) scale(var(--scale3, 0.9));
-      }
-    }
-    
     .page-transition {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #121212;
-      z-index: 9999;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgb(var(--background-rgb));
+      z-index: 9999; pointer-events: none; opacity: 1;
+      transition: opacity 0.3s ease-in-out;
     }
-    
-    .page-transition.active {
-      opacity: 1;
-    }
-    
-       .theme-dark {
-      --primary: rgba(99, 102, 241);
-      --primary-foreground: rgba(255, 255, 255);
-      --background: rgba(18, 18, 18);
-      --foreground: rgba(255, 255, 255);
-      --card: rgba(24, 24, 27);
-      --card-foreground: rgba(255, 255, 255);
-      --accent: rgba(39, 39, 42);
-      --accent-foreground: rgba(255, 255, 255);
-    }
-    
-    .theme-dim {
-      --primary: rgba(124, 58, 237);
-      --primary-foreground: rgba(255, 255, 255);
-      --background: rgba(31, 41, 55);
-      --foreground: rgba(255, 255, 255);
-      --card: rgba(55, 65, 81);
-      --card-foreground: rgba(255, 255, 255);
-      --accent: rgba(75, 85, 99);
-      --accent-foreground: rgba(255, 255, 255);
-    }
-    
-    .theme-purple {
-      --primary: rgba(139, 92, 246);
-      --primary-foreground: rgba(255, 255, 255);
-      --background: rgba(30, 20, 60);
-      --foreground: rgba(255, 255, 255);
-      --card: rgba(49, 46, 81);
-      --card-foreground: rgba(255, 255, 255);
-      --accent: rgba(91, 33, 182);
-      --accent-foreground: rgba(255, 255, 255);
-    }
-    
-    .theme-ocean {
-      --primary: rgba(14, 165, 233);
-      --primary-foreground: rgba(255, 255, 255);
-      --background: rgba(15, 23, 42);
-      --foreground: rgba(255, 255, 255);
-      --card: rgba(30, 41, 59);
-      --card-foreground: rgba(255, 255, 255);
-      --accent: rgba(56, 189, 248);
-      --accent-foreground: rgba(255, 255, 255);
-    }
-    
-    .theme-sunset {
-      --primary: rgba(249, 115, 22);
-      --primary-foreground: rgba(255, 255, 255);
-      --background: rgba(20, 14, 25);
-      --foreground: rgba(255, 255, 255);
-      --card: rgba(41, 20, 30);
-      --card-foreground: rgba(255, 255, 255);
-      --accent: rgba(251, 146, 60);
-      --accent-foreground: rgba(255, 255, 255);
-    }
-    
-    /* Heatmap styles */
-    .heatmap-container {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-gap: 4px;
-    }
-    
-    .heatmap-day {
-      display: grid;
-      grid-template-rows: repeat(24, 1fr);
-      grid-gap: 1px;
-      height: 100%;
-    }
-    
-    .heatmap-hour {
-      width: 100%;
-      height: 8px;
-      border-radius: 2px;
-      transition: all 0.2s ease;
-    }
-    
-    .heatmap-hour:hover {
-      transform: scale(1.2);
-    }
-    
-    .heatmap-legend {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-    
-    .heatmap-legend-item {
-      display: flex;
-      align-items: center;
-      margin-left: 12px;
-    }
-    
-    .heatmap-legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-      margin-right: 4px;
-    }
-    
+    .page-transition.active { opacity: 1; }
+
     /* Productivity score gauge */
-    .gauge {
-      position: relative;
-      width: 150px;
-      height: 150px;
-    }
-    
-    .gauge-body {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    
+    .gauge { position: relative; width: 150px; height: 150px; }
+    .gauge-body { position: absolute; width: 100%; height: 100%; border-radius: 50%; background-color: rgba(var(--foreground-rgb), 0.07); }
     .gauge-fill {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%);
-      background-color: rgb(var(--primary));
-      transform-origin: center;
-      transition: transform 1s ease;
+      position: absolute; width: 100%; height: 100%; border-radius: 50%;
+      clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 50%); /* Corrected clip-path for bottom half circle */
+      background-color: rgb(var(--primary-rgb));
+      transform-origin: 50% 100%; /* Rotate from bottom center */
+      transform: rotate(-90deg); /* Start pointing left */
+      transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    
     .gauge-cover {
-      position: absolute;
-      width: 75%;
-      height: 75%;
-      top: 12.5%;
-      left: 12.5%;
-      border-radius: 50%;
-      background-color: rgba(17, 25, 40, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
+      position: absolute; width: 80%; height: 80%; top: 10%; left: 10%;
+      border-radius: 50%; background-color: var(--glass-card-bg); /* Match card bg */
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
     }
+    .task-chart-container { position: relative; height: 220px; } /* Adjusted height */
     
-    /* Task completion chart */
-    .task-chart-container {
-      position: relative;
-      height: 200px;
-    }
-    
-    /* Calendar view */
-    .calendar-container {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-gap: 4px;
-    }
-    
-    .calendar-day {
-      aspect-ratio: 1;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      transition: all 0.2s ease;
-    }
-    
-    .calendar-day:hover {
-      transform: scale(1.1);
-    }
-    
-    .calendar-day-active {
-      background-color: rgba(var(--primary), 0.2);
-      border: 1px solid rgba(var(--primary), 0.5);
-    }
-    
-    .calendar-day-inactive {
-      background-color: rgba(255, 255, 255, 0.05);
-      color: rgba(255, 255, 255, 0.3);
-    }
-
-        .glass {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  
-  /* For subtle floating animation of the navbar */
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
-  }
-  
-  nav {
-    animation: float 8s ease-in-out infinite;
-  }
-
-  .glass-dropdown {
-    background: rgba(24, 24, 27, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e0e7ef;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.2s ease-in-out;
-  }
-  .glass-dropdown:hover {
-     border-color: rgba(99,102,241,0.5);
-  }
-  .glass-dropdown:focus {
-    border-color: rgba(99,102,241,0.8);
-    box-shadow: 0 0 0 2px rgba(99,102,241,0.4);
-  }
-  .glass-dropdown option {
-      background: #1a202c; /* Dark background for options */
-      color: #e0e7ef; /* Light text for options */
-  }
-
-    .glass-nav {
-    background: rgba(15, 23, 42, 0.5);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .nav-link:hover {
-    transform: scaleX(1);
-  }
-  
-  /* Nav-link rectangle animation */
-  .nav-link {
-    position: relative;
-    overflow: hidden;
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    transition: border-color 0.2s;
-  }
-  .nav-link:hover, .nav-link:focus, .nav-link[aria-current="page"] {
-    border-color: rgba(99,102,241,0.5);
-    background: rgba(99,102,241,0.08);
-  }
-  .nav-link .nav-underline { display: none !important; }
-  .nav-link[aria-current="page"] span {
-    color: #fff !important;
-    font-weight: bold;
-  }
-  /* Theme toggle switch */
-  .theme-switch {
-    width: 44px;
-    height: 24px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.3s;
-    border: 1px solid rgba(255,255,255,0.15);
-  }
-  .theme-switch .switch-thumb {
-    width: 20px;
-    height: 20px;
-    background: #fff;
-    border-radius: 50%;
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: left 0.3s cubic-bezier(.4,0,.2,1), background 0.3s;
-  }
-  .theme-switch[data-theme="dark"] .switch-thumb {
-    left: 22px;
-    background: #6366F1;
-  }
-  .theme-switch .icon {
-    width: 16px;
-    height: 16px;
-    display: block;
-  }
-  .theme-switch .icon-sun {
-    color: #FBBF24;
-    opacity: 1;
-    transition: opacity 0.3s;
-  }
-  .theme-switch[data-theme="dark"] .icon-sun {
-    opacity: 0.3;
-  }
-  .theme-switch .icon-moon {
-    color: #6366F1;
-    opacity: 0.3;
-    transition: opacity 0.3s;
-  }
-  .theme-switch[data-theme="dark"] .icon-moon {
-    opacity: 1;
-  }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0px); } }
+    nav#main-navbar { animation: float 7s ease-in-out infinite; }
   </style>
 </head>
-<body class="min-h-screen text-white flex flex-col theme-dark">
-  <!-- Navigation -->
-<nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 shadow-lg" id="main-navbar">
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="flex justify-between items-center h-16">
-      <!-- Logo -->
-      <a href="index.html" class="flex items-center group">
-        <div class="flex flex-col">
-          <span class="text-2xl font-bold text-white tracking-tight">POMODORO</span>
-          <span class="text-xs text-white text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
-        </div>
-      </a>
-      <!-- Navigation Links -->
-      <div class="hidden md:flex items-center space-x-1">
-        <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <span class="text-white text-opacity-90 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Timer</span>
-          <div class="nav-underline"></div>
-        </a>
-        <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
-          <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Dashboard</span>
-          <div class="nav-underline"></div>
-        </a>
-        <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-          <span class="text-white text-opacity-70 hover:text-opacity-100 text-sm font-medium transition-all duration-300">Settings</span>
-          <div class="nav-underline"></div>
-        </a>
-      </div>
-      <!-- Theme Selection Dropdown -->
-      <div class="relative group ml-4">
-        <select id="theme-select" class="p-2 rounded-md bg-black/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 glass-dropdown">
-          <option value="dark">Dark</option>
-          <option value="dim">Dim</option>
-          <option value="purple">Purple</option>
-          <option value="ocean">Ocean</option>
-          <option value="sunset">Sunset</option>
-        </select>
-      </div>
-      <!-- Mobile menu button -->
-      <button class="md:hidden text-white focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-    </div>
-  </div>
-  <div class="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-</nav>
+<body class="min-h-screen flex flex-col">
+  <div id="page-transition"></div>
 
-  <!-- Main content -->
+  <!-- Navigation (same as home.html) -->
+  <nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" id="main-navbar">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="flex items-center group">
+          <div class="flex flex-col">
+            <span class="text-2xl font-bold tracking-tight">POMODORO</span>
+            <span class="text-xs text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
+          </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-1">
+          <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
+            <span class="text-sm font-medium transition-all duration-300">Timer</span>
+          </a>
+          <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
+            <span class="text-sm font-medium transition-all duration-300">Dashboard</span>
+          </a>
+          <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
+            <span class="text-sm font-medium transition-all duration-300">Settings</span>
+          </a>
+        </div>
+        <div class="flex items-center">
+            <div class="relative group ml-4">
+                <select id="theme-select" class="p-2 rounded-md text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-8" aria-label="Select Theme">
+                  <option value="dark">Dark</option>
+                  <option value="dim">Dim</option>
+                  <option value="purple">Purple</option>
+                  <option value="ocean">Ocean</option>
+                  <option value="sunset">Sunset</option>
+                  <option value="auto">Auto (System)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+            <button class="md:hidden text-white focus:outline-none ml-3" id="mobile-menu-button" aria-label="Open menu">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+        </div>
+      </div>
+    </div>
+     <!-- Mobile Menu (hidden by default) -->
+    <div id="mobile-menu" class="md:hidden hidden bg-[var(--nav-bg)] border-t border-[var(--nav-border)]">
+        <a href="home.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Timer</a>
+        <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]" aria-current="page">Dashboard</a>
+        <a href="settings.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Settings</a>
+    </div>
+    <div class="h-px bg-gradient-to-r from-transparent via-[rgba(var(--primary-rgb),0.3)] to-transparent"></div>
+  </nav>
+
   <main class="flex-grow pt-24 pb-10 px-4">
     <div class="max-w-6xl mx-auto">
       <h1 class="text-3xl font-bold mb-8">Your Productivity Dashboard</h1>
-      
-      <!-- Stats overview -->
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="glass-card animated-border rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-2">Today</h2>
           <div class="flex items-end">
-            <span id="today-count" class="text-4xl font-bold text-indigo-400">0</span>
-            <span class="ml-2 text-gray-400">pomodoros</span>
+            <span id="today-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
           </div>
-          <p class="mt-2 text-sm text-gray-400">Focus time: <span id="today-minutes">0</span> minutes</p>
+          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Focus time: <span id="today-minutes" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> minutes</p>
         </div>
-        
         <div class="glass-card animated-border rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-2">This Week</h2>
           <div class="flex items-end">
-            <span id="week-count" class="text-4xl font-bold text-indigo-400">0</span>
-            <span class="ml-2 text-gray-400">pomodoros</span>
+            <span id="week-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
           </div>
-          <p class="mt-2 text-sm text-gray-400">Daily average: <span id="daily-average">0</span></p>
+          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Daily average: <span id="daily-average" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span></p>
         </div>
-        
         <div class="glass-card animated-border rounded-xl p-6">
           <h2 class="text-xl font-semibold mb-2">Current Streak</h2>
           <div class="flex items-end">
-            <span id="streak-count" class="text-4xl font-bold text-indigo-400">0</span>
-            <span class="ml-2 text-gray-400">days</span>
+            <span id="streak-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">days</span>
           </div>
-          <p class="mt-2 text-sm text-gray-400">Best streak: <span id="best-streak">0</span> days</p>
+          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Best streak: <span id="best-streak" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> days</p>
         </div>
       </div>
-      
-      <!-- Productivity score -->
+
       <div class="glass-card animated-border rounded-xl p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Productivity Score</h2>
-        <div class="flex flex-col md:flex-row items-center">
-          <div class="gauge mb-6 md:mb-0 md:mr-8">
+        <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+          <div class="gauge mb-4 md:mb-0">
             <div class="gauge-body"></div>
-            <div id="gauge-fill" class="gauge-fill"></div>
+            <div id="gauge-fill" class="gauge-fill"></div> <!-- Rotates from -90 (left) to +90 (right) for 0-100 score -->
             <div class="gauge-cover">
               <span id="productivity-score" class="text-3xl font-bold">0</span>
-              <span class="text-xs text-gray-400">SCORE</span>
+              <span class="text-xs text-[rgb(var(--muted-foreground-rgb))] uppercase tracking-wider">Score</span>
             </div>
           </div>
-          <div class="flex-grow">
-            <p class="text-gray-300 mb-4">Your productivity score is calculated based on your focus sessions, task completion rate, and consistency over time.</p>
-            <div class="grid grid-cols-2 gap-4">
+          <div class="flex-grow w-full">
+            <p class="text-[rgb(var(--muted-foreground-rgb))] mb-4 text-sm">
+              Based on focus sessions, task completion, and consistency.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
               <div>
-                <h3 class="text-sm text-gray-400 mb-1">Focus Time</h3>
-                <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div id="focus-time-bar" class="h-full bg-indigo-500" style="width: 0%"></div>
+                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Focus Time Contribution</h3>
+                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
+                  <div id="focus-time-bar" class="h-full bg-[rgb(var(--primary-rgb))]" style="width: 0%"></div>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm text-gray-400 mb-1">Task Completion</h3>
-                <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div id="task-completion-bar" class="h-full bg-green-500" style="width: 0%"></div>
+                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Task Completion Rate</h3>
+                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
+                  <div id="task-completion-bar" class="h-full bg-[rgb(var(--success-rgb))]" style="width: 0%"></div>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm text-gray-400 mb-1">Consistency</h3>
-                <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div id="consistency-bar" class="h-full bg-blue-500" style="width: 0%"></div>
+                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Consistency (Streak)</h3>
+                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
+                  <div id="consistency-bar" class="h-full bg-[rgb(var(--info-rgb))]" style="width: 0%"></div>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm text-gray-400 mb-1">Goal Achievement</h3>
-                <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div id="goal-achievement-bar" class="h-full bg-purple-500" style="width: 0%"></div>
+                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Goal Achievement</h3>
+                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
+                  <div id="goal-achievement-bar" class="h-full bg-[rgb(var(--secondary-rgb))]" style="width: 0%"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <!-- Weekly activity -->
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Weekly chart -->
         <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-4">Weekly Activity</h2>
-          <div class="h-64">
-            <canvas id="weekly-chart"></canvas>
-          </div>
+          <h2 class="text-xl font-semibold mb-4">Weekly Pomodoros</h2>
+          <div class="h-64"><canvas id="weekly-chart"></canvas></div>
         </div>
-        
-        <!-- Task completion chart -->
         <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-4">Task Completion</h2>
-          <div class="task-chart-container">
-            <canvas id="task-chart"></canvas>
-          </div>
+          <h2 class="text-xl font-semibold mb-4">Task Status</h2>
+          <div class="task-chart-container"><canvas id="task-chart"></canvas></div>
         </div>
       </div>
-      
-      <!-- Recent sessions -->
+
       <div class="glass-card animated-border rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Recent Sessions</h2>
         <div class="overflow-x-auto">
-          <table class="min-w-full leading-normal">
+          <table class="min-w-full leading-normal text-sm">
             <thead>
-              <tr class="text-left text-gray-400 border-b border-gray-700">
-                <th class="py-3">Date</th>
-                <th class="py-3">Time</th>
-                <th class="py-3">Mode</th>
-                <th class="py-3">Duration</th>
-                <th class="py-3">Task</th>
+              <tr class="text-left text-[rgb(var(--muted-foreground-rgb))] border-b border-[rgba(var(--foreground-rgb),0.1)]">
+                <th class="py-3 px-2 font-semibold">Date</th>
+                <th class="py-3 px-2 font-semibold">Time</th>
+                <th class="py-3 px-2 font-semibold">Mode</th>
+                <th class="py-3 px-2 font-semibold">Duration</th>
+                <th class="py-3 px-2 font-semibold">Task</th>
               </tr>
             </thead>
-            <tbody id="sessions-table">
-              <!-- Session data will be loaded here by JavaScript -->
-            </tbody>
+            <tbody id="sessions-table"></tbody>
           </table>
         </div>
       </div>
@@ -543,57 +223,38 @@
 
   <script src="js/main.js"></script>
   <script src="js/storage.js"></script>
+  <!-- tasks.js for getTaskStats, must be before dashboard.js -->
+  <script src="js/tasks.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/animations.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (window.injectAnimatedBackground) injectAnimatedBackground();
-      
-      // Initialize active nav link
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-          const line = link.querySelector('span');
-          if (line) {
-            line.classList.remove('scale-x-0');
-            line.classList.add('scale-x-100');
-          }
+      if (window.gsap && !prefersReducedMotion()) {
+        gsap.from('#main-navbar', { y: -70, opacity: 0, duration: 0.6, ease: 'power2.out', delay: 0.1 });
+         gsap.from(".glass-card.animated-border", {
+            opacity: 0, y: 20, duration: 0.5, stagger: 0.1, delay: 0.3, ease: "power2.out"
         });
-        
-        link.addEventListener('mouseleave', () => {
-          const line = link.querySelector('span');
-          if (line && !link.hasAttribute('aria-current')) {
-            line.classList.remove('scale-x-100');
-            line.classList.add('scale-x-0');
+      }
+       // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+          const isHidden = mobileMenu.classList.contains('hidden');
+           if (window.gsap && !prefersReducedMotion()){
+            if(isHidden) {
+                mobileMenu.classList.remove('hidden');
+                gsap.fromTo(mobileMenu, {height: 0, opacity: 0}, {height: 'auto', opacity: 1, duration: 0.3, ease: 'power1.out'});
+            } else {
+                gsap.to(mobileMenu, {height: 0, opacity: 0, duration: 0.3, ease: 'power1.in', onComplete: () => mobileMenu.classList.add('hidden')});
+            }
+          } else {
+            mobileMenu.classList.toggle('hidden');
           }
+           mobileMenuButton.setAttribute('aria-expanded', !isHidden);
         });
-      });
-      
-      // Nav-bar entrance animation
-      if (window.gsap) {
-        gsap.from('#main-navbar', { y: -60, opacity: 0, duration: 0.7, ease: 'power2.out' });
       }
-      // Theme toggle logic
-      const themeSwitch = document.getElementById('theme-switch');
-      let currentTheme = localStorage.getItem('pomodoro-theme') || 'dark';
-      function updateToggleUI(theme) {
-        themeSwitch.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
-      }
-      updateToggleUI(currentTheme);
-      themeSwitch.addEventListener('click', function() {
-        currentTheme = (currentTheme === 'dark') ? 'dim' : 'dark';
-        window.setAndApplyTheme(currentTheme);
-        updateToggleUI(currentTheme);
-      });
-      // Active nav link highlight
-      const navLinks = document.querySelectorAll('.nav-link');
-      navLinks.forEach(link => {
-        if (window.location.pathname.endsWith(link.getAttribute('href'))) {
-          link.setAttribute('aria-current', 'page');
-        } else {
-          link.removeAttribute('aria-current');
-        }
-      });
     });
   </script>
 </body>
