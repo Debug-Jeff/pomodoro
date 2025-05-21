@@ -1,293 +1,313 @@
+/* css/themes.css */
+
 :root {
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --text-opacity-default: 0.9; /* Default text opacity for better readability */
+  --text-opacity-default: 0.95;
+  --nav-text-opacity: 0.85;
+  --nav-text-hover-opacity: 1;
+  --nav-text-current-opacity: 1;
 }
 
 body {
   font-family: var(--font-sans);
-  color: rgb(var(--foreground) / var(--text-opacity-default));
-  background-color: rgb(var(--background));
-  transition: background-color 0.3s ease, color 0.3s ease;
+  color: rgb(var(--foreground-rgb) / var(--text-opacity-default));
+  background-color: rgb(var(--background-rgb));
+  transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease; /* Added background-image transition */
+  background-image: var(--bg-image-current); /* Default to dark theme stars initially (or set by JS) */
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-/* Default (Dark Theme) */
-body,
-body.theme-dark {
+/* --- Dark Theme (Default) --- */
+body.theme-dark, body.theme-auto.dark-mode {
   --primary-rgb: 99, 102, 241; /* Indigo-500 */
   --primary-hover-rgb: 79, 70, 229; /* Indigo-600 */
-  --primary-focus-ring-rgb: 99, 102, 241; /* Indigo-500 for focus rings */
+  --primary-focus-ring-rgb: 99, 102, 241;
   --primary-foreground-rgb: 255, 255, 255;
+  --secondary-rgb: 139, 92, 246; /* Violet-500 */
 
-  --secondary-rgb: 139, 92, 246; /* Violet-500 for gradients */
-
-  --background-rgb: 18, 18, 20; /* Near black */
+  --background-rgb: 10, 10, 12; /* Near black for stars */
   --foreground-rgb: 229, 231, 235; /* Gray-200 */
 
-  --card-background-rgb: 28, 28, 32; /* Slightly lighter than bg */
-  --card-border-rgb: 55, 65, 81; /* Gray-700 for subtle borders */
-  --card-foreground-rgb: 209, 213, 219; /* Gray-300 */
+  --card-background-rgb: 23, 23, 28;
+  --card-border-rgb: 45, 45, 55;
+  --card-foreground-rgb: 209, 213, 219;
 
-  --muted-foreground-rgb: 156, 163, 175; /* Gray-400 */
-  --input-background-rgb: 42, 42, 48; /* Darker input fields */
+  --muted-foreground-rgb: 130, 140, 155;
+  --input-background-rgb: 30, 30, 35;
 
-  --destructive-rgb: 239, 68, 68; /* Red-500 */
-  --success-rgb: 34, 197, 94; /* Green-500 */
-  --info-rgb: 59, 130, 246; /* Blue-500 */
+  --destructive-rgb: 220, 38, 38;
+  --success-rgb: 22, 163, 74;
+  --info-rgb: 59, 130, 246;
 
-  /* Specific UI Elements */
   --timer-ring-stroke: rgb(var(--primary-rgb));
   --timer-progress-bar-from: rgb(var(--primary-rgb));
   --timer-progress-bar-to: rgb(var(--secondary-rgb));
-  --nav-bg: rgba(18, 18, 20, 0.6);
-  --nav-border: rgba(255, 255, 255, 0.08);
-  --glass-card-bg: rgba(28, 28, 32, 0.75); /* Darker glass */
-  --glass-card-border: rgba(255, 255, 255, 0.07);
+
+  --nav-bg: rgba(10, 10, 12, 0.7); /* Slightly more opaque nav */
+  --nav-border: rgba(255, 255, 255, 0.07);
+  --nav-text-rgb: var(--foreground-rgb);
+
+  --glass-card-bg: rgba(23, 23, 28, 0.75);
+  --glass-card-border: rgba(255, 255, 255, 0.06);
+
   --slider-track-bg: linear-gradient(90deg, rgb(var(--primary-rgb)) 0%, rgb(var(--secondary-rgb)) 100%);
   --slider-thumb-border: rgb(var(--primary-rgb));
   --toggle-active-bg: rgb(var(--primary-rgb));
+
+  /* For dark theme, starfield is managed by JS injecting .background-container from animations.js */
+  /* So --bg-image-current can be none or a very subtle dark gradient if stars fail to load */
+  --bg-image-current: radial-gradient(ellipse at center, rgba(15,15,20,1) 0%, rgba(10,10,12,1) 100%);
 }
 
-body.theme-dim {
+/* --- Dim Theme --- */
+body.theme-dim, body.theme-auto.light-mode { /* Assuming dim is the 'light' auto preference */
   --primary-rgb: 124, 58, 237; /* Violet-600 */
-  --primary-hover-rgb: 109, 40, 217; /* Violet-700 */
-  --primary-focus-ring-rgb: 124, 58, 237;
+  --primary-hover-rgb: 109, 40, 217;
   --primary-foreground-rgb: 255, 255, 255;
-
-  --secondary-rgb: 99, 102, 241; /* Indigo-500 */
+  --secondary-rgb: 99, 102, 241;
 
   --background-rgb: 30, 41, 59; /* Slate-800 */
-  --foreground-rgb: 203, 213, 225; /* Slate-300 */
+  --foreground-rgb: 226, 232, 240; /* Slate-200 */
 
-  --card-background-rgb: 49, 60, 78; /* Slate-700 (approx) */
-  --card-border-rgb: 71, 85, 105; /* Slate-600 */
-  --card-foreground-rgb: 177, 189, 204; /* Slate-400 (approx) */
+  --card-background-rgb: 43, 56, 78;
+  --card-border-rgb: 60, 75, 95;
+  --card-foreground-rgb: 203, 213, 225;
+  --muted-foreground-rgb: 148, 163, 184;
+  --input-background-rgb: 36, 47, 65;
+  --nav-text-rgb: var(--foreground-rgb);
 
-  --muted-foreground-rgb: 148, 163, 184; /* Slate-400 */
-  --input-background-rgb: 40, 51, 69; /* Darker than card */
+  --glass-card-bg: rgba(43, 56, 78, 0.8); /* Slightly more opaque glass */
+  --nav-bg: rgba(30, 41, 59, 0.75);
 
-  --glass-card-bg: rgba(49, 60, 78, 0.75);
-  --nav-bg: rgba(30, 41, 59, 0.6);
+  --bg-image-dim-clouds:
+    radial-gradient(ellipse at 70% 30%, hsla(220, 40%, 30%, 0.6) 0%, transparent 55%),
+    radial-gradient(ellipse at 30% 70%, hsla(260, 30%, 35%, 0.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, hsla(240, 35%, 25%, 0.7) 0%, transparent 65%);
+  --bg-image-current: var(--bg-image-dim-clouds);
 }
 
+/* --- Purple Theme --- */
 body.theme-purple {
-  --primary-rgb: 139, 92, 246; /* Purple-500 */
-  --primary-hover-rgb: 124, 58, 237; /* Purple-600 */
-  --primary-focus-ring-rgb: 139, 92, 246;
+  --primary-rgb: 168, 85, 247; /* Purple-500 */
+  --primary-hover-rgb: 147, 51, 234;
   --primary-foreground-rgb: 255, 255, 255;
+  --secondary-rgb: 192, 132, 252;
 
-  --secondary-rgb: 167, 139, 250; /* Purple-400 */
+  --background-rgb: 46, 16, 76; /* Darker, richer purple */
+  --foreground-rgb: 243, 232, 255; /* Lavender white */
 
-  --background-rgb: 46, 26, 71; /* Deep Purple */
-  --foreground-rgb: 233, 213, 255; /* Lavender white */
+  --card-background-rgb: 65, 28, 107;
+  --card-border-rgb: 85, 40, 130;
+  --card-foreground-rgb: 229, 209, 255;
+  --muted-foreground-rgb: 200, 170, 240;
+  --input-background-rgb: 55, 22, 86;
+  --nav-text-rgb: var(--foreground-rgb);
 
-  --card-background-rgb: 67, 45, 98; /* Darker purple */
-  --card-border-rgb: 87, 55, 128;
-  --card-foreground-rgb: 216, 189, 255;
+  --glass-card-bg: rgba(65, 28, 107, 0.8);
+  --nav-bg: rgba(46, 16, 76, 0.75);
 
-  --muted-foreground-rgb: 196, 169, 235;
-  --input-background-rgb: 56, 35, 88;
-
-  --glass-card-bg: rgba(67, 45, 98, 0.75);
-  --nav-bg: rgba(46, 26, 71, 0.6);
+  --bg-image-purple-clouds:
+    radial-gradient(ellipse at 15% 20%, hsla(275, 65%, 50%, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 40%, hsla(290, 60%, 55%, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 75%, hsla(265, 70%, 45%, 0.6) 0%, transparent 60%);
+  --bg-image-current: var(--bg-image-purple-clouds);
 }
 
+/* --- Ocean Theme --- */
 body.theme-ocean {
-  --primary-rgb: 14, 165, 233; /* Sky-500 */
-  --primary-hover-rgb: 2, 132, 199; /* Sky-600 */
-  --primary-focus-ring-rgb: 14, 165, 233;
-  --primary-foreground-rgb: 255, 255, 255;
+  --primary-rgb: 56, 189, 248; /* Sky-400 */
+  --primary-hover-rgb: 14, 165, 233;
+  --primary-foreground-rgb: 255, 255, 255; /* White text for better contrast on sky blue buttons */
+  --secondary-rgb: 125, 211, 252;
 
-  --secondary-rgb: 56, 189, 248; /* Sky-400 */
+  --background-rgb: 8, 28, 50; /* Deeper ocean */
+  --foreground-rgb: 224, 242, 254; /* Sky-100 */
 
-  --background-rgb: 15, 23, 42; /* Slate-900 */
-  --foreground-rgb: 221, 238, 255; /* Light blueish white */
+  --card-background-rgb: 15, 43, 73;
+  --card-border-rgb: 25, 63, 93;
+  --card-foreground-rgb: 186, 230, 253;
+  --muted-foreground-rgb: 160, 210, 240;
+  --input-background-rgb: 12, 33, 63;
+  --nav-text-rgb: var(--foreground-rgb);
 
-  --card-background-rgb: 30, 41, 59; /* Slate-800 */
-  --card-border-rgb: 51, 65, 85; /* Slate-700 */
-  --card-foreground-rgb: 186, 230, 253; /* Sky-200 */
+  --glass-card-bg: rgba(15, 43, 73, 0.8);
+  --nav-bg: rgba(8, 28, 50, 0.75);
 
-  --muted-foreground-rgb: 163, 209, 254; /* Sky-300 */
-  --input-background-rgb: 20, 31, 49;
-
-  --glass-card-bg: rgba(30, 41, 59, 0.75);
-  --nav-bg: rgba(15, 23, 42, 0.6);
+  --bg-image-ocean-clouds:
+    radial-gradient(ellipse at 25% 30%, hsla(205, 75%, 45%, 0.45) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 65%, hsla(215, 70%, 50%, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 45% 50%, hsla(195, 80%, 40%, 0.55) 0%, transparent 60%);
+  --bg-image-current: var(--bg-image-ocean-clouds);
 }
 
+/* --- Sunset Theme --- */
 body.theme-sunset {
-  --primary-rgb: 249, 115, 22; /* Orange-500 */
-  --primary-hover-rgb: 234, 88, 12; /* Orange-600 */
-  --primary-focus-ring-rgb: 249, 115, 22;
-  --primary-foreground-rgb: 255, 255, 255;
+  --primary-rgb: 245, 158, 11; /* Amber-500 */
+  --primary-hover-rgb: 217, 119, 6;
+  --primary-foreground-rgb: 255, 255, 255; /* White for better contrast on orange */
+  --secondary-rgb: 251, 191, 36;
 
-  --secondary-rgb: 251, 146, 60; /* Orange-400 */
+  --background-rgb: 45, 20, 15; /* Dark warm, like twilight */
+  --foreground-rgb: 255, 237, 213; /* Orange-100 */
 
-  --background-rgb: 31, 15, 15; /* Very dark warm brown/red */
-  --foreground-rgb: 255, 237, 213; /* Orange-100 (pale orange) */
+  --card-background-rgb: 65, 30, 22;
+  --card-border-rgb: 85, 40, 32;
+  --card-foreground-rgb: 254, 215, 170;
+  --muted-foreground-rgb: 253, 186, 116;
+  --input-background-rgb: 55, 25, 20;
+  --nav-text-rgb: var(--foreground-rgb);
 
-  --card-background-rgb: 51, 25, 25; /* Darker warm brown */
-  --card-border-rgb: 71, 35, 35;
-  --card-foreground-rgb: 254, 215, 170; /* Orange-200 */
+  --glass-card-bg: rgba(65, 30, 22, 0.8);
+  --nav-bg: rgba(45, 20, 15, 0.75);
 
-  --muted-foreground-rgb: 253, 186, 116; /* Orange-300 */
-  --input-background-rgb: 41, 20, 20;
-
-  --glass-card-bg: rgba(51, 25, 25, 0.75);
-  --nav-bg: rgba(31, 15, 15, 0.6);
+  --bg-image-sunset-clouds:
+    radial-gradient(ellipse at 70% 60%, hsla(28, 90%, 58%, 0.5) 0%, transparent 50%), /* Vibrant Orange */
+    radial-gradient(ellipse at 30% 40%, hsla(15, 80%, 62%, 0.4) 0%, transparent 55%), /* Warm Red */
+    radial-gradient(ellipse at 50% 45%, hsla(45, 85%, 55%, 0.35) 0%, transparent 60%); /* Golden Yellow */
+  --bg-image-current: var(--bg-image-sunset-clouds);
 }
 
-/* Global style overrides using CSS variables */
+
+/* General Styles using CSS variables */
 .glass-card {
   background: var(--glass-card-bg);
   border: 1px solid var(--glass-card-border);
   color: rgb(var(--card-foreground-rgb));
+  border-radius: 1.25rem; /* Slightly larger radius for modern look */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05);
 }
 
 nav.glass-nav {
   background: var(--nav-bg);
   border-bottom: 1px solid var(--nav-border);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 nav.glass-nav a span {
-  color: rgb(var(--foreground-rgb) / 0.9);
+  color: rgb(var(--nav-text-rgb)) !important; /* Ensure nav text color applies */
+  opacity: var(--nav-text-opacity);
+  transition: opacity 0.2s ease;
 }
 nav.glass-nav a:hover span,
+nav.glass-nav a.nav-link:focus span {
+  opacity: var(--nav-text-hover-opacity);
+}
 nav.glass-nav a[aria-current="page"] span {
-  color: rgb(var(--foreground-rgb)) !important; /* Ensure override */
+  opacity: var(--nav-text-current-opacity);
+  font-weight: 600;
 }
 nav.glass-nav a[aria-current="page"] {
-   border-color: rgba(var(--primary-rgb), 0.5);
-   background: rgba(var(--primary-rgb), 0.08);
+   border-color: rgba(var(--primary-rgb), 0.7) !important; /* More prominent active border */
+   background: rgba(var(--primary-rgb), 0.15) !important; /* Stronger active background */
+}
+nav.glass-nav select#theme-select {
+    color: rgb(var(--nav-text-rgb)) !important;
+    background-color: rgba(var(--card-background-rgb), 0.6); /* Match glass card a bit */
+    border: 1px solid rgba(var(--nav-text-rgb), 0.25);
+}
+nav.glass-nav select#theme-select option {
+    background-color: rgb(var(--background-rgb)); /* Options background */
+    color: rgb(var(--foreground-rgb)); /* Options text */
 }
 
 
-/* Timer Specifics */
-#timer-progress {
-  stroke: var(--timer-ring-stroke);
-}
-#progress-bar {
-  background: linear-gradient(90deg, var(--timer-progress-bar-from) 0%, var(--timer-progress-bar-to) 100%);
-}
+#timer-progress { stroke: var(--timer-ring-stroke); }
+#progress-bar { background: linear-gradient(90deg, var(--timer-progress-bar-from) 0%, var(--timer-progress-bar-to) 100%); }
 
-/* Buttons */
 .btn-primary {
   background-color: rgb(var(--primary-rgb));
   color: rgb(var(--primary-foreground-rgb));
+  transition: background-color 0.2s ease, transform 0.15s ease-out;
 }
-.btn-primary:hover {
-  background-color: rgb(var(--primary-hover-rgb));
-}
-.btn-secondary {
-  background-color: rgb(var(--muted-foreground-rgb) / 0.3);
-  color: rgb(var(--foreground-rgb));
-}
-.btn-secondary:hover {
-  background-color: rgb(var(--muted-foreground-rgb) / 0.5);
-}
+.btn-primary:hover { background-color: rgb(var(--primary-hover-rgb)); transform: translateY(-2px) scale(1.02); }
+.btn-primary:active { transform: translateY(-1px) scale(0.98); }
 
-/* Mode Buttons */
+.btn-secondary {
+  background-color: rgba(var(--muted-foreground-rgb), 0.2);
+  color: rgb(var(--foreground-rgb));
+  border: 1px solid rgba(var(--muted-foreground-rgb), 0.25);
+  transition: background-color 0.2s ease, transform 0.15s ease-out;
+}
+.btn-secondary:hover { background-color: rgba(var(--muted-foreground-rgb), 0.3);  transform: translateY(-2px) scale(1.02); }
+.btn-secondary:active { transform: translateY(-1px) scale(0.98); }
+
+
 .mode-btn[aria-pressed="true"] {
-  background: linear-gradient(90deg, rgb(var(--primary-rgb)) 60%, rgb(var(--secondary-rgb)) 100%);
+  background: linear-gradient(95deg, rgb(var(--primary-rgb)) 40%, rgb(var(--secondary-rgb)) 100%);
   color: rgb(var(--primary-foreground-rgb));
+  box-shadow: 0 3px 12px rgba(var(--primary-rgb),0.25);
 }
 .mode-btn[aria-pressed="true"]::after {
-  background: linear-gradient(90deg, rgb(var(--primary-rgb)) 60%, rgb(var(--secondary-rgb)) 100%);
+  background: linear-gradient(95deg, rgb(var(--primary-rgb)) 40%, rgb(var(--secondary-rgb)) 100%);
 }
 .mode-btn:not([aria-pressed="true"]):hover {
-  background: rgba(var(--primary-rgb),0.08);
-  color: color-mix(in srgb, rgb(var(--primary-rgb)) 80%, white);
+  background: rgba(var(--primary-rgb),0.12);
+  color: color-mix(in srgb, rgb(var(--primary-rgb)) 75%, rgb(var(--foreground-rgb)));
 }
 
+.slider { background: var(--slider-track-bg); }
+.slider::-webkit-slider-thumb { border: 3px solid var(--slider-thumb-border); }
+.slider:focus::-webkit-slider-thumb { border-color: rgb(var(--secondary-rgb)); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb), 0.3); }
+.slider::-moz-range-thumb { border: 3px solid var(--slider-thumb-border); }
+.slider:focus::-moz-range-thumb { border-color: rgb(var(--secondary-rgb)); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb), 0.3); }
 
-/* Settings Sliders */
-.slider {
-  background: var(--slider-track-bg);
-}
-.slider::-webkit-slider-thumb {
-  border: 3px solid var(--slider-thumb-border);
-}
-.slider:focus::-webkit-slider-thumb {
-  border-color: rgb(var(--secondary-rgb));
-}
-.slider::-moz-range-thumb {
-  border: 3px solid var(--slider-thumb-border);
-}
-.slider:focus::-moz-range-thumb {
-  border-color: rgb(var(--secondary-rgb));
-}
+.toggle-container input:checked + .toggle-slider { background-color: var(--toggle-active-bg); }
+.toggle-container input:focus + .toggle-slider { box-shadow: 0 0 0 3px rgba(var(--toggle-active-bg), 0.4); }
 
+.theme-preview.active { border-color: rgb(var(--primary-rgb)) !important; box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3); }
+.theme-preview .theme-preview-check { background: rgb(var(--primary-rgb)); }
 
-/* Settings Toggles */
-.toggle-container input:checked + .toggle-slider {
-  background-color: var(--toggle-active-bg);
-}
-.toggle-container input:focus + .toggle-slider {
-  box-shadow: 0 0 1px var(--toggle-active-bg);
-}
-
-/* Theme Previews in Settings */
-.theme-preview.active {
-  border-color: rgb(var(--primary-rgb)) !important;
-}
-.theme-preview .theme-preview-check {
-  background: rgb(var(--primary-rgb));
-}
-#theme-dark .theme-color-box { background: #6366f1; } /* Indigo */
-#theme-dim .theme-color-box { background: #7c3aed; } /* Violet */
-#theme-purple .theme-color-box { background: #8b5cf6; } /* Purple */
-#theme-ocean .theme-color-box { background: #0ea5e9; } /* Sky */
-#theme-sunset .theme-color-box { background: #f97316; } /* Orange */
-#theme-auto .theme-color-box { background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%); }
-
-
-/* Input fields */
-input[type="text"], select {
+input[type="text"], select, textarea { /* Added textarea */
   background-color: rgb(var(--input-background-rgb));
   color: rgb(var(--foreground-rgb));
   border: 1px solid rgb(var(--card-border-rgb));
+  border-radius: 0.375rem; /* Tailwind's rounded-md */
 }
-input[type="text"]:focus, select:focus {
+input[type="text"]:focus, select:focus, textarea:focus {
   border-color: rgb(var(--primary-rgb));
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3);
   outline: none;
 }
-.glass-dropdown { /* Overrides for the specific class if needed, or integrate general select */
-    background: rgb(var(--input-background-rgb) / 0.8); /* More transparent for glass effect */
-    border: 1px solid rgba(var(--primary-rgb), 0.2);
+
+/* Analog Clock (ensure it uses theme variables for visibility) */
+.analog-clock-widget {
+  border: 3px solid rgba(var(--foreground-rgb), 0.2);
+  background-color: rgba(var(--card-background-rgb), 0.6);
 }
-.glass-dropdown option {
-    background: rgb(var(--background-rgb));
+.analog-clock-widget .hand { background-color: rgb(var(--foreground-rgb)); }
+.analog-clock-widget .hour-hand { background-color: rgb(var(--primary-rgb)); }
+.analog-clock-widget .second-hand { background-color: rgb(var(--secondary-rgb)); }
+.analog-clock-widget .center-dot {
+  background-color: rgb(var(--secondary-rgb));
+  border: 1px solid rgb(var(--foreground-rgb));
+}
+.analog-clock-widget .marking { background-color: rgba(var(--foreground-rgb), 0.4); }
+
+/* Task Item specific styling for better contrast */
+.task-item.completed {
+  background: rgba(var(--success-rgb), 0.08) !important; /* Softer completed bg */
+  border-left: 4px solid rgb(var(--success-rgb)) !important;
+}
+.task-item.completed .task-text {
+  color: color-mix(in srgb, rgb(var(--success-rgb)) 70%, rgb(var(--muted-foreground-rgb))) !important;
+}
+.task-item.bg-\\[rgba\\(var\\(--primary-rgb\\),0\\.15\\)\\] { /* For selected task */
+    background-color: rgba(var(--primary-rgb), 0.15) !important;
+    --tw-ring-color: rgba(var(--primary-rgb), 0.7) !important; /* Tailwind ring color */
+}
+
+/* Pop-out Timer Buttons: Ensure they use theme button styles */
+#pop-out-timer .btn-primary, #pop-out-timer #pop-start-btn {
+    /* Uses .btn-primary from above */
+    background-color: rgb(var(--primary-rgb));
+    color: rgb(var(--primary-foreground-rgb));
+    transition: background-color 0.2s ease, transform 0.15s ease-out;
+}
+#pop-out-timer .btn-secondary, #pop-out-timer #pop-reset-btn {
+    /* Uses .btn-secondary from above */
+    background-color: rgba(var(--muted-foreground-rgb), 0.2);
     color: rgb(var(--foreground-rgb));
-}
-
-/* Chart.js text color */
-.chartjs-render-monitor { /* Default chart text color */
-    color: rgb(var(--muted-foreground-rgb)) !important;
-}
-
-/* Ensure Tailwind's bg-indigo-600 etc. still work by defining them if needed,
-   or prefer using CSS variables for theme-dependent colors.
-   For simplicity, Tailwind classes will mostly define structure,
-   and theme colors come from CSS variables. */
-
-/* Specific button colors from Tailwind if used directly in HTML */
-.bg-indigo-600 { background-color: rgb(var(--primary-rgb)) !important; }
-.hover\:bg-indigo-700:hover { background-color: rgb(var(--primary-hover-rgb)) !important; }
-.bg-red-600 { background-color: rgb(var(--destructive-rgb)) !important; }
-.hover\:bg-red-700:hover { background-color: color-mix(in srgb, rgb(var(--destructive-rgb)) 90%, black) !important; }
-.bg-green-600 { background-color: rgb(var(--success-rgb)) !important; }
-.hover\:bg-green-700:hover { background-color: color-mix(in srgb, rgb(var(--success-rgb)) 90%, black) !important; }
-.bg-blue-600 { background-color: rgb(var(--info-rgb)) !important; }
-.hover\:bg-blue-700:hover { background-color: color-mix(in srgb, rgb(var(--info-rgb)) 90%, black) !important; }
-
-.text-indigo-400 { color: color-mix(in srgb, rgb(var(--primary-rgb)) 80%, white) !important; }
-.text-green-400 { color: color-mix(in srgb, rgb(var(--success-rgb)) 80%, white) !important; }
-.text-blue-400 { color: color-mix(in srgb, rgb(var(--info-rgb)) 80%, white) !important; }
-.text-purple-400 { color: color-mix(in srgb, rgb(var(--secondary-rgb)) 80%, white) !important; }
-
-
-/* Ensure dashboard chart ticks and grid lines use theme colors */
-.chartjs-render-monitor text { /* This might be too generic, Chart.js options are better */
-  fill: rgb(var(--muted-foreground-rgb)) !important;
-}
-.chartjs-render-monitor line { /* This might be too generic */
-  stroke: rgba(var(--muted-foreground-rgb), 0.2) !important;
+    border: 1px solid rgba(var(--muted-foreground-rgb), 0.25);
+    transition: background-color 0.2s ease, transform 0.15s ease-out;
 }

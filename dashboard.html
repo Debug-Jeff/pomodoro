@@ -1,93 +1,88 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A professional Pomodoro timer application to boost your productivity">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;">
   <meta name="theme-color" content="#121214">
   <title>Dashboard - Pomodoro Timer</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/logo.png">
   <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/animated-background.css">
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> <!-- Chart.js specific to dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script type="module">
+    import { inject } from "@vercel/analytics";
+    inject();
+  </script>
   <style>
-    body {
-      transition: background-color 0.3s ease, color 0.3s ease;
+    body { transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease; }
+    .page-transition { /* ... */ }
+    
+    .gauge { position: relative; width: 140px; height: 70px; /* Half circle */ overflow: hidden; margin: 0 auto; }
+    .gauge-bg {
+        width: 140px; height: 140px; border-radius: 50%;
+        background: conic-gradient(
+            rgba(var(--primary-rgb),0.15) 0deg 180deg, /* Active part range */
+            rgba(var(--foreground-rgb),0.1) 180deg 360deg /* Inactive part */
+        );
+        position: absolute; top: 0; left: 0;
     }
-    .glass-card {
-      background: var(--glass-card-bg, rgba(17, 25, 40, 0.75));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-card-border, rgba(255,255,255,0.08));
-      border-radius: 1rem;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
-      color: rgb(var(--card-foreground-rgb));
-      position: relative;
-      overflow: hidden;
-    }
-    .page-transition {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgb(var(--background-rgb));
-      z-index: 9999; pointer-events: none; opacity: 1;
-      transition: opacity 0.3s ease-in-out;
-    }
-    .page-transition.active { opacity: 1; }
-
-    /* Productivity score gauge */
-    .gauge { position: relative; width: 150px; height: 150px; }
-    .gauge-body { position: absolute; width: 100%; height: 100%; border-radius: 50%; background-color: rgba(var(--foreground-rgb), 0.07); }
-    .gauge-fill {
-      position: absolute; width: 100%; height: 100%; border-radius: 50%;
-      clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 50%); /* Corrected clip-path for bottom half circle */
-      background-color: rgb(var(--primary-rgb));
-      transform-origin: 50% 100%; /* Rotate from bottom center */
-      transform: rotate(-90deg); /* Start pointing left */
+    .gauge-fill { /* The moving part */
+      width: 140px; height: 140px; border-radius: 50%;
+      background: rgb(var(--primary-rgb));
+      clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%); /* Left half */
+      position: absolute; top: 0; left: 0;
+      transform-origin: 50% 50%; /* Rotate around center */
+      transform: rotate(0deg); /* Starts at 0 */
       transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    .gauge-cover {
-      position: absolute; width: 80%; height: 80%; top: 10%; left: 10%;
-      border-radius: 50%; background-color: var(--glass-card-bg); /* Match card bg */
+    .gauge-cover { /* Hides the top half of the circle and creates the inner circle */
+      width: 110px; height: 110px; /* Smaller than gauge-bg/fill */
+      background-color: rgb(var(--card-background-rgb));
+      border-radius: 50%;
+      position: absolute; top: 15px; left: 15px; /* (140-110)/2 */
       display: flex; align-items: center; justify-content: center; flex-direction: column;
+      z-index: 1;
     }
-    .task-chart-container { position: relative; height: 220px; } /* Adjusted height */
-    
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0px); } }
-    nav#main-navbar { animation: float 7s ease-in-out infinite; }
+     .gauge-mask { /* Hides the top part of the gauge */
+        width: 140px; height: 70px;
+        background-color: rgb(var(--card-background-rgb)); /* Match parent card's bg */
+        position: absolute; top: 0; left: 0;
+        z-index: 0; /* Below fill but above bg, to hide top of bg circle */
+    }
+
+    .task-chart-container { position: relative; height: 230px; }
+    @keyframes float-nav { 0% { transform: translateY(0px); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0px); } }
+    nav#main-navbar { animation: float-nav 7s ease-in-out infinite; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col" data-page="dashboard">
   <div id="page-transition"></div>
+  <div id="dynamic-animated-background"></div>
 
-  <!-- Navigation (same as home.html) -->
-  <nav class="glass-nav fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" id="main-navbar">
-    <div class="max-w-6xl mx-auto px-4">
+  <nav class="glass-nav fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" id="main-navbar">
+    <!-- ... Navbar HTML as in home.html ... -->
+     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <a href="index.html" class="flex items-center group">
           <div class="flex flex-col">
-            <span class="text-2xl font-bold tracking-tight">POMODORO</span>
+            <span class="text-xl sm:text-2xl font-bold tracking-tight">POMODORO</span>
             <span class="text-xs text-opacity-60 tracking-widest mt-[-4px]">FOCUS. BREAK. REPEAT.</span>
           </div>
         </a>
         <div class="hidden md:flex items-center space-x-1">
-          <a href="home.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-            <span class="text-sm font-medium transition-all duration-300">Timer</span>
-          </a>
-          <a href="dashboard.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-current="page">
-            <span class="text-sm font-medium transition-all duration-300">Dashboard</span>
-          </a>
-          <a href="settings.html" class="nav-link px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-            <span class="text-sm font-medium transition-all duration-300">Settings</span>
-          </a>
+          <a href="home.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg"><span>Timer</span></a>
+          <a href="dashboard.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg" aria-current="page"><span>Dashboard</span></a>
+          <a href="settings.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg"><span>Settings</span></a>
         </div>
         <div class="flex items-center">
-            <div class="relative group ml-4">
-                <select id="theme-select" class="p-2 rounded-md text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-8" aria-label="Select Theme">
+            <div class="relative group ml-2 sm:ml-4">
+                <select id="theme-select" class="p-1.5 sm:p-2 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-7 sm:pr-8" aria-label="Select Theme">
                   <option value="dark">Dark</option>
                   <option value="dim">Dim</option>
                   <option value="purple">Purple</option>
@@ -96,94 +91,84 @@
                   <option value="auto">Auto (System)</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    <svg class="fill-current h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                 </div>
             </div>
-            <button class="md:hidden text-white focus:outline-none ml-3" id="mobile-menu-button" aria-label="Open menu">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <button class="md:hidden focus:outline-none ml-2 sm:ml-3 p-1" id="mobile-menu-button" aria-label="Open menu" aria-expanded="false">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
         </div>
       </div>
     </div>
-     <!-- Mobile Menu (hidden by default) -->
-    <div id="mobile-menu" class="md:hidden hidden bg-[var(--nav-bg)] border-t border-[var(--nav-border)]">
+    <div id="mobile-menu" class="md:hidden hidden bg-[var(--nav-bg)] border-t border-[var(--nav-border)] shadow-lg">
         <a href="home.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Timer</a>
         <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]" aria-current="page">Dashboard</a>
         <a href="settings.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Settings</a>
     </div>
-    <div class="h-px bg-gradient-to-r from-transparent via-[rgba(var(--primary-rgb),0.3)] to-transparent"></div>
+    <div class="h-px bg-gradient-to-r from-transparent via-[rgba(var(--primary-rgb),0.25)] to-transparent"></div>
   </nav>
 
   <main class="flex-grow pt-24 pb-10 px-4">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto" id="dashboard-page-identifier">
       <h1 class="text-3xl font-bold mb-8">Your Productivity Dashboard</h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-2">Today</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold mb-2">Today</h2>
           <div class="flex items-end">
-            <span id="today-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
-            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
+            <span id="today-count" class="text-3xl sm:text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-sm text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
           </div>
-          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Focus time: <span id="today-minutes" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> minutes</p>
+          <p class="mt-1 text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))]">Focus time: <span id="today-minutes" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> minutes</p>
         </div>
-        <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-2">This Week</h2>
+        <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold mb-2">This Week</h2>
           <div class="flex items-end">
-            <span id="week-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
-            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
+            <span id="week-count" class="text-3xl sm:text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-sm text-[rgb(var(--muted-foreground-rgb))]">pomodoros</span>
           </div>
-          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Daily average: <span id="daily-average" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span></p>
+          <p class="mt-1 text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))]">Daily average: <span id="daily-average" class="font-medium text-[rgb(var(--foreground-rgb))]">0.0</span></p>
         </div>
-        <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-2">Current Streak</h2>
+        <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold mb-2">Current Streak</h2>
           <div class="flex items-end">
-            <span id="streak-count" class="text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
-            <span class="ml-2 text-[rgb(var(--muted-foreground-rgb))]">days</span>
+            <span id="streak-count" class="text-3xl sm:text-4xl font-bold text-[rgb(var(--primary-rgb))]">0</span>
+            <span class="ml-2 text-sm text-[rgb(var(--muted-foreground-rgb))]">days</span>
           </div>
-          <p class="mt-1 text-sm text-[rgb(var(--muted-foreground-rgb))]">Best streak: <span id="best-streak" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> days</p>
+          <p class="mt-1 text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))]">Best streak: <span id="best-streak" class="font-medium text-[rgb(var(--foreground-rgb))]">0</span> days</p>
         </div>
       </div>
 
-      <div class="glass-card animated-border rounded-xl p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Productivity Score</h2>
-        <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
-          <div class="gauge mb-4 md:mb-0">
-            <div class="gauge-body"></div>
-            <div id="gauge-fill" class="gauge-fill"></div> <!-- Rotates from -90 (left) to +90 (right) for 0-100 score -->
+      <div class="glass-card animated-border rounded-xl p-5 sm:p-6 mb-8">
+        <h2 class="text-lg sm:text-xl font-semibold mb-4">Productivity Score</h2>
+        <div class="flex flex-col md:flex-row items-center gap-5 sm:gap-6 md:gap-8">
+          <div class="gauge">
+            <div class="gauge-mask"></div>
+            <div class="gauge-bg"></div>
+            <div id="gauge-fill" class="gauge-fill"></div>
             <div class="gauge-cover">
-              <span id="productivity-score" class="text-3xl font-bold">0</span>
-              <span class="text-xs text-[rgb(var(--muted-foreground-rgb))] uppercase tracking-wider">Score</span>
+              <span id="productivity-score" class="text-2xl sm:text-3xl font-bold">0</span>
+              <span class="text-[10px] sm:text-xs text-[rgb(var(--muted-foreground-rgb))] uppercase tracking-wider">Score</span>
             </div>
           </div>
           <div class="flex-grow w-full">
-            <p class="text-[rgb(var(--muted-foreground-rgb))] mb-4 text-sm">
-              Based on focus sessions, task completion, and consistency.
-            </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+            <p class="text-[rgb(var(--muted-foreground-rgb))] mb-3 sm:mb-4 text-xs sm:text-sm">Based on focus sessions, task completion, and consistency.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 sm:gap-x-6 gap-y-2.5 sm:gap-y-3">
               <div>
-                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Focus Time Contribution</h3>
-                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
-                  <div id="focus-time-bar" class="h-full bg-[rgb(var(--primary-rgb))]" style="width: 0%"></div>
-                </div>
+                <h3 class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Focus Time</h3>
+                <div class="h-2 sm:h-2.5 bg-[rgba(var(--foreground-rgb),0.08)] rounded-full overflow-hidden"><div id="focus-time-bar" class="h-full bg-[rgb(var(--primary-rgb))]" style="width: 0%"></div></div>
               </div>
               <div>
-                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Task Completion Rate</h3>
-                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
-                  <div id="task-completion-bar" class="h-full bg-[rgb(var(--success-rgb))]" style="width: 0%"></div>
-                </div>
+                <h3 class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Task Completion</h3>
+                <div class="h-2 sm:h-2.5 bg-[rgba(var(--foreground-rgb),0.08)] rounded-full overflow-hidden"><div id="task-completion-bar" class="h-full bg-[rgb(var(--success-rgb))]" style="width: 0%"></div></div>
               </div>
               <div>
-                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Consistency (Streak)</h3>
-                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
-                  <div id="consistency-bar" class="h-full bg-[rgb(var(--info-rgb))]" style="width: 0%"></div>
-                </div>
+                <h3 class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Consistency</h3>
+                <div class="h-2 sm:h-2.5 bg-[rgba(var(--foreground-rgb),0.08)] rounded-full overflow-hidden"><div id="consistency-bar" class="h-full bg-[rgb(var(--info-rgb))]" style="width: 0%"></div></div>
               </div>
               <div>
-                <h3 class="text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Goal Achievement</h3>
-                <div class="h-2.5 bg-[rgba(var(--foreground-rgb),0.1)] rounded-full overflow-hidden">
-                  <div id="goal-achievement-bar" class="h-full bg-[rgb(var(--secondary-rgb))]" style="width: 0%"></div>
-                </div>
+                <h3 class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-1">Goal Achievement</h3>
+                <div class="h-2 sm:h-2.5 bg-[rgba(var(--foreground-rgb),0.08)] rounded-full overflow-hidden"><div id="goal-achievement-bar" class="h-full bg-[rgb(var(--secondary-rgb))]" style="width: 0%"></div></div>
               </div>
             </div>
           </div>
@@ -191,27 +176,27 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-4">Weekly Pomodoros</h2>
-          <div class="h-64"><canvas id="weekly-chart"></canvas></div>
+        <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold mb-4">Weekly Pomodoros</h2>
+          <div class="h-60 sm:h-64"><canvas id="weekly-chart"></canvas></div>
         </div>
-        <div class="glass-card animated-border rounded-xl p-6">
-          <h2 class="text-xl font-semibold mb-4">Task Status</h2>
+        <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-semibold mb-4">Task Status</h2>
           <div class="task-chart-container"><canvas id="task-chart"></canvas></div>
         </div>
       </div>
 
-      <div class="glass-card animated-border rounded-xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Recent Sessions</h2>
+      <div class="glass-card animated-border rounded-xl p-5 sm:p-6">
+        <h2 class="text-lg sm:text-xl font-semibold mb-4">Recent Sessions</h2>
         <div class="overflow-x-auto">
-          <table class="min-w-full leading-normal text-sm">
+          <table class="min-w-full leading-normal text-xs sm:text-sm">
             <thead>
               <tr class="text-left text-[rgb(var(--muted-foreground-rgb))] border-b border-[rgba(var(--foreground-rgb),0.1)]">
-                <th class="py-3 px-2 font-semibold">Date</th>
-                <th class="py-3 px-2 font-semibold">Time</th>
-                <th class="py-3 px-2 font-semibold">Mode</th>
-                <th class="py-3 px-2 font-semibold">Duration</th>
-                <th class="py-3 px-2 font-semibold">Task</th>
+                <th class="py-2.5 sm:py-3 px-2 sm:px-3 font-semibold">Date</th>
+                <th class="py-2.5 sm:py-3 px-2 sm:px-3 font-semibold">Time</th>
+                <th class="py-2.5 sm:py-3 px-2 sm:px-3 font-semibold">Mode</th>
+                <th class="py-2.5 sm:py-3 px-2 sm:px-3 font-semibold">Duration</th>
+                <th class="py-2.5 sm:py-3 px-2 sm:px-3 font-semibold">Task</th>
               </tr>
             </thead>
             <tbody id="sessions-table"></tbody>
@@ -220,11 +205,29 @@
       </div>
     </div>
   </main>
+  
+  <!-- Pop-out timer structure needs to be on all pages for JS to manage its state -->
+  <div id="pop-out-timer" class="pop-out-timer hidden flex flex-col glass-card backdrop-blur-md border border-[rgba(var(--primary-rgb),0.3)] shadow-2xl">
+    <div class="pop-out-header flex items-center justify-between px-3 py-1.5 sm:px-4 sm:py-2 cursor-move border-b border-[rgba(var(--primary-rgb),0.15)]">
+      <span class="font-semibold text-xs sm:text-sm">Floating Timer</span>
+      <button id="close-pop-out" aria-label="Close floating timer" class="p-1 rounded-full hover:bg-[rgba(var(--foreground-rgb),0.1)]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div class="flex-grow flex flex-col items-center justify-center p-3 sm:p-4">
+      <span id="pop-timer-display" class="text-3xl sm:text-4xl font-bold">25:00</span>
+      <span id="pop-timer-label" class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-2 sm:mb-3">Focus Time</span>
+      <div class="flex space-x-1.5 sm:space-x-2">
+        <button id="pop-start-btn" class="btn-primary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">Start</button>
+        <button id="pop-reset-btn" class="btn-secondary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">Reset</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/main.js"></script>
   <script src="js/storage.js"></script>
-  <!-- tasks.js for getTaskStats, must be before dashboard.js -->
-  <script src="js/tasks.js"></script>
+  <script src="js/tasks.js"></script> 
+  <script src="js/timer.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/animations.js"></script>
   <script>
@@ -233,10 +236,11 @@
       if (window.gsap && !prefersReducedMotion()) {
         gsap.from('#main-navbar', { y: -70, opacity: 0, duration: 0.6, ease: 'power2.out', delay: 0.1 });
          gsap.from(".glass-card.animated-border", {
-            opacity: 0, y: 20, duration: 0.5, stagger: 0.1, delay: 0.3, ease: "power2.out"
+            opacity: 0, y: 20, duration: 0.5, stagger: 0.1, delay: 0.25, ease: "power2.out"
         });
       }
-       // Mobile menu toggle
+      
+      // Mobile menu toggle
       const mobileMenuButton = document.getElementById('mobile-menu-button');
       const mobileMenu = document.getElementById('mobile-menu');
       if (mobileMenuButton && mobileMenu) {

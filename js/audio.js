@@ -3,75 +3,85 @@
  * Handles sound effects and volume control
  */
 
-// Audio context
 let audioContext = null;
-let audioBuffers = {};
-let gainNode = null;
-let audioInitialized = false; // Flag to prevent multiple initializations
+let audioBuffers = {}; // Store by sound key e.g., 'default_alarm', 'retro_notify'
+let masterGainNode = null;
+let audioInitializedPromise = null;
 
-// Initialize audio
-async function initAudio() {
-  if (audioInitialized || audioContext) return true; // Already initialized or in process
+async function initAudioSystem() {
+  if (audioInitializedPromise) return audioInitializedPromise; // Return existing promise if init in progress
 
-  try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = audioContext.createGain();
-    gainNode.connect(audioContext.destination);
+  audioInitializedPromise = (async () => {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      masterGainNode = audioContext.createGain();
+      masterGainNode.connect(audioContext.destination);
 
-    const settings = loadData('settings', SCHEMAS.settings); // Uses global loadData/SCHEMAS
-    setVolume(settings.soundVolume / 100); // Use soundVolume
+      const settings = loadData('settings', SCHEMAS.settings);
+      setMasterVolume(settings.soundVolume / 100);
 
-    await Promise.all([
-      loadSound('start', 'assets/audio/intro-transition.wav'),
-      loadSound('break', 'assets/audio/retro-game-notification.wav'),
-      loadSound('complete', 'assets/audio/classic-alarm.wav')
-    ]);
+      // Define sounds to load based on potential settings
+      const soundsToLoad = {
+        'default_alarm': 'assets/audio/classic-alarm.wav',
+        'retro_notify': 'assets/audio/retro-game-notification.wav',
+        // Add other sounds defined in settings UI (e.g., 'soft_chime')
+        'soft_chime': 'assets/audio/soft-chime.wav', // Example, ensure file exists
+        // Timer specific sounds if not covered by notificationSound setting
+        'timer_start': 'assets/audio/intro-transition.wav', // Renamed from 'start' for clarity
+        'timer_break_end': 'assets/audio/retro-game-notification.wav' // Renamed from 'break'
+      };
 
-    audioInitialized = true;
-    console.log('Audio initialized successfully.');
-    return true;
-  } catch (error) {
-    console.error('Error initializing audio:', error);
-    audioContext = null; // Reset on error
-    return false;
-  }
+      const loadPromises = Object.entries(soundsToLoad).map(([key, path]) => loadSoundIntoBuffer(key, path));
+      await Promise.all(loadPromises);
+
+      console.log('Audio system initialized.');
+      return true;
+    } catch (error) {
+      console.error('Error initializing audio system:', error);
+      audioContext = null; // Reset on error
+      masterGainNode = null;
+      audioInitializedPromise = null; // Allow retry
+      return false;
+    }
+  })();
+  return audioInitializedPromise;
 }
 
-// Load a sound file
-async function loadSound(name, url) {
+async function loadSoundIntoBuffer(name, url) {
   if (!audioContext) {
     console.warn('AudioContext not available for loading sound:', name);
     return;
   }
   try {
     const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status} for ${url}`);
-    }
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for ${url}`);
     const arrayBuffer = await response.arrayBuffer();
+    // Ensure context is running before decoding
+    if (audioContext.state === 'suspended') await audioContext.resume();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     audioBuffers[name] = audioBuffer;
   } catch (error) {
     console.error(`Error loading sound ${name} from ${url}:`, error);
-    // Create a silent fallback buffer
-    if (audioContext) {
+    if (audioContext) { // Create a silent fallback buffer if context exists
         const fallbackBuffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
         audioBuffers[name] = fallbackBuffer;
     }
   }
 }
 
-// Play a sound
-async function playSound(name) {
-  if (!audioContext) {
-    // Try to initialize audio on first play attempt if not done by user interaction
-    const success = await initAudio();
-    if (!success || !audioBuffers[name]) {
-      console.warn(`Cannot play sound ${name}, audio not ready or buffer missing.`);
+async function playSound(soundNameKey) { // Takes key like 'default_alarm'
+  const settings = loadData('settings', SCHEMAS.settings);
+  if (!settings.enableSounds) return;
+
+  if (!audioContext || Object.keys(audioBuffers).length === 0) {
+    const success = await initAudioSystem(); // Ensure system is initialized
+    if (!success) {
+      console.warn(`Cannot play sound ${soundNameKey}, audio system failed to initialize.`);
       return;
     }
-  } else if (audioContext.state === 'suspended') {
-    // Resume audio context if suspended (browser policy)
+  }
+
+  if (audioContext.state === 'suspended') {
     try {
       await audioContext.resume();
     } catch (e) {
@@ -80,79 +90,64 @@ async function playSound(name) {
     }
   }
 
-  if (audioBuffers[name]) {
-    playBuffer(audioBuffers[name]);
+  const bufferToPlay = audioBuffers[soundNameKey];
+  if (bufferToPlay) {
+    const source = audioContext.createBufferSource();
+    source.buffer = bufferToPlay;
+    source.connect(masterGainNode);
+    source.start(0);
   } else {
-    console.warn(`Sound buffer for ${name} not found.`);
+    console.warn(`Sound buffer for key "${soundNameKey}" not found. Available:`, Object.keys(audioBuffers));
   }
 }
-window.playSound = playSound; // Expose globally
+window.playSound = playSound;
 
-// Play an audio buffer
-function playBuffer(buffer) {
-  if (!audioContext || !gainNode) return;
-  const source = audioContext.createBufferSource();
-  source.buffer = buffer;
-  source.connect(gainNode);
-  source.start(0);
-}
-
-// Set volume (0-1)
-function setVolume(volumeLevel) {
-  if (gainNode) {
-    gainNode.gain.value = Math.max(0, Math.min(1, volumeLevel));
+function setMasterVolume(volumeLevel) { // Volume 0-1
+  if (masterGainNode) {
+    masterGainNode.gain.setValueAtTime(Math.max(0, Math.min(1, volumeLevel)), audioContext.currentTime);
   }
-  // Save to settings if changed by a control that doesn't do it itself
-  const settings = loadData('settings', SCHEMAS.settings);
-  if (settings.soundVolume / 100 !== volumeLevel) {
-    settings.soundVolume = Math.round(volumeLevel * 100);
-    saveData('settings', settings);
-  }
+  // This function is primarily for internal use by audio.js
+  // Settings save should happen in settings.js
 }
-window.setVolume = setVolume; // Expose globally
+window.setMasterVolume = setMasterVolume; // Expose for settings.js
 
-// Get current volume (0-1) - not directly used by settings.js, but good utility
-function getVolume() {
-  return gainNode ? gainNode.gain.value : (loadData('settings', SCHEMAS.settings).soundVolume / 100);
-}
-// window.getVolume = getVolume;
-
-// Initialize audio on first user interaction
 function WARM_UP_AUDIO_CONTEXT_SAFELY() {
     if (!audioContext) {
-        initAudio().then(success => {
-            if (success) {
+        initAudioSystem().then(success => {
+            if (success && audioContext.state !== 'running') {
                 // Play a tiny silent sound to ensure context is truly 'running'
-                // Some browsers require this for full un-suspension
                 const buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
                 const source = audioContext.createBufferSource();
                 source.buffer = buffer;
-                source.connect(audioContext.destination); // Connect to destination directly, not gainNode for this
+                source.connect(masterGainNode); // Connect to gain node which is connected to destination
                 source.start(0);
-                console.log('Audio context warmed up.');
+                console.log('Audio context warmed up after init.');
+            } else if (success) {
+                 console.log('Audio context already running or initAudioSystem handled it.');
             }
         });
     } else if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => console.log('Audio context resumed.'));
+        audioContext.resume().then(() => console.log('Audio context resumed by interaction.'));
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Attempt to initialize audio on first user interaction to comply with browser policies
-  // Using 'pointerdown' as it's often earlier than 'click' and covers touch.
-  document.addEventListener('pointerdown', WARM_UP_AUDIO_CONTEXT_SAFELY, { once: true });
-  document.addEventListener('keydown', WARM_UP_AUDIO_CONTEXT_SAFELY, { once: true });
+  // Pre-warm/init audio on first user interaction
+  const interactionEvents = ['pointerdown', 'keydown'];
+  interactionEvents.forEach(eventType => {
+    document.addEventListener(eventType, WARM_UP_AUDIO_CONTEXT_SAFELY, { once: true, passive: true });
+  });
 
-  // Listen for settings changes to update volume
-  window.addEventListener('storage', (event) => {
-    if (event.key === `${APP_NAME}_settings` && event.newValue) {
-      try {
-        const newSettings = JSON.parse(event.newValue);
-        if (gainNode && newSettings.soundVolume !== undefined) {
-          setVolume(newSettings.soundVolume / 100);
-        }
-      } catch (e) {
-        console.error("Error parsing settings from storage event in audio.js", e);
+  // Listen for settings changes from storage to update volume
+  window.addEventListener('appStorageChange', (event) => {
+    if (event.detail.key === 'settings' && event.detail.newValue) {
+      const newSettings = event.detail.newValue;
+      if (masterGainNode && newSettings.soundVolume !== undefined) {
+        setMasterVolume(newSettings.soundVolume / 100);
+      }
+       // Re-initialize audio system if enableSounds was toggled on, and it wasn't initialized
+      if (newSettings.enableSounds && !audioInitializedPromise) {
+          WARM_UP_AUDIO_CONTEXT_SAFELY();
       }
     }
   });

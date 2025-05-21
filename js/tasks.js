@@ -3,238 +3,240 @@
  * Handles task management and integration with timer sessions
  */
 
-// DOM elements
-const taskInput = document.getElementById('task-input');
-const addTaskForm = document.getElementById('add-task-form');
-const taskList = document.getElementById('task-list');
-const completedTasksElement = document.getElementById('completed-tasks');
-const totalTasksElement = document.getElementById('total-tasks');
-const clearCompletedBtn = document.getElementById('clear-completed-btn');
+const taskInputElement = document.getElementById('task-input');
+const addTaskFormElement = document.getElementById('add-task-form');
+const taskListElement = document.getElementById('task-list');
+const completedTasksDisplay = document.getElementById('completed-tasks');
+const totalTasksDisplay = document.getElementById('total-tasks');
+const clearCompletedBtnElement = document.getElementById('clear-completed-btn');
 
-// Task state
-let tasks = [];
-let currentTaskId = null;
+let tasksState = []; // Use a more specific name
+let currentSelectedTaskId = null;
 
-// Initialize tasks
-function initTasks() {
-  loadTasksFromStorage(); // Renamed for clarity
-  setupTaskEventListeners(); // Renamed
-  renderTasks();
-  updateTaskStats();
+function initTasksModule() {
+  loadTasksFromStorage();
+  setupTaskEventListeners();
+  renderTaskList();
+  updateTaskStatsDisplay();
 }
 
-// Load tasks from localStorage
 function loadTasksFromStorage() {
-  tasks = loadData('tasks', []); // Use global loadData
+  tasksState = loadData('tasks', []); // Uses global loadData from storage.js
 }
 
-// Save tasks to localStorage
 function saveTasksToStorage() {
-  saveData('tasks', tasks); // Use global saveData
-  // Dispatch storage event for dashboard or other components
-  window.dispatchEvent(new StorageEvent('storage', { key: `${APP_NAME}_tasks`, newValue: JSON.stringify(tasks) }));
+  saveData('tasks', tasksState); // Uses global saveData from storage.js
 }
 
-// Handle add task form submission
 function handleAddTask(event) {
   event.preventDefault();
-  if (!taskInput || !taskInput.value.trim()) return;
+  if (!taskInputElement || !taskInputElement.value.trim()) return;
 
   const newTask = {
     id: Date.now().toString(),
-    text: taskInput.value.trim(),
+    text: taskInputElement.value.trim(),
     completed: false,
     createdAt: new Date().toISOString(),
     completedAt: null,
     pomodoros: 0
   };
 
-  tasks.unshift(newTask);
+  tasksState.unshift(newTask); // Add to the beginning
   saveTasksToStorage();
-  taskInput.value = '';
-  renderTasks();
-  updateTaskStats();
+  taskInputElement.value = '';
+  renderTaskList();
+  updateTaskStatsDisplay();
 
-  if (window.gsap && taskList && taskList.firstChild && !prefersReducedMotion()) {
-    gsap.from(taskList.firstChild, { y: -20, opacity: 0, duration: 0.4, ease: "back.out(1.4)" });
+  if (window.gsap && taskListElement && taskListElement.firstChild && !prefersReducedMotion()) {
+    gsap.from(taskListElement.firstChild, { y: -25, opacity: 0, duration: 0.4, ease: "back.out(1.5)" });
   }
 }
 
-// Render tasks
-function renderTasks() {
-  if (!taskList) return;
-  taskList.innerHTML = '';
+function renderTaskList() {
+  if (!taskListElement) return;
+  taskListElement.innerHTML = ''; // Clear existing tasks
 
-  if (tasks.length === 0) {
-    taskList.innerHTML = `<div class="text-gray-400 text-center py-4">No tasks yet. Add one above!</div>`;
+  if (tasksState.length === 0) {
+    taskListElement.innerHTML = `<div class="text-center text-[rgb(var(--muted-foreground-rgb))] py-5 px-3 text-sm">No tasks yet. Add one to get started!</div>`;
     return;
   }
 
-  tasks.forEach(task => {
+  tasksState.forEach(task => {
     const taskItem = document.createElement('div');
-    taskItem.className = `task-item flex items-center justify-between p-3 bg-opacity-30 rounded-lg mb-2 transition-all duration-200 ease-in-out ${task.completed ? 'completed' : ''} ${task.id === currentTaskId ? 'bg-indigo-900/30 ring-2 ring-indigo-500' : 'bg-black/30'}`;
+    taskItem.className = `task-item flex items-center justify-between p-3 rounded-lg mb-2.5 transition-all duration-200 ease-in-out cursor-pointer shadow-sm hover:shadow-md`;
     taskItem.dataset.id = task.id;
     taskItem.setAttribute('role', 'listitem');
-    taskItem.setAttribute('tabindex', '0'); // Make selectable by keyboard
+    taskItem.setAttribute('tabindex', '0');
 
-    const pomodoroCountDisplay = task.pomodoros > 0 ? `<span class="text-xs text-yellow-400 mr-3">${'🍅'.repeat(task.pomodoros)}</span>` : '';
+    // Apply dynamic classes for completed and selected states
+    if (task.completed) {
+      taskItem.classList.add('completed'); // CSS handles specific styling
+    }
+    if (task.id === currentSelectedTaskId && !task.completed) {
+      taskItem.classList.add('bg-[rgba(var(--primary-rgb),0.15)]', 'ring-2', 'ring-[rgb(var(--primary-rgb))]');
+    } else if (!task.completed) {
+      taskItem.classList.add('bg-[rgba(var(--card-background-rgb),0.7)]'); // Default for non-completed, non-selected
+    }
+
+
+    const pomodorosDisplay = task.pomodoros > 0 ?
+      `<span class="text-xs font-medium text-amber-400 mr-2 flex items-center" title="${task.pomodoros} Pomodoros">${'🍅'.repeat(Math.min(task.pomodoros, 5))}${task.pomodoros > 5 ? `+${task.pomodoros-5}`:''}</span>` : '';
 
     taskItem.innerHTML = `
-      <div class="flex items-center flex-grow">
-        <input type="checkbox" id="task-check-${task.id}" class="task-checkbox form-checkbox h-5 w-5 rounded border-gray-600 text-indigo-600 focus:ring-indigo-500 mr-3 flex-shrink-0" ${task.completed ? 'checked' : ''} aria-labelledby="task-text-${task.id}">
-        <label for="task-check-${task.id}" id="task-text-${task.id}" class="task-text flex-grow ${task.completed ? 'line-through text-gray-500' : 'text-gray-100'} cursor-pointer">${task.text}</label>
+      <div class="flex items-center flex-grow min-w-0">  <!--min-w-0 for text truncation-->
+        <input type="checkbox" id="task-check-${task.id}" class="task-checkbox form-checkbox h-5 w-5 rounded border-gray-500 text-[rgb(var(--primary-rgb))] focus:ring-[rgb(var(--primary-rgb))] mr-3 flex-shrink-0" ${task.completed ? 'checked' : ''} aria-labelledby="task-text-${task.id}">
+        <label for="task-check-${task.id}" id="task-text-${task.id}" class="task-text flex-grow truncate ${task.completed ? 'line-through text-[rgb(var(--muted-foreground-rgb))]' : 'text-[rgb(var(--foreground-rgb))]'}">${task.text}</label>
       </div>
       <div class="flex items-center flex-shrink-0 ml-2">
-        ${pomodoroCountDisplay}
-        <button class="task-delete text-gray-500 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-500/10" aria-label="Delete task ${task.text}">
-          <svg xmlns="<http://www.w3.org/2000/svg>" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        ${pomodorosDisplay}
+        <button class="task-delete text-gray-500 hover:text-red-500 transition-colors p-1.5 rounded-full hover:bg-[rgba(var(--destructive-rgb),0.1)]" aria-label="Delete task: ${task.text}">
+          <svg xmlns="<http://www.w3.org/2000/svg>" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
     `;
 
     const checkbox = taskItem.querySelector('.task-checkbox');
-    checkbox.addEventListener('change', () => toggleTaskCompletion(task.id));
+    checkbox.addEventListener('change', (e) => { e.stopPropagation(); toggleTaskCompletion(task.id); });
 
     const deleteBtn = taskItem.querySelector('.task-delete');
     deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteTask(task.id); });
 
     taskItem.addEventListener('click', (e) => {
       if (e.target.type === 'checkbox' || e.target.closest('.task-delete')) return;
-      selectTaskForSession(task.id);
+      if (!task.completed) selectTaskForSession(task.id); // Only allow selecting non-completed tasks
     });
     taskItem.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            if (document.activeElement === taskItem) { // only if task item itself is focused
-                 selectTaskForSession(task.id);
+            if (document.activeElement === taskItem && !task.completed) {
+                e.preventDefault();
+                selectTaskForSession(task.id);
+            } else if (document.activeElement.type === 'checkbox') {
+                // Let checkbox handle its own space/enter
             }
         }
     });
-    taskList.appendChild(taskItem);
+    taskListElement.appendChild(taskItem);
   });
 }
 
-// Toggle task completion
 function toggleTaskCompletion(taskId) {
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
+  const taskIndex = tasksState.findIndex(task => task.id === taskId);
   if (taskIndex === -1) return;
 
-  tasks[taskIndex].completed = !tasks[taskIndex].completed;
-  tasks[taskIndex].completedAt = tasks[taskIndex].completed ? new Date().toISOString() : null;
+  tasksState[taskIndex].completed = !tasksState[taskIndex].completed;
+  tasksState[taskIndex].completedAt = tasksState[taskIndex].completed ? new Date().toISOString() : null;
+
+  // If completing the currently selected task, deselect it
+  if (tasksState[taskIndex].completed && currentSelectedTaskId === taskId) {
+    currentSelectedTaskId = null;
+  }
+
   saveTasksToStorage();
-  renderTasks(); // Re-render to update styles correctly
-  updateTaskStats();
+  renderTaskList();
+  updateTaskStatsDisplay();
 }
 
-// Delete task
 function deleteTask(taskId) {
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
+  const taskIndex = tasksState.findIndex(task => task.id === taskId);
   if (taskIndex === -1) return;
 
-  const taskItem = taskList.querySelector(`[data-id="${taskId}"]`);
+  const taskItem = taskListElement.querySelector(`[data-id="${taskId}"]`);
   if (window.gsap && taskItem && !prefersReducedMotion()) {
     gsap.to(taskItem, {
-      height: 0, padding: 0, margin: 0, opacity: 0, duration: 0.3, ease: "power2.in",
+      height: 0, paddingBlock: 0, marginBlock:0, opacity: 0, duration: 0.3, ease: "power2.in",
       onComplete: () => {
-        tasks.splice(taskIndex, 1);
-        if (currentTaskId === taskId) currentTaskId = null;
+        tasksState.splice(taskIndex, 1);
+        if (currentSelectedTaskId === taskId) currentSelectedTaskId = null;
         saveTasksToStorage();
-        renderTasks(); // Full re-render might be simpler than partial DOM manipulation
-        updateTaskStats();
+        renderTaskList();
+        updateTaskStatsDisplay();
       }
     });
   } else {
-    tasks.splice(taskIndex, 1);
-    if (currentTaskId === taskId) currentTaskId = null;
+    tasksState.splice(taskIndex, 1);
+    if (currentSelectedTaskId === taskId) currentSelectedTaskId = null;
     saveTasksToStorage();
-    renderTasks();
-    updateTaskStats();
+    renderTaskList();
+    updateTaskStatsDisplay();
   }
 }
 
-// Clear completed tasks
 function clearCompletedTasks() {
-  const completedTaskItems = Array.from(taskList.querySelectorAll('.task-item.completed'));
+  const completedTaskItems = Array.from(taskListElement.querySelectorAll('.task-item.completed'));
   if (completedTaskItems.length === 0) return;
 
   if (window.gsap && !prefersReducedMotion()) {
     gsap.to(completedTaskItems, {
-      height: 0, padding: 0, margin: 0, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in",
+      height: 0, paddingBlock: 0, marginBlock:0, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in",
       onComplete: () => {
-        tasks = tasks.filter(task => !task.completed);
-        if (tasks.find(task => task.id === currentTaskId && task.completed)) {
-            currentTaskId = null; // Deselect if current task was cleared
-        }
+        tasksState = tasksState.filter(task => !task.completed);
+        // No need to deselect current task if it was completed, as it's gone.
         saveTasksToStorage();
-        renderTasks();
-        updateTaskStats();
+        renderTaskList();
+        updateTaskStatsDisplay();
       }
     });
   } else {
-    tasks = tasks.filter(task => !task.completed);
-    if (tasks.find(task => task.id === currentTaskId && task.completed)) {
-        currentTaskId = null;
-    }
+    tasksState = tasksState.filter(task => !task.completed);
     saveTasksToStorage();
-    renderTasks();
-    updateTaskStats();
+    renderTaskList();
+    updateTaskStatsDisplay();
   }
 }
 
-// Update task stats display
-function updateTaskStats() {
-  if (!completedTasksElement || !totalTasksElement) return;
-  const completedCount = tasks.filter(task => task.completed).length;
-  completedTasksElement.textContent = completedCount;
-  totalTasksElement.textContent = tasks.length;
+function updateTaskStatsDisplay() {
+  if (!completedTasksDisplay || !totalTasksDisplay) return;
+  const completedCount = tasksState.filter(task => task.completed).length;
+  completedTasksDisplay.textContent = completedCount;
+  totalTasksDisplay.textContent = tasksState.length;
 }
 
-// Select task for current session
 function selectTaskForSession(taskId) {
-  if (currentTaskId === taskId) { // Click again to deselect
-    currentTaskId = null;
+  if (currentSelectedTaskId === taskId) {
+    currentSelectedTaskId = null; // Deselect if clicking the same task
   } else {
-    currentTaskId = taskId;
+    const taskToSelect = tasksState.find(t => t.id === taskId);
+    if (taskToSelect && !taskToSelect.completed) { // Can only select non-completed tasks
+        currentSelectedTaskId = taskId;
+    } else {
+        currentSelectedTaskId = null; // Ensure no selection if task is completed
+    }
   }
-  renderTasks(); // Re-render to update selection highlight
-  // Optionally, provide feedback for screen readers if selection changes
+  renderTaskList(); // Re-render to update selection highlight
 }
 
-// Get current selected task
 function getCurrentTask() {
-  if (!currentTaskId) return null;
-  return tasks.find(task => task.id === currentTaskId);
+  if (!currentSelectedTaskId) return null;
+  return tasksState.find(task => task.id === currentSelectedTaskId);
 }
-window.getCurrentTask = getCurrentTask; // Expose for timer.js
+window.getCurrentTask = getCurrentTask;
 
-// Increment pomodoro count for current task
 function incrementTaskPomodoro() {
-  if (!currentTaskId) return;
-  const taskIndex = tasks.findIndex(task => task.id === currentTaskId);
+  const currentTask = getCurrentTask();
+  if (!currentTask) return; // Only if a task is selected
+
+  const taskIndex = tasksState.findIndex(task => task.id === currentTask.id);
   if (taskIndex === -1) return;
 
-  tasks[taskIndex].pomodoros = (tasks[taskIndex].pomodoros || 0) + 1;
+  tasksState[taskIndex].pomodoros = (tasksState[taskIndex].pomodoros || 0) + 1;
   saveTasksToStorage();
-  renderTasks(); // Re-render to show updated pomodoro count
+  renderTaskList();
 }
-window.incrementTaskPomodoro = incrementTaskPomodoro; // Expose for timer.js
+window.incrementTaskPomodoro = incrementTaskPomodoro;
 
-// Get task stats for dashboard
 function getTaskStats() {
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const totalPomodoros = tasks.reduce((sum, task) => sum + (task.pomodoros || 0), 0);
-  const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) : 0; // Rate as 0-1
+  const totalTasks = tasksState.length;
+  const completedTasks = tasksState.filter(task => task.completed).length;
+  const totalPomodoros = tasksState.reduce((sum, task) => sum + (task.pomodoros || 0), 0);
+  const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) : 0;
 
   return { totalTasks, completedTasks, totalPomodoros, completionRate };
 }
-window.getTaskStats = getTaskStats; // Expose for dashboard.js
+window.getTaskStats = getTaskStats;
 
-// Setup event listeners for task module
 function setupTaskEventListeners() {
-  if (addTaskForm) addTaskForm.addEventListener('submit', handleAddTask);
-  if (clearCompletedBtn) clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+  if (addTaskFormElement) addTaskFormElement.addEventListener('submit', handleAddTask);
+  if (clearCompletedBtnElement) clearCompletedBtnElement.addEventListener('click', clearCompletedTasks);
 }
 
-// Initialize tasks when DOM is loaded
-document.addEventListener('DOMContentLoaded', initTasks);
+document.addEventListener('DOMContentLoaded', initTasksModule);
