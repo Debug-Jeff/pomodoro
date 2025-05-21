@@ -3,6 +3,8 @@
  * Contains shared utilities and initialization code
  */
 
+import { inject } from "@vercel/analytics";
+
 // App constants
 const APP_NAME = 'PomodoroApp'; // Made accessible globally for other scripts
 window.APP_NAME = APP_NAME;
