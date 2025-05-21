@@ -50,8 +50,19 @@
     
     .glass-card:hover::before {
       left: 100%;
-    }
+    } 
     
+    #animated-background {
+    position: fixed;
+    top: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
     .animated-border {
       position: relative;
     }
@@ -95,13 +106,14 @@
     }
     
     .particles {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      z-index: 0;
+      z-index: -1;
+      pointer-events: none;
     }
     
     .particle {
@@ -226,6 +238,13 @@
     .page-transition.active {
       opacity: 1;
     }
+
+    /* #landing {
+    position: relative;
+    z-index: 100;
+    } */
+
+
   </style>
 </head>
 <body class="min-h-screen text-white flex items-center justify-center overflow-hidden theme-dark">
@@ -244,9 +263,12 @@
     </div>
     <h1 class="text-4xl font-bold mb-4 tracking-wider">POMODORO</h1>
     <p class="text-xl text-gray-300 mb-8">Focus. Break. Repeat.</p>
-    <button id="enter-app" class="glass px-8 py-3 rounded-full text-lg font-medium transition-all duration-300 hover:bg-opacity-30 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 border-2 border-indigo-400 shadow-lg bg-indigo-600 text-white z-50" aria-label="Enter application">
-      Get Started
-    </button>
+
+    <button id="enter-app" 
+          class="px-8 py-3 rounded-full text-lg font-medium transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 border-2 border-indigo-400 shadow-lg bg-indigo-600/90 hover:bg-indigo-500/90 text-white z-100 relative" style="translate: none; rotate: none; scale: none; opacity: 150%; transform: translate(0px, 20px);"
+          aria-label="Enter application">
+    Get Started
+  </button>
   </div>
 
   <script src="js/main.js"></script>
@@ -265,6 +287,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       initLandingPage();
       createAnimatedBackground();
+      createParticles();
     });
     
     // Create animated background bubbles
