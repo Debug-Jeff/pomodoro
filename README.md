@@ -1,5 +1,7 @@
 # Pomodoro Timer App
 
+![Screenshot](assets/images/image.png)
+
 A modern, feature-rich Pomodoro timer application to boost your productivity. Includes customizable timers, task management, productivity analytics, multiple themes, and PWA support.
 
 ---
@@ -12,31 +14,6 @@ A modern, feature-rich Pomodoro timer application to boost your productivity. In
 - **Multiple Themes:** Choose from several color themes or use system auto mode.
 - **Notifications & Sounds:** Desktop notifications and sound effects for session transitions.
 - **PWA Support:** Installable, offline-capable, and mobile-friendly.
-
----
-
-## Folder Structure
-```
-pomodoro/
-  assets/           # Images, icons, audio, video
-  css/              # CSS files (if any custom styles)
-  js/               # JavaScript modules (functionality for each feature)
-    main.js
-    animations.js
-    audio.js
-    settings.js
-    dashboard.js
-    timer.js
-    custom-sequences.js
-    tasks.js
-    storage.js
-  dashboard.html    # Productivity dashboard
-  home.html         # Main timer and tasks page
-  index.html        # Landing page
-  manifest.json     # PWA manifest
-  service-worker.js # Service worker for offline support
-  settings.html     # Settings page
-```
 
 ---
 
@@ -71,6 +48,4 @@ pomodoro/
 - Inspired by the Pomodoro Technique.
 
 ---
-
-## License
-[MIT License] or your preferred license. 
+ 
