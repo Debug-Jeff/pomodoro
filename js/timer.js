@@ -57,7 +57,7 @@ function initTimerModule() {
   timerState.timeRemaining = initialSettings.focusDuration * 60;
   timerState.totalDurationAtStart = timerState.timeRemaining;
 
-  switchMode('focus', true); // Initial mode without stopping timer
+  switchModeAndSequence('focus', null, true); // Initial mode without stopping timer
   setupTimerEventListeners();
   updatePomodoroCycleDisplay();
 
