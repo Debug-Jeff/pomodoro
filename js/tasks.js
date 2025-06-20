@@ -10,7 +10,7 @@ const completedTasksDisplay = document.getElementById('completed-tasks');
 const totalTasksDisplay = document.getElementById('total-tasks');
 const clearCompletedBtnElement = document.getElementById('clear-completed-btn');
 
-let tasksState = []; // Use a more specific name
+let tasksState = [];
 let currentSelectedTaskId = null;
 
 function initTasksModule() {
@@ -21,11 +21,11 @@ function initTasksModule() {
 }
 
 function loadTasksFromStorage() {
-  tasksState = loadData('tasks', []); // Uses global loadData from storage.js
+  tasksState = loadData('tasks', []);
 }
 
 function saveTasksToStorage() {
-  saveData('tasks', tasksState); // Uses global saveData from storage.js
+  saveData('tasks', tasksState);
 }
 
 function handleAddTask(event) {
@@ -41,7 +41,7 @@ function handleAddTask(event) {
     pomodoros: 0
   };
 
-  tasksState.unshift(newTask); // Add to the beginning
+  tasksState.unshift(newTask);
   saveTasksToStorage();
   taskInputElement.value = '';
   renderTaskList();
@@ -54,7 +54,7 @@ function handleAddTask(event) {
 
 function renderTaskList() {
   if (!taskListElement) return;
-  taskListElement.innerHTML = ''; // Clear existing tasks
+  taskListElement.innerHTML = '';
 
   if (tasksState.length === 0) {
     taskListElement.innerHTML = `<div class="text-center text-[rgb(var(--muted-foreground-rgb))] py-5 px-3 text-sm">No tasks yet. Add one to get started!</div>`;
@@ -68,29 +68,27 @@ function renderTaskList() {
     taskItem.setAttribute('role', 'listitem');
     taskItem.setAttribute('tabindex', '0');
 
-    // Apply dynamic classes for completed and selected states
     if (task.completed) {
-      taskItem.classList.add('completed'); // CSS handles specific styling
+      taskItem.classList.add('completed');
     }
     if (task.id === currentSelectedTaskId && !task.completed) {
       taskItem.classList.add('bg-[rgba(var(--primary-rgb),0.15)]', 'ring-2', 'ring-[rgb(var(--primary-rgb))]');
     } else if (!task.completed) {
-      taskItem.classList.add('bg-[rgba(var(--card-background-rgb),0.7)]'); // Default for non-completed, non-selected
+      taskItem.classList.add('bg-[rgba(var(--card-background-rgb),0.7)]');
     }
-
 
     const pomodorosDisplay = task.pomodoros > 0 ?
       `<span class="text-xs font-medium text-amber-400 mr-2 flex items-center" title="${task.pomodoros} Pomodoros">${'🍅'.repeat(Math.min(task.pomodoros, 5))}${task.pomodoros > 5 ? `+${task.pomodoros - 5}` : ''}</span>` : '';
 
     taskItem.innerHTML = `
-      <div class="flex items-center flex-grow min-w-0">  <!--min-w-0 for text truncation-->
+      <div class="flex items-center flex-grow min-w-0">
         <input type="checkbox" id="task-check-${task.id}" class="task-checkbox form-checkbox h-5 w-5 rounded border-gray-500 text-[rgb(var(--primary-rgb))] focus:ring-[rgb(var(--primary-rgb))] mr-3 flex-shrink-0" ${task.completed ? 'checked' : ''} aria-labelledby="task-text-${task.id}">
         <label for="task-check-${task.id}" id="task-text-${task.id}" class="task-text flex-grow truncate ${task.completed ? 'line-through text-[rgb(var(--muted-foreground-rgb))]' : 'text-[rgb(var(--foreground-rgb))]'}">${task.text}</label>
       </div>
       <div class="flex items-center flex-shrink-0 ml-2">
         ${pomodorosDisplay}
         <button class="task-delete text-gray-500 hover:text-red-500 transition-colors p-1.5 rounded-full hover:bg-[rgba(var(--destructive-rgb),0.1)]" aria-label="Delete task: ${task.text}">
-          <svg xmlns="<http://www.w3.org/2000/svg>" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
     `;
@@ -103,18 +101,18 @@ function renderTaskList() {
 
     taskItem.addEventListener('click', (e) => {
       if (e.target.type === 'checkbox' || e.target.closest('.task-delete')) return;
-      if (!task.completed) selectTaskForSession(task.id); // Only allow selecting non-completed tasks
+      if (!task.completed) selectTaskForSession(task.id);
     });
+    
     taskItem.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         if (document.activeElement === taskItem && !task.completed) {
           e.preventDefault();
           selectTaskForSession(task.id);
-        } else if (document.activeElement.type === 'checkbox') {
-          // Let checkbox handle its own space/enter
         }
       }
     });
+    
     taskListElement.appendChild(taskItem);
   });
 }
@@ -126,7 +124,6 @@ function toggleTaskCompletion(taskId) {
   tasksState[taskIndex].completed = !tasksState[taskIndex].completed;
   tasksState[taskIndex].completedAt = tasksState[taskIndex].completed ? new Date().toISOString() : null;
 
-  // If completing the currently selected task, deselect it
   if (tasksState[taskIndex].completed && currentSelectedTaskId === taskId) {
     currentSelectedTaskId = null;
   }
@@ -170,7 +167,6 @@ function clearCompletedTasks() {
       height: 0, paddingBlock: 0, marginBlock: 0, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in",
       onComplete: () => {
         tasksState = tasksState.filter(task => !task.completed);
-        // No need to deselect current task if it was completed, as it's gone.
         saveTasksToStorage();
         renderTaskList();
         updateTaskStatsDisplay();
@@ -193,16 +189,16 @@ function updateTaskStatsDisplay() {
 
 function selectTaskForSession(taskId) {
   if (currentSelectedTaskId === taskId) {
-    currentSelectedTaskId = null; // Deselect if clicking the same task
+    currentSelectedTaskId = null;
   } else {
     const taskToSelect = tasksState.find(t => t.id === taskId);
-    if (taskToSelect && !taskToSelect.completed) { // Can only select non-completed tasks
+    if (taskToSelect && !taskToSelect.completed) {
       currentSelectedTaskId = taskId;
     } else {
-      currentSelectedTaskId = null; // Ensure no selection if task is completed
+      currentSelectedTaskId = null;
     }
   }
-  renderTaskList(); // Re-render to update selection highlight
+  renderTaskList();
 }
 
 function getCurrentTask() {
@@ -213,7 +209,7 @@ window.getCurrentTask = getCurrentTask;
 
 function incrementTaskPomodoro() {
   const currentTask = getCurrentTask();
-  if (!currentTask) return; // Only if a task is selected
+  if (!currentTask) return;
 
   const taskIndex = tasksState.findIndex(task => task.id === currentTask.id);
   if (taskIndex === -1) return;
@@ -239,4 +235,8 @@ function setupTaskEventListeners() {
   if (clearCompletedBtnElement) clearCompletedBtnElement.addEventListener('click', clearCompletedTasks);
 }
 
-document.addEventListener('DOMContentLoaded', initTasksModule);
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('task-input')) {
+    initTasksModule();
+  }
+});

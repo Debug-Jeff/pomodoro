@@ -9,19 +9,18 @@ const longBreakDurationSlider = document.getElementById('long-break-duration');
 const sessionsBeforeLongBreakSlider = document.getElementById('sessions-before-long-break');
 const enableNotificationsToggle = document.getElementById('enable-notifications');
 const enableSoundsToggle = document.getElementById('enable-sounds');
-const notificationSoundSelect = document.getElementById('notification-sound'); // New
+const notificationSoundSelect = document.getElementById('notification-sound');
 const themePreviewElements = document.querySelectorAll('.theme-preview');
 const exportDataBtn = document.getElementById('export-data-btn');
 const importDataBtn = document.getElementById('import-data-btn');
-const resetAllDataBtn = document.getElementById('reset-settings'); // ID from HTML, maps to resetAllAppData
+const resetAllDataBtn = document.getElementById('reset-settings');
 const importFileInput = document.getElementById('import-file');
 const settingsFeedbackElement = document.getElementById('settings-feedback');
 
-
 function initSettingsModule() {
-  if (!document.querySelector('body[data-page="settings"]')) return; // Check if on settings page
+  if (!document.querySelector('body[data-page="settings"]')) return;
 
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.SCHEMAS.settings);
 
   updateSliderUI(focusDurationSlider, 'focus-duration-display', settings.focusDuration, ' min');
   updateSliderUI(shortBreakDurationSlider, 'short-break-duration-display', settings.shortBreakDuration, ' min');
@@ -36,9 +35,8 @@ function initSettingsModule() {
   setActiveThemePreviewUI(settings.theme);
   setupSettingsEventListeners();
 
-  // Ensure current theme from localStorage is applied visually if different from default
   const currentTheme = getCurrentTheme();
-  if (currentTheme !== settings.theme) { // settings.theme is from loadData which could be default
+  if (currentTheme !== settings.theme) {
     setActiveThemePreviewUI(currentTheme);
   }
 }
@@ -56,6 +54,7 @@ function setupSettingsEventListeners() {
     { el: longBreakDurationSlider, display: 'long-break-duration-display', unit: ' min', settingKey: 'longBreakDuration' },
     { el: sessionsBeforeLongBreakSlider, display: 'sessions-before-long-break-display', unit: ' sessions', settingKey: 'sessionsBeforeLongBreak' }
   ];
+  
   slidersConfig.forEach(item => {
     if (item.el) {
       item.el.addEventListener('input', () => {
@@ -99,7 +98,7 @@ function setupSettingsEventListeners() {
       saveCurrentSettingsToStorage();
       announceFeedback(`Notification sound set to ${notificationSoundSelect.options[notificationSoundSelect.selectedIndex].text}.`);
       if (enableSoundsToggle && enableSoundsToggle.checked && window.playSound) {
-        window.playSound(notificationSoundSelect.value); // Play selected sound as preview
+        window.playSound(notificationSoundSelect.value);
       }
     });
   }
@@ -107,9 +106,8 @@ function setupSettingsEventListeners() {
   themePreviewElements.forEach(element => {
     element.addEventListener('click', () => {
       const theme = element.dataset.theme;
-      window.setAndApplyTheme(theme); // This saves to localStorage and applies
-      setActiveThemePreviewUI(theme); // Updates UI on this page
-      // saveCurrentSettingsToStorage(); // setAndApplyTheme already saves the 'theme' key
+      window.setAndApplyTheme(theme);
+      setActiveThemePreviewUI(theme);
       announceFeedback(`Theme set to ${theme.charAt(0).toUpperCase() + theme.slice(1)}.`);
       if (window.gsap && !prefersReducedMotion()) {
         gsap.fromTo(element, { scale: 0.95 }, { scale: 1, duration: 0.2, ease: "power2.out" });
@@ -117,7 +115,7 @@ function setupSettingsEventListeners() {
     });
   });
 
-  if (resetAllDataBtn) resetAllDataBtn.addEventListener('click', window.resetAllAppData); // Uses global from storage.js
+  if (resetAllDataBtn) resetAllDataBtn.addEventListener('click', window.resetAllAppData);
   if (exportDataBtn) exportDataBtn.addEventListener('click', window.exportAllAppData);
   if (importDataBtn && importFileInput) {
     importDataBtn.addEventListener('click', () => importFileInput.click());
@@ -127,7 +125,7 @@ function setupSettingsEventListeners() {
       const reader = new FileReader();
       reader.onload = (e) => window.importAllAppData(e.target.result);
       reader.readAsText(file);
-      importFileInput.value = ''; // Reset for next import
+      importFileInput.value = '';
     });
   }
 }
@@ -140,7 +138,8 @@ function setActiveThemePreviewUI(activeTheme) {
     }
   });
 }
-function getCurrentThemeEffective() { // Gets effective theme if 'auto' is selected
+
+function getCurrentThemeEffective() {
   const storedPref = getCurrentTheme();
   if (storedPref === 'auto') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dim';
@@ -148,12 +147,11 @@ function getCurrentThemeEffective() { // Gets effective theme if 'auto' is selec
   return storedPref;
 }
 
-
 function setupVolumeGridUI(selectedVolume, soundEnabled) {
   const volumeGrid = document.getElementById('volume-grid');
   if (!volumeGrid) return;
   volumeGrid.innerHTML = '';
-  const volumeLevels = [0, 20, 40, 60, 80, 100]; // Fewer steps for cleaner UI
+  const volumeLevels = [0, 20, 40, 60, 80, 100];
 
   volumeLevels.forEach(level => {
     const btn = document.createElement('button');
@@ -168,10 +166,12 @@ function setupVolumeGridUI(selectedVolume, soundEnabled) {
     } else {
       btn.classList.add('bg-transparent', 'border-[rgb(var(--muted-foreground-rgb))]', 'text-[rgb(var(--muted-foreground-rgb))]', 'hover:border-[rgb(var(--primary-rgb))]', 'hover:text-[rgb(var(--primary-rgb))]');
     }
+    
     if (!soundEnabled) {
       btn.disabled = true;
       btn.classList.add('opacity-50', 'cursor-not-allowed');
     }
+    
     btn.addEventListener('click', () => {
       if (soundEnabled) {
         saveVolumeSettingToStorage(level);
@@ -180,15 +180,16 @@ function setupVolumeGridUI(selectedVolume, soundEnabled) {
     });
     volumeGrid.appendChild(btn);
   });
+  
   const volumeDisplay = document.getElementById('volume-display');
   if (volumeDisplay) volumeDisplay.textContent = soundEnabled ? `${selectedVolume}%` : 'Muted';
 }
 
 function saveVolumeSettingToStorage(value) {
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.SCHEMAS.settings);
   settings.soundVolume = value;
   settings.enableSounds = enableSoundsToggle ? enableSoundsToggle.checked : settings.enableSounds;
-  saveData('settings', settings); // This will trigger 'appStorageChange'
+  saveData('settings', settings);
 
   if (window.setMasterVolume) window.setMasterVolume(value / 100);
   setupVolumeGridUI(value, settings.enableSounds);
@@ -200,17 +201,17 @@ function saveCurrentSettingsToStorage() {
   const currentTheme = activeThemeElement ? activeThemeElement.dataset.theme : getCurrentTheme();
 
   const settings = {
-    focusDuration: focusDurationSlider ? parseInt(focusDurationSlider.value) : DEFAULT_SETTINGS.focusDuration,
-    shortBreakDuration: shortBreakDurationSlider ? parseInt(shortBreakDurationSlider.value) : DEFAULT_SETTINGS.shortBreakDuration,
-    longBreakDuration: longBreakDurationSlider ? parseInt(longBreakDurationSlider.value) : DEFAULT_SETTINGS.longBreakDuration,
-    sessionsBeforeLongBreak: sessionsBeforeLongBreakSlider ? parseInt(sessionsBeforeLongBreakSlider.value) : DEFAULT_SETTINGS.sessionsBeforeLongBreak,
-    enableNotifications: enableNotificationsToggle ? enableNotificationsToggle.checked : DEFAULT_SETTINGS.enableNotifications,
-    enableSounds: enableSoundsToggle ? enableSoundsToggle.checked : DEFAULT_SETTINGS.enableSounds,
-    soundVolume: parseInt(document.querySelector('#volume-grid button.bg-\\\\[rgb\\\\(var\\\\(--primary-rgb\\\\)\\\\)\\\\]')?.dataset.value || loadData('settings').soundVolume || DEFAULT_SETTINGS.soundVolume),
-    notificationSound: notificationSoundSelect ? notificationSoundSelect.value : DEFAULT_SETTINGS.notificationSound,
+    focusDuration: focusDurationSlider ? parseInt(focusDurationSlider.value) : window.DEFAULT_SETTINGS.focusDuration,
+    shortBreakDuration: shortBreakDurationSlider ? parseInt(shortBreakDurationSlider.value) : window.DEFAULT_SETTINGS.shortBreakDuration,
+    longBreakDuration: longBreakDurationSlider ? parseInt(longBreakDurationSlider.value) : window.DEFAULT_SETTINGS.longBreakDuration,
+    sessionsBeforeLongBreak: sessionsBeforeLongBreakSlider ? parseInt(sessionsBeforeLongBreakSlider.value) : window.DEFAULT_SETTINGS.sessionsBeforeLongBreak,
+    enableNotifications: enableNotificationsToggle ? enableNotificationsToggle.checked : window.DEFAULT_SETTINGS.enableNotifications,
+    enableSounds: enableSoundsToggle ? enableSoundsToggle.checked : window.DEFAULT_SETTINGS.enableSounds,
+    soundVolume: parseInt(document.querySelector('#volume-grid button.bg-\\[rgb\\(var\\(--primary-rgb\\)\\)\\]')?.dataset.value || loadData('settings').soundVolume || window.DEFAULT_SETTINGS.soundVolume),
+    notificationSound: notificationSoundSelect ? notificationSoundSelect.value : window.DEFAULT_SETTINGS.notificationSound,
     theme: currentTheme,
-    enableBackgroundSync: loadData('settings').enableBackgroundSync, // Preserve existing
-    enablePushNotifications: loadData('settings').enablePushNotifications // Preserve existing
+    enableBackgroundSync: loadData('settings').enableBackgroundSync,
+    enablePushNotifications: loadData('settings').enablePushNotifications
   };
   saveData('settings', settings);
 }
@@ -221,21 +222,14 @@ function announceFeedback(message) {
   }
 }
 
-// Push notification VAPID key (replace with your actual key)
-// const PUBLIC_VAPID_KEY = 'YOUR_PUBLIC_VAPID_KEY_HERE';
-// function requestPushPermission() { ... } // As before, if implementing
-
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.querySelector('body[data-page="settings"]')) { // Example check
+  if (document.querySelector('body[data-page="settings"]')) {
     initSettingsModule();
-  }
-  if (window.globalUpdatePopOutTimerDisplayStatus) {
-    globalUpdatePopOutTimerDisplayStatus();
   }
 });
 
 window.addEventListener('themeChanged', (event) => {
   if (document.querySelector('body[data-page="settings"]')) {
-    setActiveThemePreviewUI(event.detail.theme); // Update previews if theme changed elsewhere
+    setActiveThemePreviewUI(event.detail.theme);
   }
 });
