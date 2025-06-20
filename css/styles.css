@@ -125,6 +125,7 @@ body {
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  background: rgba(var(--card-background-rgb), 0.5);
 }
 
 .theme-preview:hover {
@@ -159,6 +160,39 @@ body {
 .theme-color-box {
   border-radius: 6px;
   transition: all 0.2s ease;
+  margin: 0 auto;
+  height: 40px;
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Specific theme color boxes */
+.theme-preview[data-theme="dark"] .theme-color-box {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.theme-preview[data-theme="dim"] .theme-color-box {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+}
+
+.theme-preview[data-theme="purple"] .theme-color-box {
+  background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+}
+
+.theme-preview[data-theme="ocean"] .theme-color-box {
+  background: linear-gradient(135deg, #0ea5e9 0%, #7dd3fc 100%);
+}
+
+.theme-preview[data-theme="sunset"] .theme-color-box {
+  background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+}
+
+.theme-preview[data-theme="auto"] .theme-color-box {
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 50%, #0ea5e9 100%);
 }
 
 /* Analog clock styles */
@@ -169,7 +203,8 @@ body {
   position: relative;
   margin: 0 auto;
   border: 3px solid rgba(var(--foreground-rgb), 0.2);
-  background-color: rgba(var(--card-background-rgb), 0.6);
+  background-color: rgba(var(--card-background-rgb), 0.8);
+  box-shadow: inset 0 0 20px rgba(var(--primary-rgb), 0.1);
 }
 
 .analog-clock-widget .hand {
@@ -180,23 +215,27 @@ body {
   background-color: rgb(var(--foreground-rgb));
   border-radius: 10px;
   transform: translateX(-50%);
+  transition: transform 0.1s ease-out;
 }
 
 .analog-clock-widget .hour-hand {
   width: 4px;
   height: 30px;
   background-color: rgb(var(--primary-rgb));
+  z-index: 3;
 }
 
 .analog-clock-widget .minute-hand {
   width: 3px;
   height: 40px;
+  z-index: 2;
 }
 
 .analog-clock-widget .second-hand {
   width: 2px;
   height: 45px;
   background-color: rgb(var(--secondary-rgb));
+  z-index: 1;
 }
 
 .analog-clock-widget .center-dot {
@@ -208,21 +247,32 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1px solid rgb(var(--foreground-rgb));
+  border: 2px solid rgb(var(--foreground-rgb));
+  z-index: 4;
 }
 
 .analog-clock-widget .marking {
   position: absolute;
-  width: 2px;
-  height: 8px;
   background-color: rgba(var(--foreground-rgb), 0.4);
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+  border-radius: 1px;
 }
 
 .analog-clock-widget .hour-mark {
-  height: 10px;
+  width: 3px;
+  height: 12px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(var(--foreground-rgb), 0.6);
+}
+
+.analog-clock-widget .minute-mark {
+  width: 1px;
+  height: 8px;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(var(--foreground-rgb), 0.3);
 }
 
 /* Pop-out timer styles */
@@ -246,6 +296,14 @@ body {
   font-weight: inherit;
   text-align: center;
   width: 100%;
+  border: 2px solid rgba(var(--primary-rgb), 0.5);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.time-edit-input:focus {
+  border-color: rgb(var(--primary-rgb));
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
 }
 
 /* Animated border for cards */
@@ -279,6 +337,18 @@ body {
 @keyframes border-flow {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Timer display editing styles */
+.timer-display-editable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timer-display-editable:hover {
+  background: rgba(var(--primary-rgb), 0.1);
+  border-radius: 8px;
+  padding: 4px 8px;
 }
 
 /* Responsive adjustments */

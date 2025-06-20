@@ -5,10 +5,10 @@
 
 let timerState = {
   mode: 'focus',
-  timeRemaining: DEFAULT_SETTINGS.focusDuration * 60,
+  timeRemaining: 25 * 60,
   isRunning: false,
   startTime: null,
-  totalDurationAtStart: DEFAULT_SETTINGS.focusDuration * 60,
+  totalDurationAtStart: 25 * 60,
   timerId: null,
   completedSessionsToday: 0,
   currentSequenceStep: 0,
@@ -32,14 +32,13 @@ const completedCountDisplayElement = document.getElementById('completed-count');
 const cycleProgressBarElement = document.getElementById('progress-bar');
 const cycleProgressLabelElement = document.getElementById('progress-label');
 
-// Pop-out Timer Elements (global for potential cross-page access attempts)
+// Pop-out Timer Elements
 window.popOutTimerGlobalElement = null;
 window.popTimerDisplayGlobalElement = null;
 window.popTimerLabelGlobalElement = null;
 window.popStartBtnGlobalElement = null;
 window.popResetBtnGlobalElement = null;
 window.closePopOutBtnGlobalElement = null;
-
 
 function initTimerModule() {
   // Assign pop-out elements if they exist on the current page
@@ -53,11 +52,11 @@ function initTimerModule() {
   }
 
   loadCompletedSessionsToday();
-  const initialSettings = loadData('settings', SCHEMAS.settings);
+  const initialSettings = loadData('settings', window.DEFAULT_SETTINGS);
   timerState.timeRemaining = initialSettings.focusDuration * 60;
   timerState.totalDurationAtStart = timerState.timeRemaining;
 
-  switchMode('focus', true); // Initial mode without stopping timer
+  switchModeAndSequence('focus', null, true);
   setupTimerEventListeners();
   updatePomodoroCycleDisplay();
 
@@ -65,10 +64,10 @@ function initTimerModule() {
     const radius = timerProgressRingElement.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
     timerProgressRingElement.style.strokeDasharray = circumference;
-    timerProgressRingElement.style.strokeDashoffset = 0; // Full at start, will be updated
+    timerProgressRingElement.style.strokeDashoffset = 0;
   }
-  updateTimerProgressRingVisual(true); // Set initial visual state of ring
-  globalUpdatePopOutTimerDisplayStatus(); // Check if pop-out should be shown
+  updateTimerProgressRingVisual(true);
+  globalUpdatePopOutTimerDisplayStatus();
 }
 
 function setupTimerEventListeners() {
@@ -81,7 +80,12 @@ function setupTimerEventListeners() {
   if (timerDisplayContainerElement) timerDisplayContainerElement.addEventListener('click', enableTimerDisplayEdit);
   if (timerEditInputElement) {
     timerEditInputElement.addEventListener('blur', disableTimerDisplayEdit);
-    timerEditInputElement.addEventListener('keydown', (e) => { if (e.key === 'Enter') disableTimerDisplayEdit(); });
+    timerEditInputElement.addEventListener('keydown', (e) => { 
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        disableTimerDisplayEdit();
+      }
+    });
   }
 
   if (window.popOutTimerGlobalElement && document.getElementById('pop-out-btn')) {
@@ -98,6 +102,7 @@ function enableTimerDisplayEdit() {
     if (timerState.isRunning && window.showToast) window.showToast("Pause timer to edit time.", "info");
     return;
   }
+  
   timerDisplayElement.classList.add('hidden');
   timerEditInputElement.classList.remove('hidden');
   const minutes = Math.floor(timerState.timeRemaining / 60);
@@ -109,28 +114,29 @@ function enableTimerDisplayEdit() {
 
 function disableTimerDisplayEdit() {
   if (!timerDisplayElement || !timerEditInputElement) return;
-  const timePattern = /^(\\d{1,3}):(\\d{2})$/;
+  
+  const timePattern = /^(\d{1,3}):(\d{2})$/;
   const match = timerEditInputElement.value.match(timePattern);
   let timeChanged = false;
 
   if (match) {
     let minutes = parseInt(match[1], 10);
     let seconds = parseInt(match[2], 10);
-    if (minutes >= 0 && minutes <= 180 && seconds >= 0 && seconds < 60) { // Max 3 hours
+    if (minutes >= 0 && minutes <= 180 && seconds >= 0 && seconds < 60) {
       let newTime = (minutes * 60) + seconds;
       if (newTime === 0 && timerState.mode === 'focus') {
-        newTime = 60; // Min 1 min for focus
+        newTime = 60;
         if (window.showToast) window.showToast("Focus time set to minimum 01:00.", "info");
       }
       if (timerState.timeRemaining !== newTime) {
         timerState.timeRemaining = newTime;
-        timerState.totalDurationAtStart = newTime; // User explicitly set this duration
+        timerState.totalDurationAtStart = newTime;
         timeChanged = true;
       }
     } else if (window.showToast) {
-      window.showToast("Invalid time. Reverted.", "error");
+      window.showToast("Invalid time. Use MM:SS format (max 180:00).", "error");
     }
-  } else if (timerEditInputElement.value !== "" && window.showToast) { // Value was entered but didn't match pattern
+  } else if (timerEditInputElement.value !== "" && window.showToast) {
     window.showToast("Invalid format. Use MM:SS.", "error");
   }
 
@@ -138,8 +144,8 @@ function disableTimerDisplayEdit() {
   timerDisplayElement.classList.remove('hidden');
 
   if (timeChanged) {
-    updateAllTimerDisplays(); // Update main, popout, title
-    updateTimerProgressRingVisual(true); // Reset ring to new duration
+    updateAllTimerDisplays();
+    updateTimerProgressRingVisual(true);
   }
   updateStartButtonUIText();
 }
@@ -147,7 +153,7 @@ function disableTimerDisplayEdit() {
 function switchModeAndSequence(mode, sequenceStepIndex = null, isInitial = false) {
   if (!isInitial && timerState.isRunning) stopTimerExecution();
 
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.DEFAULT_SETTINGS);
   let newDurationSeconds;
   let newLabel;
 
@@ -161,12 +167,11 @@ function switchModeAndSequence(mode, sequenceStepIndex = null, isInitial = false
     newDurationSeconds = step.duration * 60;
     newLabel = step.type === 'focus' ? 'Focus Time' : step.type === 'shortBreak' ? 'Short Break' : 'Long Break';
     timerState.currentSequenceStep = sequenceStepIndex;
-    if (window.updateCustomSequenceUI) window.updateCustomSequenceUI(); // Update home page sequence display
+    if (window.updateCustomSequenceUI) window.updateCustomSequenceUI();
   } else {
-    // Standard mode switch or sequence ended/cleared
     timerState.mode = mode;
-    timerState.currentSequenceStep = 0; // Reset sequence step if not in a sequence call
-    if (activeSequenceId && !currentSequence) saveData('active_sequence_id', null); // Clear invalid active sequence
+    timerState.currentSequenceStep = 0;
+    if (activeSequenceId && !currentSequence) saveData('active_sequence_id', null);
 
     switch (mode) {
       case 'focus': newDurationSeconds = settings.focusDuration * 60; newLabel = 'Focus Time'; break;
@@ -183,16 +188,15 @@ function switchModeAndSequence(mode, sequenceStepIndex = null, isInitial = false
   updateAllTimerDisplays();
   updateModeButtonUI();
   updatePomodoroCycleDisplay();
-  updateTimerProgressRingVisual(true); // Reset ring for new mode/duration
+  updateTimerProgressRingVisual(true);
 }
-// Make switchModeAndSequence globally available for custom-sequences.js
+
 window.timerJsSwitchToSequenceStep = (index) => switchModeAndSequence(null, index);
 window.timerJsSwitchMode = (mode) => switchModeAndSequence(mode);
 
-
 function updateAllTimerDisplays() {
   updateMainTimerDisplay();
-  updatePopOutTimerFullDisplay(); // Syncs content and visibility state
+  updatePopOutTimerFullDisplay();
   updateStartButtonUIText();
 }
 
@@ -203,6 +207,7 @@ function updateModeButtonUI() {
       btn.setAttribute('aria-pressed', 'false');
     }
   });
+  
   let activeBtn;
   if (timerState.mode === 'focus') activeBtn = focusModeButton;
   else if (timerState.mode === 'shortBreak') activeBtn = shortBreakModeButton;
@@ -241,7 +246,7 @@ function startTimerExecution() {
   timerState.startTime = Date.now() - elapsedMs;
 
   if (timerContainerElement && !prefersReducedMotion()) timerContainerElement.classList.add('timer-pulse');
-  if (timerState.timerId) cancelAnimationFrame(timerState.timerId); // Clear any existing frame
+  if (timerState.timerId) cancelAnimationFrame(timerState.timerId);
   timerState.timerId = requestAnimationFrame(timerTick);
 }
 
@@ -255,16 +260,16 @@ function stopTimerExecution() {
 
 function resetCurrentTimer() {
   stopTimerExecution();
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.DEFAULT_SETTINGS);
   let newDuration;
-  // Check if in a sequence, if so, reset to current step's duration
+  
   const activeSeqId = loadData('active_sequence_id');
   const sequences = loadData('sequences', []);
   const currentSeq = activeSeqId ? sequences.find(s => s.id === activeSeqId) : null;
 
   if (currentSeq && currentSeq.steps[timerState.currentSequenceStep]) {
     newDuration = currentSeq.steps[timerState.currentSequenceStep].duration * 60;
-  } else { // Standard mode durations
+  } else {
     switch (timerState.mode) {
       case 'focus': newDuration = settings.focusDuration * 60; break;
       case 'shortBreak': newDuration = settings.shortBreakDuration * 60; break;
@@ -272,10 +277,11 @@ function resetCurrentTimer() {
       default: newDuration = settings.focusDuration * 60;
     }
   }
+  
   timerState.timeRemaining = newDuration;
   timerState.totalDurationAtStart = newDuration;
   updateAllTimerDisplays();
-  updateTimerProgressRingVisual(true); // Reset ring fully
+  updateTimerProgressRingVisual(true);
 }
 
 function timerTick() {
@@ -287,7 +293,7 @@ function timerTick() {
 
   updateMainTimerDisplay();
   updateTimerProgressRingVisual();
-  updatePopOutTimerFullDisplay(); // Keep pop-out synced
+  updatePopOutTimerFullDisplay();
 
   if (timerState.timeRemaining <= 0) {
     handleTimerSessionCompletion();
@@ -313,7 +319,7 @@ function updateTimerProgressRingVisual(resetRing = false) {
   const circumference = 2 * Math.PI * radius;
   timerProgressRingElement.style.strokeDasharray = circumference;
 
-  let progressFraction = 0; // Default to full ring (offset 0)
+  let progressFraction = 0;
   if (timerState.totalDurationAtStart > 0 && !resetRing) {
     progressFraction = timerState.timeRemaining / timerState.totalDurationAtStart;
   }
@@ -329,15 +335,16 @@ function updateTimerProgressRingVisual(resetRing = false) {
 
 function handleTimerSessionCompletion() {
   stopTimerExecution();
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.DEFAULT_SETTINGS);
 
   if (settings.enableSounds && window.playSound) {
     let soundKey = settings.notificationSound || 'default_alarm';
-    if (timerState.mode !== 'focus') { // Different sound for break completion
-      soundKey = settings.breakNotificationSound || 'retro_notify'; // Assuming breakNotificationSound setting exists
+    if (timerState.mode !== 'focus') {
+      soundKey = settings.breakNotificationSound || 'retro_notify';
     }
     window.playSound(soundKey);
   }
+  
   if (settings.enableNotifications && window.showNotification) {
     const title = timerState.mode === 'focus' ? 'Focus session complete!' : 'Break time over!';
     const message = timerState.mode === 'focus' ? 'Well done! Time for a break.' : 'Ready for the next focus session?';
@@ -352,7 +359,6 @@ function handleTimerSessionCompletion() {
     updateCompletedSessionsDisplay();
   }
 
-  // Determine next mode (sequence or standard)
   const activeSequenceId = loadData('active_sequence_id');
   const sequences = loadData('sequences', []);
   const currentSequence = activeSequenceId ? sequences.find(s => s.id === activeSequenceId) : null;
@@ -361,8 +367,7 @@ function handleTimerSessionCompletion() {
     const nextStepIndex = (timerState.currentSequenceStep + 1) % currentSequence.steps.length;
     switchModeAndSequence(null, nextStepIndex);
     if (window.dispatchEvent) window.dispatchEvent(new CustomEvent('timerSequenceStepChanged', { detail: { currentStepIndex: nextStepIndex } }));
-
-  } else { // Standard Pomodoro logic
+  } else {
     if (timerState.mode === 'focus') {
       const sessionsForLongBreak = settings.sessionsBeforeLongBreak;
       if (timerState.completedSessionsToday > 0 && timerState.completedSessionsToday % sessionsForLongBreak === 0) {
@@ -370,10 +375,11 @@ function handleTimerSessionCompletion() {
       } else {
         switchModeAndSequence('shortBreak');
       }
-    } else { // After any break
+    } else {
       switchModeAndSequence('focus');
     }
   }
+  
   updateAllTimerDisplays();
   updatePomodoroCycleDisplay();
   if (timerContainerElement && window.gsap && !prefersReducedMotion()) {
@@ -396,21 +402,20 @@ function recordCompletedSession() {
 
 function updateDailyStreak() {
   const todayStr = new Date().toLocaleDateString();
-  let streakData = loadData('streak', SCHEMAS.streak);
-  if (streakData.lastActiveDay === todayStr && timerState.mode === 'focus') return; // Only count first focus session of the day for streak
+  let streakData = loadData('streak', window.SCHEMAS.streak);
+  if (streakData.lastActiveDay === todayStr && timerState.mode === 'focus') return;
 
-  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterday = new Date(); 
+  yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayStr = yesterday.toLocaleDateString();
 
   if (streakData.lastActiveDay === yesterdayStr) {
     streakData.currentStreak++;
-  } else if (streakData.lastActiveDay !== todayStr) { // If not yesterday and not today, streak broken
+  } else if (streakData.lastActiveDay !== todayStr) {
     streakData.currentStreak = 1;
-  } else { // Already recorded today but this is a subsequent focus session, don't increment streak
-    // No change to currentStreak if lastActiveDay is today but this is not the first focus session of the day triggering streak update
   }
 
-  streakData.lastActiveDay = todayStr; // Mark today as active
+  streakData.lastActiveDay = todayStr;
   streakData.bestStreak = Math.max(streakData.bestStreak, streakData.currentStreak);
   saveData('streak', streakData);
 }
@@ -427,27 +432,20 @@ function updateCompletedSessionsDisplay() {
 
 function updatePomodoroCycleDisplay() {
   if (!cycleProgressBarElement || !cycleProgressLabelElement) return;
-  const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', window.DEFAULT_SETTINGS);
   const sessionsInCycle = settings.sessionsBeforeLongBreak;
 
   let completedInCurrentCycle = timerState.completedSessionsToday % sessionsInCycle;
   if (completedInCurrentCycle === 0 && timerState.completedSessionsToday > 0) {
-    completedInCurrentCycle = sessionsInCycle; // Show 4/4 if cycle just completed
+    completedInCurrentCycle = sessionsInCycle;
   }
-
-  // If currently in a focus session that's not yet complete, it's the "next" one in the cycle.
-  // This display typically shows *completed* sessions towards the next long break.
-  // So, completedInCurrentCycle as calculated above is usually correct.
-  // If timerState.mode is 'focus' and isRunning, and completedInCurrentCycle is sessionsInCycle, it means user is ON the last session of cycle.
-  // If timerState.mode is 'longBreak', it means completedInCurrentCycle should show sessionsInCycle.
 
   cycleProgressLabelElement.textContent = `${completedInCurrentCycle}/${sessionsInCycle}`;
   const progressPercent = sessionsInCycle > 0 ? (completedInCurrentCycle / sessionsInCycle) * 100 : 0;
   cycleProgressBarElement.style.width = `${progressPercent}%`;
 }
 
-
-// --- Pop-out Timer Logic ---
+// Pop-out Timer Logic
 function togglePopOutTimerVisibility() {
   if (!window.popOutTimerGlobalElement) return;
   const isHidden = window.popOutTimerGlobalElement.classList.toggle('hidden');
@@ -457,8 +455,8 @@ function togglePopOutTimerVisibility() {
       window.popOutTimerGlobalElement.style.left = popOutState.x;
       window.popOutTimerGlobalElement.style.top = popOutState.y;
     } else {
-      window.popOutTimerGlobalElement.style.right = '30px'; // Default position
-      window.popOutTimerGlobalElement.style.top = '75px';  // Default position
+      window.popOutTimerGlobalElement.style.right = '30px';
+      window.popOutTimerGlobalElement.style.top = '75px';
       window.popOutTimerGlobalElement.style.left = 'auto';
     }
     if (window.gsap && !prefersReducedMotion()) {
@@ -466,7 +464,7 @@ function togglePopOutTimerVisibility() {
     }
   }
   saveData('popOutTimerOpen', !isHidden);
-  updatePopOutTimerFullDisplay(); // Sync content
+  updatePopOutTimerFullDisplay();
 }
 
 function closePopOutTimer() {
@@ -480,12 +478,10 @@ function closePopOutTimer() {
 }
 
 function updatePopOutTimerFullDisplay() {
-  if (!window.popOutTimerGlobalElement) return; // Element might not be on this page
+  if (!window.popOutTimerGlobalElement) return;
 
-  // Visibility based on stored preference
   const isOpen = loadData('popOutTimerOpen', false);
   if (isOpen && window.popOutTimerGlobalElement.classList.contains('hidden')) {
-    // Restore position and show
     const popOutState = loadData('popOutTimerState', { x: 'auto', y: '75px' });
     window.popOutTimerGlobalElement.style.left = popOutState.x || 'auto';
     window.popOutTimerGlobalElement.style.top = popOutState.y || '75px';
@@ -495,7 +491,6 @@ function updatePopOutTimerFullDisplay() {
     window.popOutTimerGlobalElement.classList.add('hidden');
   }
 
-  // Update content if visible
   if (!window.popOutTimerGlobalElement.classList.contains('hidden')) {
     const minutes = Math.floor(timerState.timeRemaining / 60);
     const seconds = timerState.timeRemaining % 60;
@@ -504,10 +499,9 @@ function updatePopOutTimerFullDisplay() {
     const currentLabelText = timerLabelElement ? timerLabelElement.textContent : (timerState.mode.charAt(0).toUpperCase() + timerState.mode.slice(1) + " Mode");
     if (window.popTimerLabelGlobalElement) window.popTimerLabelGlobalElement.textContent = currentLabelText;
 
-    updateStartButtonUIText(); // This updates popStartBtn as well
+    updateStartButtonUIText();
   }
 }
-
 
 function makeTimerElementDraggable(elmnt) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -516,71 +510,67 @@ function makeTimerElementDraggable(elmnt) {
   dragHeader.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
-    e = e || window.event; e.preventDefault();
-    pos3 = e.clientX; pos4 = e.clientY;
+    e = e || window.event; 
+    e.preventDefault();
+    pos3 = e.clientX; 
+    pos4 = e.clientY;
     document.onmouseup = closeDragElement;
     document.onmousemove = elementDrag;
   }
+  
   function elementDrag(e) {
-    e = e || window.event; e.preventDefault();
-    pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-    pos3 = e.clientX; pos4 = e.clientY;
+    e = e || window.event; 
+    e.preventDefault();
+    pos1 = pos3 - e.clientX; 
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX; 
+    pos4 = e.clientY;
     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    elmnt.style.right = 'auto'; // Clear right when dragging by left/top
+    elmnt.style.right = 'auto';
   }
+  
   function closeDragElement() {
-    document.onmouseup = null; document.onmousemove = null;
+    document.onmouseup = null; 
+    document.onmousemove = null;
     saveData('popOutTimerState', { x: elmnt.style.left, y: elmnt.style.top });
   }
 }
 
-// Expose functions for custom sequences to call
 window.getCurrentSequenceStepIndex = () => timerState.currentSequenceStep;
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('timer-display')) { // Only run full init if on a page with the main timer
+  if (document.getElementById('timer-display')) {
     initTimerModule();
   }
-  globalUpdatePopOutTimerDisplayStatus(); // Always check pop-out status
+  globalUpdatePopOutTimerDisplayStatus();
 });
 
-// For pages without the main timer, this function updates the pop-out status and time.
 function globalUpdatePopOutTimerDisplayStatus() {
   if (!window.popOutTimerGlobalElement && document.getElementById('pop-out-timer')) {
-    // Initialize pop-out elements if not done by initTimerModule (e.g. on dashboard/settings page)
     window.popOutTimerGlobalElement = document.getElementById('pop-out-timer');
     window.popTimerDisplayGlobalElement = document.getElementById('pop-timer-display');
     window.popTimerLabelGlobalElement = document.getElementById('pop-timer-label');
-    // Buttons might not exist/be functional on non-timer pages, primarily for display
   }
-  updatePopOutTimerFullDisplay(); // Checks stored open state and updates
+  updatePopOutTimerFullDisplay();
 }
 
-// Refresh pop-out periodically IF timer.js's main tick isn't running on this page.
-// This is a fallback. Ideally, timer state is globally managed or events are used.
 setInterval(() => {
   if (loadData('popOutTimerOpen', false) && window.popOutTimerGlobalElement && !timerState.isRunning) {
-    // If timer is not running (e.g. user is on another page),
-    // we need a way to get the latest timerState.
-    // This is complex. For now, it will only show the last known state from timerState object.
-    // A proper solution would involve localStorage for timerState or a Service Worker.
     updatePopOutTimerFullDisplay();
   }
 }, 2000);
 
-
 window.addEventListener('storage', function (event) {
   if (event.key === `${APP_NAME}_settings` && event.newValue) {
     const newSettings = JSON.parse(event.newValue);
-    if (!timerState.isRunning) { // Only update if timer not running
+    if (!timerState.isRunning) {
       let newDuration = timerState.totalDurationAtStart;
       switch (timerState.mode) {
         case 'focus': newDuration = newSettings.focusDuration * 60; break;
         case 'shortBreak': newDuration = newSettings.shortBreakDuration * 60; break;
         case 'longBreak': newDuration = newSettings.longBreakDuration * 60; break;
       }
-      // Only update if the duration for the current mode actually changed
       if (timerState.totalDurationAtStart !== newDuration && timerState.timeRemaining === timerState.totalDurationAtStart) {
         timerState.timeRemaining = newDuration;
         timerState.totalDurationAtStart = newDuration;
@@ -588,17 +578,6 @@ window.addEventListener('storage', function (event) {
         updateTimerProgressRingVisual(true);
       }
     }
-    updatePomodoroCycleDisplay(); // Max sessions in cycle might have changed
+    updatePomodoroCycleDisplay();
   }
-
-  function updateAllDisplays() {
-    requestAnimationFrame(() => {
-      updateTimerDisplay();
-      updateTimerProgressRing(true);
-      updatePopOutTimerDisplay();
-      updateStartButtonText();
-    });
-  }
-  // If timer state itself was stored due to page navigation (advanced):
-  // if (event.key === `${APP_NAME}_timerState` && event.newValue) { ... update local timerState ... }
 });

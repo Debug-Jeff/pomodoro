@@ -16,7 +16,7 @@ const DEFAULT_SETTINGS = {
   enableSounds: true,
   soundVolume: 80,
   theme: 'dark',
-  notificationSound: 'default_alarm', // Added default for notification sound
+  notificationSound: 'default_alarm',
   enableBackgroundSync: true,
   enablePushNotifications: false
 };
@@ -26,6 +26,7 @@ window.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
 function formatTime(minutes, seconds) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
+window.formatTime = formatTime;
 
 function formatDate(date) {
   return new Date(date).toLocaleDateString(undefined, {
@@ -34,6 +35,7 @@ function formatDate(date) {
     day: 'numeric'
   });
 }
+window.formatDate = formatDate;
 
 function formatTimeOfDay(date) {
   return new Date(date).toLocaleTimeString(undefined, {
@@ -41,11 +43,12 @@ function formatTimeOfDay(date) {
     minute: '2-digit'
   });
 }
+window.formatTimeOfDay = formatTimeOfDay;
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-window.prefersReducedMotion = prefersReducedMotion; // Make global if used by other modules directly
+window.prefersReducedMotion = prefersReducedMotion;
 
 async function requestNotificationPermission() {
   if (!('Notification' in window)) {
@@ -64,9 +67,9 @@ window.requestNotificationPermission = requestNotificationPermission;
 function showNotification(title, options = {}) {
   if (Notification.permission === 'granted') {
     const notification = new Notification(title, {
-      icon: 'assets/logo.png', // Ensure this path is correct
-      badge: 'assets/icons/clock-3.png', // Optional: for Android notifications
-      silent: false, // Explicitly not silent unless overridden
+      icon: 'assets/logo.png',
+      badge: 'assets/icons/clock-3.png',
+      silent: false,
       ...options
     });
     return notification;
@@ -84,7 +87,7 @@ function setAndApplyTheme(themeName) {
   let effectiveTheme = themeName;
   if (themeName === 'auto') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    effectiveTheme = prefersDark ? 'dark' : 'dim'; // Auto can default to dark or dim
+    effectiveTheme = prefersDark ? 'dark' : 'dim';
     localStorage.setItem(`${APP_NAME}_theme`, 'auto');
     body.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
   } else {
@@ -97,8 +100,8 @@ function setAndApplyTheme(themeName) {
     setTimeout(() => {
       const computedStyle = getComputedStyle(body);
       const bgColorValue = computedStyle.getPropertyValue('--background-rgb').trim();
-      themeColorMeta.content = bgColorValue ? `rgb(${bgColorValue})` : '#0A0A0C'; // Fallback
-    }, 60); // Increased delay slightly
+      themeColorMeta.content = bgColorValue ? `rgb(${bgColorValue})` : '#0A0A0C';
+    }, 60);
   }
 
   updateThemeBackground(effectiveTheme);
@@ -108,25 +111,17 @@ window.setAndApplyTheme = setAndApplyTheme;
 
 function updateThemeBackground(effectiveThemeName) {
   const body = document.body;
-  // This function relies on themes.css setting:
-  // body.theme-xxx { --bg-image-current: var(--bg-image-xxx-clouds); background-image: var(--bg-image-current); }
-  // So, just applying the class theme-xxx should trigger the CSS to set the background.
-  // The JS part is mainly for the starfield on dark theme.
+  const oldBgContainer = document.querySelector('.background-container');
+  if (oldBgContainer) oldBgContainer.remove();
 
-  // Handle starfield for dark theme
-  const dynamicBgContainer = document.getElementById('dynamic-animated-background'); // A dedicated div for stars
-  if (effectiveThemeName === 'dark') {
-    if (window.injectAnimatedBackground && !document.querySelector('.background-container')) {
-      window.injectAnimatedBackground(); // This function should create '.background-container' with stars
-    } else if (document.querySelector('.background-container')) {
-      document.querySelector('.background-container').style.display = 'block'; // Ensure visible
-    }
-  } else {
-    const existingStarContainer = document.querySelector('.background-container');
-    if (existingStarContainer) existingStarContainer.style.display = 'none'; // Hide for other themes
+  if (prefersReducedMotion() || effectiveThemeName !== 'dark') {
+    return;
+  }
+
+  if (effectiveThemeName === 'dark' && window.injectAnimatedBackground) {
+    window.injectAnimatedBackground();
   }
 }
-
 
 function getCurrentTheme() {
   return localStorage.getItem(`${APP_NAME}_theme`) || DEFAULT_SETTINGS.theme;
@@ -134,7 +129,7 @@ function getCurrentTheme() {
 window.getCurrentTheme = getCurrentTheme;
 
 function setActiveNavLink() {
-  const currentPath = window.location.pathname.split('/').pop() || 'index.html'; // Default to index.html if path is empty
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
   const navLinks = document.querySelectorAll('nav a.nav-link');
   navLinks.forEach(link => {
     const linkPath = link.getAttribute('href').split('/').pop() || 'index.html';
@@ -150,20 +145,30 @@ function initAnalogClock(clockId) {
   const clock = document.getElementById(clockId);
   if (!clock) return;
 
-  // Create hands if they don't exist (more robust)
-  let hourHand = clock.querySelector('.hour-hand');
-  if (!hourHand) { hourHand = document.createElement('div'); hourHand.className = 'hand hour-hand'; clock.appendChild(hourHand); }
-  let minuteHand = clock.querySelector('.minute-hand');
-  if (!minuteHand) { minuteHand = document.createElement('div'); minuteHand.className = 'hand minute-hand'; clock.appendChild(minuteHand); }
-  let secondHand = clock.querySelector('.second-hand');
-  if (!secondHand) { secondHand = document.createElement('div'); secondHand.className = 'hand second-hand'; clock.appendChild(secondHand); }
-  let centerDot = clock.querySelector('.center-dot');
-  if (!centerDot) { centerDot = document.createElement('div'); centerDot.className = 'center-dot'; clock.appendChild(centerDot); }
+  // Clear existing content
+  clock.innerHTML = '';
+
+  // Create hands
+  const hourHand = document.createElement('div');
+  hourHand.className = 'hand hour-hand';
+  clock.appendChild(hourHand);
+
+  const minuteHand = document.createElement('div');
+  minuteHand.className = 'hand minute-hand';
+  clock.appendChild(minuteHand);
+
+  const secondHand = document.createElement('div');
+  secondHand.className = 'hand second-hand';
+  clock.appendChild(secondHand);
+
+  const centerDot = document.createElement('div');
+  centerDot.className = 'center-dot';
+  clock.appendChild(centerDot);
 
   function setClock() {
     const now = new Date();
     const seconds = now.getSeconds();
-    const secondsDegrees = ((seconds / 60) * 360) - 90; // Offset for 12 at top
+    const secondsDegrees = ((seconds / 60) * 360) - 90;
     secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
 
     const minutes = now.getMinutes();
@@ -175,18 +180,16 @@ function initAnalogClock(clockId) {
     hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
   }
 
-  // Add clock markings only once
+  // Add clock markings
   if (!clock.dataset.markingsAdded) {
     for (let i = 1; i <= 12; i++) {
       const mark = document.createElement('div');
       mark.classList.add('marking', 'hour-mark');
-      // Position calculation needs to account for hand transform-origin (bottom center)
-      // and clock center. Simpler: use absolute positioning with rotation.
-      const angle = i * 30; // 30 degrees per hour
+      const angle = i * 30;
       mark.style.position = 'absolute';
       mark.style.left = '50%';
-      mark.style.top = '0%'; // Start from top edge of clock for rotation
-      mark.style.transformOrigin = '0% 65px'; // Rotate around center (65px is radius for 130px clock)
+      mark.style.top = '0%';
+      mark.style.transformOrigin = '0% 65px';
       mark.style.transform = `translateX(-50%) rotate(${angle}deg)`;
       clock.appendChild(mark);
     }
@@ -194,7 +197,7 @@ function initAnalogClock(clockId) {
   }
 
   setClock();
-  if (clock.updateInterval) clearInterval(clock.updateInterval); // Clear existing interval if any
+  if (clock.updateInterval) clearInterval(clock.updateInterval);
   clock.updateInterval = setInterval(setClock, 1000);
 }
 window.initAnalogClock = initAnalogClock;
@@ -213,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   let quoteIndex = 0;
   const quoteTextElement = document.getElementById('quote-text');
+  
   function showQuote(index) {
     if (!quoteTextElement) return;
     if (window.gsap && !prefersReducedMotion()) {
@@ -224,15 +228,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     } else {
       quoteTextElement.textContent = quotes[index];
-      quoteTextElement.style.opacity = 1; // Ensure visible if no GSAP
+      quoteTextElement.style.opacity = 1;
     }
   }
+  
   if (quoteTextElement) {
     showQuote(quoteIndex);
     setInterval(() => {
       quoteIndex = (quoteIndex + 1) % quotes.length;
       showQuote(quoteIndex);
-    }, 12000); // Slower quote change
+    }, 12000);
   }
 
   window.pulseTimerDisplay = function () {
@@ -246,10 +251,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeSelectDropdowns = document.querySelectorAll('select#theme-select');
   themeSelectDropdowns.forEach(select => {
     select.value = getCurrentTheme();
-    select.addEventListener('change', function () { setAndApplyTheme(this.value); });
+    select.addEventListener('change', function () { 
+      setAndApplyTheme(this.value); 
+    });
   });
+  
   window.addEventListener('themeChanged', (event) => {
-    themeSelectDropdowns.forEach(select => { select.value = event.detail.theme; });
+    themeSelectDropdowns.forEach(select => { 
+      select.value = event.detail.theme; 
+    });
   });
 
   // Mobile Menu Toggle
@@ -266,25 +276,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             gsap.to(mobileMenu, { height: 0, opacity: 0, y: -10, duration: 0.25, ease: 'power1.in', onComplete: () => mobileMenu.classList.add('hidden') });
         }
-      } else { mobileMenu.classList.toggle('hidden'); }
+      } else { 
+        mobileMenu.classList.toggle('hidden'); 
+      }
     });
   }
 });
 
 // Add toast notification functionality
 function showToast(message, type = 'info', duration = 3000) {
-  // Remove any existing toasts
   const existingToast = document.getElementById('toast-notification');
   if (existingToast) {
     existingToast.remove();
   }
   
-  // Create toast element
   const toast = document.createElement('div');
   toast.id = 'toast-notification';
   toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 text-white text-sm font-medium';
   
-  // Set background color based on type
   switch (type) {
     case 'success':
       toast.classList.add('bg-green-500');
@@ -302,14 +311,12 @@ function showToast(message, type = 'info', duration = 3000) {
   toast.textContent = message;
   document.body.appendChild(toast);
   
-  // Animate in
   if (window.gsap && !prefersReducedMotion()) {
     gsap.fromTo(toast, 
       { y: 20, opacity: 0 }, 
       { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
     );
     
-    // Animate out after duration
     setTimeout(() => {
       gsap.to(toast, { 
         y: 20, 
@@ -320,7 +327,6 @@ function showToast(message, type = 'info', duration = 3000) {
       });
     }, duration);
   } else {
-    // Simple fade for reduced motion
     setTimeout(() => toast.remove(), duration);
   }
 }

@@ -18,13 +18,13 @@ const gaugeFillElement = document.getElementById('gauge-fill');
 const focusTimeBar = document.getElementById('focus-time-bar');
 const taskCompletionBar = document.getElementById('task-completion-bar');
 const consistencyBar = document.getElementById('consistency-bar');
-const goalAchievementBar = document.getElementById('goal-achievement-bar'); // Assuming future goals
+const goalAchievementBar = document.getElementById('goal-achievement-bar');
 
 let weeklyChartInstance = null;
 let taskChartInstance = null;
 
 function initDashboardModule() {
-  if (!document.getElementById('dashboard-page-identifier')) return; // Simple check if on dashboard
+  if (!document.getElementById('dashboard-page-identifier')) return;
 
   loadDashboardData();
   setupDashboardEventListeners();
@@ -42,23 +42,21 @@ function loadDashboardData() {
 
 function setupDashboardEventListeners() {
   window.addEventListener('appStorageChange', (event) => {
-    const relevantKeys = [`${APP_NAME}_sessions`, `${APP_NAME}_streak`, `${APP_NAME}_tasks`];
-    // For direct storage manipulation, use 'storage' event
-    // For app-driven changes via saveData, use 'appStorageChange'
-    if (relevantKeys.includes(`${APP_NAME}_${event.detail.key}`)) {
+    const relevantKeys = ['sessions', 'streak', 'tasks'];
+    if (relevantKeys.includes(event.detail.key)) {
       loadDashboardData();
     }
   });
-  // Also listen to standard storage event for cross-tab updates
+
   window.addEventListener('storage', (event) => {
-    const relevantKeys = [`${APP_NAME}_sessions`, `${APP_NAME}_streak`, `${APP_NAME}_tasks`];
+    const relevantKeys = [`${window.APP_NAME}_sessions`, `${window.APP_NAME}_streak`, `${window.APP_NAME}_tasks`];
     if (relevantKeys.includes(event.key)) {
       loadDashboardData();
     }
   });
 
   window.addEventListener('themeChanged', () => {
-    if (weeklyChartCanvas || taskChartCanvas) { // Only if charts are on the page
+    if (weeklyChartCanvas || taskChartCanvas) {
       createOrUpdateWeeklyChart();
       createOrUpdateTaskCompletionChart();
     }
@@ -89,7 +87,7 @@ function loadWeekStats() {
 }
 
 function loadStreakData() {
-  const streakData = loadData('streak', SCHEMAS.streak);
+  const streakData = loadData('streak', window.SCHEMAS.streak);
   if (streakCountElement) streakCountElement.textContent = streakData.currentStreak;
   if (bestStreakElement) bestStreakElement.textContent = streakData.bestStreak;
 }
@@ -113,10 +111,11 @@ function createOrUpdateWeeklyChart() {
   const chartColors = getChartThemeColors();
 
   const today = new Date();
-  const currentDayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+  const currentDayOfWeek = today.getDay();
   const labels = [];
   const data = [];
-  for (let i = 0; i < 7; i++) { // Sunday (0) to Saturday (6)
+  
+  for (let i = 0; i < 7; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() - currentDayOfWeek + i);
     labels.push(date.toLocaleDateString(undefined, { weekday: 'short' }));
@@ -133,21 +132,45 @@ function createOrUpdateWeeklyChart() {
     weeklyChartInstance.options.scales.y.ticks.color = chartColors.text;
     weeklyChartInstance.options.scales.y.grid.color = chartColors.grid;
     weeklyChartInstance.options.scales.x.ticks.color = chartColors.text;
-    weeklyChartInstance.options.plugins.tooltip.backgroundColor = chartColors.tooltipBg;
-    weeklyChartInstance.options.plugins.tooltip.titleColor = chartColors.tooltipText;
-    weeklyChartInstance.options.plugins.tooltip.bodyColor = chartColors.tooltipText;
     weeklyChartInstance.update();
   } else {
     weeklyChartInstance = new Chart(weeklyChartCanvas, {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Completed Pomodoros', data, backgroundColor: chartColors.primaryTransparent, borderColor: chartColors.primary, borderWidth: 1, borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.7 }] },
+      data: { 
+        labels, 
+        datasets: [{ 
+          label: 'Completed Pomodoros', 
+          data, 
+          backgroundColor: chartColors.primaryTransparent, 
+          borderColor: chartColors.primary, 
+          borderWidth: 1, 
+          borderRadius: 4, 
+          barPercentage: 0.6, 
+          categoryPercentage: 0.7 
+        }] 
+      },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true, 
+        maintainAspectRatio: false,
         scales: {
-          y: { beginAtZero: true, ticks: { precision: 0, color: chartColors.text }, grid: { color: chartColors.grid, drawBorder: false } },
-          x: { ticks: { color: chartColors.text }, grid: { display: false } }
+          y: { 
+            beginAtZero: true, 
+            ticks: { precision: 0, color: chartColors.text }, 
+            grid: { color: chartColors.grid, drawBorder: false } 
+          },
+          x: { 
+            ticks: { color: chartColors.text }, 
+            grid: { display: false } 
+          }
         },
-        plugins: { legend: { display: false }, tooltip: { /* ... use chartColors ... */ } }
+        plugins: { 
+          legend: { display: false }, 
+          tooltip: {
+            backgroundColor: chartColors.tooltipBg,
+            titleColor: chartColors.tooltipText,
+            bodyColor: chartColors.tooltipText
+          }
+        }
       }
     });
   }
@@ -163,22 +186,38 @@ function createOrUpdateTaskCompletionChart() {
     taskChartInstance.data.datasets[0].data = data;
     taskChartInstance.data.datasets[0].backgroundColor = [chartColors.success, chartColors.muted];
     taskChartInstance.options.plugins.legend.labels.color = chartColors.text;
-    taskChartInstance.options.plugins.tooltip.backgroundColor = chartColors.tooltipBg;
-    taskChartInstance.options.plugins.tooltip.titleColor = chartColors.tooltipText;
-    taskChartInstance.options.plugins.tooltip.bodyColor = chartColors.tooltipText;
     taskChartInstance.update();
   } else {
     taskChartInstance = new Chart(taskChartCanvas, {
       type: 'doughnut',
       data: {
         labels: ['Completed', 'Pending'],
-        datasets: [{ data, backgroundColor: [chartColors.success, chartColors.muted], borderWidth: 0, hoverOffset: 8 }]
+        datasets: [{ 
+          data, 
+          backgroundColor: [chartColors.success, chartColors.muted], 
+          borderWidth: 0, 
+          hoverOffset: 8 
+        }]
       },
       options: {
-        responsive: true, maintainAspectRatio: false, cutout: '70%',
+        responsive: true, 
+        maintainAspectRatio: false, 
+        cutout: '70%',
         plugins: {
-          legend: { position: 'bottom', labels: { color: chartColors.text, usePointStyle: true, boxWidth: 8, padding: 15 } },
-          tooltip: { /* ... use chartColors ... */ }
+          legend: { 
+            position: 'bottom', 
+            labels: { 
+              color: chartColors.text, 
+              usePointStyle: true, 
+              boxWidth: 8, 
+              padding: 15 
+            } 
+          },
+          tooltip: {
+            backgroundColor: chartColors.tooltipBg,
+            titleColor: chartColors.tooltipText,
+            bodyColor: chartColors.tooltipText
+          }
         }
       }
     });
@@ -187,12 +226,13 @@ function createOrUpdateTaskCompletionChart() {
 
 function calculateAndDisplayProductivityScore() {
   if (!productivityScoreDisplay || !gaugeFillElement) return;
+  
   const todayFocusSessions = getTodaySessions().filter(s => s.mode === 'focus' && s.completed).length;
   const taskStats = window.getTaskStats ? window.getTaskStats() : { completionRate: 0 };
-  const streakData = loadData('streak', SCHEMAS.streak);
+  const streakData = loadData('streak', window.SCHEMAS.streak);
 
   const focusWeight = 0.4, taskWeight = 0.35, consistencyWeight = 0.25;
-  const focusTarget = 8, consistencyTargetStreak = 14; // Daily targets
+  const focusTarget = 8, consistencyTargetStreak = 14;
 
   const focusScoreRaw = Math.min((todayFocusSessions / focusTarget) * 100, 100);
   const taskScoreRaw = taskStats.completionRate * 100;
@@ -202,14 +242,13 @@ function calculateAndDisplayProductivityScore() {
   totalScore = Math.round(Math.max(0, Math.min(totalScore, 100)));
 
   productivityScoreDisplay.textContent = totalScore;
-  // Gauge: -90deg is 0 score, +90deg is 100 score (180deg sweep for bottom half)
   const gaugeRotation = -90 + (totalScore / 100) * 180;
   gaugeFillElement.style.transform = `rotate(${gaugeRotation}deg)`;
 
   if (focusTimeBar) focusTimeBar.style.width = `${Math.round(focusScoreRaw)}%`;
   if (taskCompletionBar) taskCompletionBar.style.width = `${Math.round(taskScoreRaw)}%`;
   if (consistencyBar) consistencyBar.style.width = `${Math.round(consistencyScoreRaw)}%`;
-  if (goalAchievementBar) goalAchievementBar.style.width = `0%`; // Placeholder
+  if (goalAchievementBar) goalAchievementBar.style.width = `0%`;
 }
 
 function loadRecentSessionsTable() {
@@ -219,9 +258,9 @@ function loadRecentSessionsTable() {
   const sortedSessions = allSessions
     .filter(s => s.completed)
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .slice(0, 15); // Show more recent sessions
+    .slice(0, 15);
 
-  sessionsTableElement.innerHTML = ''; // Clear
+  sessionsTableElement.innerHTML = '';
   if (sortedSessions.length === 0) {
     sessionsTableElement.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-[rgb(var(--muted-foreground-rgb))]">No completed sessions recorded yet.</td></tr>`;
   } else {
@@ -242,14 +281,8 @@ function loadRecentSessionsTable() {
   }
 }
 
-// Initialize on specific page
 document.addEventListener('DOMContentLoaded', () => {
-  // Add a unique ID to dashboard.html's body or a main container
-  if (document.querySelector('body[data-page="dashboard"]')) { // Example check
+  if (document.querySelector('body[data-page="dashboard"]')) {
     initDashboardModule();
-  }
-  // Pop-out timer display update for dashboard page
-  if (window.globalUpdatePopOutTimerDisplayStatus) {
-    globalUpdatePopOutTimerDisplayStatus();
   }
 });

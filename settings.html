@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="A professional Pomodoro timer application to boost your productivity" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;" />
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;" />
   <meta name="theme-color" content="#121214" />
   <title>Settings - Pomodoro Timer</title>
   <link rel="manifest" href="manifest.json" />
@@ -15,26 +15,18 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="css/themes.css" />
   <link rel="stylesheet" href="css/animated-background.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-  <script type="module">
-    import { inject } from "@vercel/analytics";
-    inject();
-  </script>
   <style>
     body {
       transition: background-color 0.4s ease, color 0.4s ease,
         background-image 0.4s ease;
     }
 
-    .page-transition {
-      /* ... */
-    }
-
     .settings-section {
       transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
     }
 
-    /* Smoother hover */
     .settings-section:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1),
@@ -67,7 +59,6 @@
   <div id="settings-feedback" aria-live="polite" class="sr-only"></div>
 
   <nav class="glass-nav fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" id="main-navbar">
-    <!-- ... Navbar HTML as in home.html ... -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <a href="index.html" class="flex items-center group">
@@ -239,8 +230,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="background: #6366f1; width: 80%; height: 30px"></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Dark</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Dark</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="dim" aria-label="Dim theme" title="Dim Theme">
             <div class="theme-preview-check">
@@ -249,8 +240,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="background: #7c3aed; width: 80%; height: 30px"></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Dim</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Dim</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="purple" aria-label="Purple theme" title="Purple Theme">
             <div class="theme-preview-check">
@@ -259,8 +250,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="background: #8b5cf6; width: 80%; height: 30px"></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Purple</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Purple</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="ocean" aria-label="Ocean theme" title="Ocean Theme">
             <div class="theme-preview-check">
@@ -269,8 +260,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="background: #0ea5e9; width: 80%; height: 30px"></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Ocean</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Ocean</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="sunset" aria-label="Sunset theme" title="Sunset Theme">
             <div class="theme-preview-check">
@@ -279,8 +270,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="background: #f97316; width: 80%; height: 30px"></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Sunset</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Sunset</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="auto" aria-label="Auto theme"
             title="Auto (System) Theme">
@@ -290,12 +281,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <div class="theme-color-box mx-auto" style="
-                  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
-                  width: 80%;
-                  height: 30px;
-                "></div>
-            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Auto</span>
+            <div class="theme-color-box mb-2"></div>
+            <span class="text-xs sm:text-sm font-medium">Auto</span>
           </div>
         </div>
       </div>
