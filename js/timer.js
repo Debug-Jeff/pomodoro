@@ -120,7 +120,7 @@ function disableTimerDisplayEdit() {
       let newTime = (minutes * 60) + seconds;
       if (newTime === 0 && timerState.mode === 'focus') {
         newTime = 60; // Min 1 min for focus
-        if(window.showToast) window.showToast("Focus time set to minimum 01:00.", "info");
+        if (window.showToast) window.showToast("Focus time set to minimum 01:00.", "info");
       }
       if (timerState.timeRemaining !== newTime) {
         timerState.timeRemaining = newTime;
@@ -128,16 +128,16 @@ function disableTimerDisplayEdit() {
         timeChanged = true;
       }
     } else if (window.showToast) {
-        window.showToast("Invalid time. Reverted.", "error");
+      window.showToast("Invalid time. Reverted.", "error");
     }
   } else if (timerEditInputElement.value !== "" && window.showToast) { // Value was entered but didn't match pattern
-      window.showToast("Invalid format. Use MM:SS.", "error");
+    window.showToast("Invalid format. Use MM:SS.", "error");
   }
 
   timerEditInputElement.classList.add('hidden');
   timerDisplayElement.classList.remove('hidden');
 
-  if(timeChanged) {
+  if (timeChanged) {
     updateAllTimerDisplays(); // Update main, popout, title
     updateTimerProgressRingVisual(true); // Reset ring to new duration
   }
@@ -145,45 +145,45 @@ function disableTimerDisplayEdit() {
 }
 
 function switchModeAndSequence(mode, sequenceStepIndex = null, isInitial = false) {
-    if (!isInitial && timerState.isRunning) stopTimerExecution();
+  if (!isInitial && timerState.isRunning) stopTimerExecution();
 
-    const settings = loadData('settings', SCHEMAS.settings);
-    let newDurationSeconds;
-    let newLabel;
+  const settings = loadData('settings', SCHEMAS.settings);
+  let newDurationSeconds;
+  let newLabel;
 
-    const activeSequenceId = loadData('active_sequence_id');
-    const sequences = loadData('sequences', []);
-    const currentSequence = activeSequenceId ? sequences.find(s => s.id === activeSequenceId) : null;
+  const activeSequenceId = loadData('active_sequence_id');
+  const sequences = loadData('sequences', []);
+  const currentSequence = activeSequenceId ? sequences.find(s => s.id === activeSequenceId) : null;
 
-    if (currentSequence && sequenceStepIndex !== null && currentSequence.steps[sequenceStepIndex]) {
-        const step = currentSequence.steps[sequenceStepIndex];
-        timerState.mode = step.type;
-        newDurationSeconds = step.duration * 60;
-        newLabel = step.type === 'focus' ? 'Focus Time' : step.type === 'shortBreak' ? 'Short Break' : 'Long Break';
-        timerState.currentSequenceStep = sequenceStepIndex;
-        if(window.updateCustomSequenceUI) window.updateCustomSequenceUI(); // Update home page sequence display
-    } else {
-        // Standard mode switch or sequence ended/cleared
-        timerState.mode = mode;
-        timerState.currentSequenceStep = 0; // Reset sequence step if not in a sequence call
-        if(activeSequenceId && !currentSequence) saveData('active_sequence_id', null); // Clear invalid active sequence
+  if (currentSequence && sequenceStepIndex !== null && currentSequence.steps[sequenceStepIndex]) {
+    const step = currentSequence.steps[sequenceStepIndex];
+    timerState.mode = step.type;
+    newDurationSeconds = step.duration * 60;
+    newLabel = step.type === 'focus' ? 'Focus Time' : step.type === 'shortBreak' ? 'Short Break' : 'Long Break';
+    timerState.currentSequenceStep = sequenceStepIndex;
+    if (window.updateCustomSequenceUI) window.updateCustomSequenceUI(); // Update home page sequence display
+  } else {
+    // Standard mode switch or sequence ended/cleared
+    timerState.mode = mode;
+    timerState.currentSequenceStep = 0; // Reset sequence step if not in a sequence call
+    if (activeSequenceId && !currentSequence) saveData('active_sequence_id', null); // Clear invalid active sequence
 
-        switch (mode) {
-            case 'focus': newDurationSeconds = settings.focusDuration * 60; newLabel = 'Focus Time'; break;
-            case 'shortBreak': newDurationSeconds = settings.shortBreakDuration * 60; newLabel = 'Short Break'; break;
-            case 'longBreak': newDurationSeconds = settings.longBreakDuration * 60; newLabel = 'Long Break'; break;
-            default: newDurationSeconds = settings.focusDuration * 60; newLabel = 'Focus Time';
-        }
+    switch (mode) {
+      case 'focus': newDurationSeconds = settings.focusDuration * 60; newLabel = 'Focus Time'; break;
+      case 'shortBreak': newDurationSeconds = settings.shortBreakDuration * 60; newLabel = 'Short Break'; break;
+      case 'longBreak': newDurationSeconds = settings.longBreakDuration * 60; newLabel = 'Long Break'; break;
+      default: newDurationSeconds = settings.focusDuration * 60; newLabel = 'Focus Time';
     }
+  }
 
-    timerState.timeRemaining = newDurationSeconds;
-    timerState.totalDurationAtStart = newDurationSeconds;
-    if (timerLabelElement) timerLabelElement.textContent = newLabel;
+  timerState.timeRemaining = newDurationSeconds;
+  timerState.totalDurationAtStart = newDurationSeconds;
+  if (timerLabelElement) timerLabelElement.textContent = newLabel;
 
-    updateAllTimerDisplays();
-    updateModeButtonUI();
-    updatePomodoroCycleDisplay();
-    updateTimerProgressRingVisual(true); // Reset ring for new mode/duration
+  updateAllTimerDisplays();
+  updateModeButtonUI();
+  updatePomodoroCycleDisplay();
+  updateTimerProgressRingVisual(true); // Reset ring for new mode/duration
 }
 // Make switchModeAndSequence globally available for custom-sequences.js
 window.timerJsSwitchToSequenceStep = (index) => switchModeAndSequence(null, index);
@@ -191,9 +191,9 @@ window.timerJsSwitchMode = (mode) => switchModeAndSequence(mode);
 
 
 function updateAllTimerDisplays() {
-    updateMainTimerDisplay();
-    updatePopOutTimerFullDisplay(); // Syncs content and visibility state
-    updateStartButtonUIText();
+  updateMainTimerDisplay();
+  updatePopOutTimerFullDisplay(); // Syncs content and visibility state
+  updateStartButtonUIText();
 }
 
 function updateModeButtonUI() {
@@ -219,8 +219,8 @@ function toggleTimerExecution() {
     stopTimerExecution();
   } else {
     if (timerState.timeRemaining === 0 && timerState.mode === 'focus') {
-        if(window.showToast) window.showToast("Cannot start 00:00 focus. Edit time.", "error");
-        return;
+      if (window.showToast) window.showToast("Cannot start 00:00 focus. Edit time.", "error");
+      return;
     }
     startTimerExecution();
   }
@@ -228,10 +228,10 @@ function toggleTimerExecution() {
 }
 
 function updateStartButtonUIText() {
-    const text = timerState.isRunning ? 'Pause' :
-                 (timerState.timeRemaining < timerState.totalDurationAtStart && timerState.timeRemaining > 0 ? 'Resume' : 'Start');
-    if (startButton) startButton.textContent = text;
-    if (window.popStartBtnGlobalElement) window.popStartBtnGlobalElement.textContent = text;
+  const text = timerState.isRunning ? 'Pause' :
+    (timerState.timeRemaining < timerState.totalDurationAtStart && timerState.timeRemaining > 0 ? 'Resume' : 'Start');
+  if (startButton) startButton.textContent = text;
+  if (window.popStartBtnGlobalElement) window.popStartBtnGlobalElement.textContent = text;
 }
 
 function startTimerExecution() {
@@ -263,14 +263,14 @@ function resetCurrentTimer() {
   const currentSeq = activeSeqId ? sequences.find(s => s.id === activeSeqId) : null;
 
   if (currentSeq && currentSeq.steps[timerState.currentSequenceStep]) {
-      newDuration = currentSeq.steps[timerState.currentSequenceStep].duration * 60;
+    newDuration = currentSeq.steps[timerState.currentSequenceStep].duration * 60;
   } else { // Standard mode durations
-      switch (timerState.mode) {
-        case 'focus': newDuration = settings.focusDuration * 60; break;
-        case 'shortBreak': newDuration = settings.shortBreakDuration * 60; break;
-        case 'longBreak': newDuration = settings.longBreakDuration * 60; break;
-        default: newDuration = settings.focusDuration * 60;
-      }
+    switch (timerState.mode) {
+      case 'focus': newDuration = settings.focusDuration * 60; break;
+      case 'shortBreak': newDuration = settings.shortBreakDuration * 60; break;
+      case 'longBreak': newDuration = settings.longBreakDuration * 60; break;
+      default: newDuration = settings.focusDuration * 60;
+    }
   }
   timerState.timeRemaining = newDuration;
   timerState.totalDurationAtStart = newDuration;
@@ -334,7 +334,7 @@ function handleTimerSessionCompletion() {
   if (settings.enableSounds && window.playSound) {
     let soundKey = settings.notificationSound || 'default_alarm';
     if (timerState.mode !== 'focus') { // Different sound for break completion
-        soundKey = settings.breakNotificationSound || 'retro_notify'; // Assuming breakNotificationSound setting exists
+      soundKey = settings.breakNotificationSound || 'retro_notify'; // Assuming breakNotificationSound setting exists
     }
     window.playSound(soundKey);
   }
@@ -358,21 +358,21 @@ function handleTimerSessionCompletion() {
   const currentSequence = activeSequenceId ? sequences.find(s => s.id === activeSequenceId) : null;
 
   if (currentSequence && currentSequence.steps && currentSequence.steps.length > 0) {
-      const nextStepIndex = (timerState.currentSequenceStep + 1) % currentSequence.steps.length;
-      switchModeAndSequence(null, nextStepIndex);
-      if(window.dispatchEvent) window.dispatchEvent(new CustomEvent('timerSequenceStepChanged', { detail: { currentStepIndex: nextStepIndex }}));
+    const nextStepIndex = (timerState.currentSequenceStep + 1) % currentSequence.steps.length;
+    switchModeAndSequence(null, nextStepIndex);
+    if (window.dispatchEvent) window.dispatchEvent(new CustomEvent('timerSequenceStepChanged', { detail: { currentStepIndex: nextStepIndex } }));
 
   } else { // Standard Pomodoro logic
-      if (timerState.mode === 'focus') {
-        const sessionsForLongBreak = settings.sessionsBeforeLongBreak;
-        if (timerState.completedSessionsToday > 0 && timerState.completedSessionsToday % sessionsForLongBreak === 0) {
-          switchModeAndSequence('longBreak');
-        } else {
-          switchModeAndSequence('shortBreak');
-        }
-      } else { // After any break
-        switchModeAndSequence('focus');
+    if (timerState.mode === 'focus') {
+      const sessionsForLongBreak = settings.sessionsBeforeLongBreak;
+      if (timerState.completedSessionsToday > 0 && timerState.completedSessionsToday % sessionsForLongBreak === 0) {
+        switchModeAndSequence('longBreak');
+      } else {
+        switchModeAndSequence('shortBreak');
       }
+    } else { // After any break
+      switchModeAndSequence('focus');
+    }
   }
   updateAllTimerDisplays();
   updatePomodoroCycleDisplay();
@@ -432,7 +432,7 @@ function updatePomodoroCycleDisplay() {
 
   let completedInCurrentCycle = timerState.completedSessionsToday % sessionsInCycle;
   if (completedInCurrentCycle === 0 && timerState.completedSessionsToday > 0) {
-      completedInCurrentCycle = sessionsInCycle; // Show 4/4 if cycle just completed
+    completedInCurrentCycle = sessionsInCycle; // Show 4/4 if cycle just completed
   }
 
   // If currently in a focus session that's not yet complete, it's the "next" one in the cycle.
@@ -454,12 +454,12 @@ function togglePopOutTimerVisibility() {
   if (!isHidden) {
     const popOutState = loadData('popOutTimerState', { x: null, y: null });
     if (popOutState.x !== null && popOutState.y !== null) {
-        window.popOutTimerGlobalElement.style.left = popOutState.x;
-        window.popOutTimerGlobalElement.style.top = popOutState.y;
+      window.popOutTimerGlobalElement.style.left = popOutState.x;
+      window.popOutTimerGlobalElement.style.top = popOutState.y;
     } else {
-        window.popOutTimerGlobalElement.style.right = '30px'; // Default position
-        window.popOutTimerGlobalElement.style.top = '75px';  // Default position
-        window.popOutTimerGlobalElement.style.left = 'auto';
+      window.popOutTimerGlobalElement.style.right = '30px'; // Default position
+      window.popOutTimerGlobalElement.style.top = '75px';  // Default position
+      window.popOutTimerGlobalElement.style.left = 'auto';
     }
     if (window.gsap && !prefersReducedMotion()) {
       gsap.fromTo(window.popOutTimerGlobalElement, { scale: 0.85, opacity: 0, y: 15 }, { scale: 1, opacity: 1, y: 0, duration: 0.25, ease: "back.out(1.5)" });
@@ -480,32 +480,32 @@ function closePopOutTimer() {
 }
 
 function updatePopOutTimerFullDisplay() {
-    if (!window.popOutTimerGlobalElement) return; // Element might not be on this page
+  if (!window.popOutTimerGlobalElement) return; // Element might not be on this page
 
-    // Visibility based on stored preference
-    const isOpen = loadData('popOutTimerOpen', false);
-    if (isOpen && window.popOutTimerGlobalElement.classList.contains('hidden')) {
-        // Restore position and show
-        const popOutState = loadData('popOutTimerState', { x: 'auto', y: '75px' });
-        window.popOutTimerGlobalElement.style.left = popOutState.x || 'auto';
-        window.popOutTimerGlobalElement.style.top = popOutState.y || '75px';
-        window.popOutTimerGlobalElement.style.right = (popOutState.x === 'auto' && !popOutState.x) ? '30px' : 'auto';
-        window.popOutTimerGlobalElement.classList.remove('hidden');
-    } else if (!isOpen && !window.popOutTimerGlobalElement.classList.contains('hidden')) {
-        window.popOutTimerGlobalElement.classList.add('hidden');
-    }
+  // Visibility based on stored preference
+  const isOpen = loadData('popOutTimerOpen', false);
+  if (isOpen && window.popOutTimerGlobalElement.classList.contains('hidden')) {
+    // Restore position and show
+    const popOutState = loadData('popOutTimerState', { x: 'auto', y: '75px' });
+    window.popOutTimerGlobalElement.style.left = popOutState.x || 'auto';
+    window.popOutTimerGlobalElement.style.top = popOutState.y || '75px';
+    window.popOutTimerGlobalElement.style.right = (popOutState.x === 'auto' && !popOutState.x) ? '30px' : 'auto';
+    window.popOutTimerGlobalElement.classList.remove('hidden');
+  } else if (!isOpen && !window.popOutTimerGlobalElement.classList.contains('hidden')) {
+    window.popOutTimerGlobalElement.classList.add('hidden');
+  }
 
-    // Update content if visible
-    if (!window.popOutTimerGlobalElement.classList.contains('hidden')) {
-        const minutes = Math.floor(timerState.timeRemaining / 60);
-        const seconds = timerState.timeRemaining % 60;
-        if(window.popTimerDisplayGlobalElement) window.popTimerDisplayGlobalElement.textContent = formatTime(minutes, seconds);
+  // Update content if visible
+  if (!window.popOutTimerGlobalElement.classList.contains('hidden')) {
+    const minutes = Math.floor(timerState.timeRemaining / 60);
+    const seconds = timerState.timeRemaining % 60;
+    if (window.popTimerDisplayGlobalElement) window.popTimerDisplayGlobalElement.textContent = formatTime(minutes, seconds);
 
-        const currentLabelText = timerLabelElement ? timerLabelElement.textContent : (timerState.mode.charAt(0).toUpperCase() + timerState.mode.slice(1) + " Mode");
-        if(window.popTimerLabelGlobalElement) window.popTimerLabelGlobalElement.textContent = currentLabelText;
+    const currentLabelText = timerLabelElement ? timerLabelElement.textContent : (timerState.mode.charAt(0).toUpperCase() + timerState.mode.slice(1) + " Mode");
+    if (window.popTimerLabelGlobalElement) window.popTimerLabelGlobalElement.textContent = currentLabelText;
 
-        updateStartButtonUIText(); // This updates popStartBtn as well
-    }
+    updateStartButtonUIText(); // This updates popStartBtn as well
+  }
 }
 
 
@@ -539,38 +539,38 @@ function makeTimerElementDraggable(elmnt) {
 window.getCurrentSequenceStepIndex = () => timerState.currentSequenceStep;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('timer-display')) { // Only run full init if on a page with the main timer
-        initTimerModule();
-    }
-    globalUpdatePopOutTimerDisplayStatus(); // Always check pop-out status
+  if (document.getElementById('timer-display')) { // Only run full init if on a page with the main timer
+    initTimerModule();
+  }
+  globalUpdatePopOutTimerDisplayStatus(); // Always check pop-out status
 });
 
 // For pages without the main timer, this function updates the pop-out status and time.
 function globalUpdatePopOutTimerDisplayStatus() {
-    if (!window.popOutTimerGlobalElement && document.getElementById('pop-out-timer')) {
-        // Initialize pop-out elements if not done by initTimerModule (e.g. on dashboard/settings page)
-        window.popOutTimerGlobalElement = document.getElementById('pop-out-timer');
-        window.popTimerDisplayGlobalElement = document.getElementById('pop-timer-display');
-        window.popTimerLabelGlobalElement = document.getElementById('pop-timer-label');
-        // Buttons might not exist/be functional on non-timer pages, primarily for display
-    }
-    updatePopOutTimerFullDisplay(); // Checks stored open state and updates
+  if (!window.popOutTimerGlobalElement && document.getElementById('pop-out-timer')) {
+    // Initialize pop-out elements if not done by initTimerModule (e.g. on dashboard/settings page)
+    window.popOutTimerGlobalElement = document.getElementById('pop-out-timer');
+    window.popTimerDisplayGlobalElement = document.getElementById('pop-timer-display');
+    window.popTimerLabelGlobalElement = document.getElementById('pop-timer-label');
+    // Buttons might not exist/be functional on non-timer pages, primarily for display
+  }
+  updatePopOutTimerFullDisplay(); // Checks stored open state and updates
 }
 
 // Refresh pop-out periodically IF timer.js's main tick isn't running on this page.
 // This is a fallback. Ideally, timer state is globally managed or events are used.
 setInterval(() => {
-    if (loadData('popOutTimerOpen', false) && window.popOutTimerGlobalElement && !timerState.isRunning) {
-        // If timer is not running (e.g. user is on another page),
-        // we need a way to get the latest timerState.
-        // This is complex. For now, it will only show the last known state from timerState object.
-        // A proper solution would involve localStorage for timerState or a Service Worker.
-        updatePopOutTimerFullDisplay();
-    }
+  if (loadData('popOutTimerOpen', false) && window.popOutTimerGlobalElement && !timerState.isRunning) {
+    // If timer is not running (e.g. user is on another page),
+    // we need a way to get the latest timerState.
+    // This is complex. For now, it will only show the last known state from timerState object.
+    // A proper solution would involve localStorage for timerState or a Service Worker.
+    updatePopOutTimerFullDisplay();
+  }
 }, 2000);
 
 
-window.addEventListener('storage', function(event) {
+window.addEventListener('storage', function (event) {
   if (event.key === `${APP_NAME}_settings` && event.newValue) {
     const newSettings = JSON.parse(event.newValue);
     if (!timerState.isRunning) { // Only update if timer not running
@@ -589,6 +589,15 @@ window.addEventListener('storage', function(event) {
       }
     }
     updatePomodoroCycleDisplay(); // Max sessions in cycle might have changed
+  }
+
+  function updateAllDisplays() {
+    requestAnimationFrame(() => {
+      updateTimerDisplay();
+      updateTimerProgressRing(true);
+      updatePopOutTimerDisplay();
+      updateStartButtonText();
+    });
   }
   // If timer state itself was stored due to page navigation (advanced):
   // if (event.key === `${APP_NAME}_timerState` && event.newValue) { ... update local timerState ... }

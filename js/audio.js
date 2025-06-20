@@ -61,8 +61,8 @@ async function loadSoundIntoBuffer(name, url) {
   } catch (error) {
     console.error(`Error loading sound ${name} from ${url}:`, error);
     if (audioContext) { // Create a silent fallback buffer if context exists
-        const fallbackBuffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
-        audioBuffers[name] = fallbackBuffer;
+      const fallbackBuffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
+      audioBuffers[name] = fallbackBuffer;
     }
   }
 }
@@ -108,23 +108,23 @@ function setMasterVolume(volumeLevel) { // Volume 0-1
 window.setMasterVolume = setMasterVolume; // Expose for settings.js
 
 function WARM_UP_AUDIO_CONTEXT_SAFELY() {
-    if (!audioContext) {
-        initAudioSystem().then(success => {
-            if (success && audioContext.state !== 'running') {
-                // Play a tiny silent sound to ensure context is truly 'running'
-                const buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
-                const source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.connect(masterGainNode); // Connect to gain node which is connected to destination
-                source.start(0);
-                console.log('Audio context warmed up after init.');
-            } else if (success) {
-                 console.log('Audio context already running or initAudioSystem handled it.');
-            }
-        });
-    } else if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => console.log('Audio context resumed by interaction.'));
-    }
+  if (!audioContext) {
+    initAudioSystem().then(success => {
+      if (success && audioContext.state !== 'running') {
+        // Play a tiny silent sound to ensure context is truly 'running'
+        const buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(masterGainNode); // Connect to gain node which is connected to destination
+        source.start(0);
+        console.log('Audio context warmed up after init.');
+      } else if (success) {
+        console.log('Audio context already running or initAudioSystem handled it.');
+      }
+    });
+  } else if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => console.log('Audio context resumed by interaction.'));
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -141,9 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (masterGainNode && newSettings.soundVolume !== undefined) {
         setMasterVolume(newSettings.soundVolume / 100);
       }
-       // Re-initialize audio system if enableSounds was toggled on, and it wasn't initialized
+      // Re-initialize audio system if enableSounds was toggled on, and it wasn't initialized
       if (newSettings.enableSounds && !audioInitializedPromise) {
-          WARM_UP_AUDIO_CONTEXT_SAFELY();
+        WARM_UP_AUDIO_CONTEXT_SAFELY();
       }
     }
   });

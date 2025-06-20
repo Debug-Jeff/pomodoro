@@ -26,13 +26,13 @@ function initLandingPageVisuals() { // Renamed to avoid conflict if main.js had 
       .to(subtext, { y: 0, autoAlpha: 1, duration: 0.7, ease: "power2.out" }, "-=0.5")
       .to(enterAppBtn, { y: 0, autoAlpha: 1, duration: 0.5, ease: "back.out(1.7)" }, "-=0.3");
   } else if (logo && enterAppBtn) { // Basic fallback if no GSAP or reduced motion
-      logo.style.opacity = 1;
-      const title = document.querySelector('h1.landing-title');
-      const subtext = document.querySelector('p.landing-subtext');
-      if(title) title.style.opacity = 1;
-      if(subtext) subtext.style.opacity = 1;
-      enterAppBtn.style.opacity = 1;
-      enterAppBtn.style.transform = 'translateY(0px)';
+    logo.style.opacity = 1;
+    const title = document.querySelector('h1.landing-title');
+    const subtext = document.querySelector('p.landing-subtext');
+    if (title) title.style.opacity = 1;
+    if (subtext) subtext.style.opacity = 1;
+    enterAppBtn.style.opacity = 1;
+    enterAppBtn.style.transform = 'translateY(0px)';
   }
 
   if (enterAppBtn) {
@@ -66,11 +66,11 @@ function setupPageLoadTransition() {
       // Transition layer should start opaque (CSS opacity 1 or add 'active' class before this)
       // Then fade out by removing 'active'
       setTimeout(() => { // Ensure content is painted before fade-out
-          pageTransitionElement.classList.remove('active'); // Fades out the overlay
+        pageTransitionElement.classList.remove('active'); // Fades out the overlay
       }, 50);
     } else if (pageTransitionElement) {
-        pageTransitionElement.style.opacity = '0'; // Instantly hide if reduced motion
-        pageTransitionElement.style.pointerEvents = 'none';
+      pageTransitionElement.style.opacity = '0'; // Instantly hide if reduced motion
+      pageTransitionElement.style.pointerEvents = 'none';
     }
   });
 }
@@ -110,10 +110,10 @@ window.injectAnimatedBackground = injectAnimatedBackground;
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Page load transition is handled for all pages (except index.html if it has its own)
-    if (!document.getElementById('logo-landing')) { // Don't run general page load on index.html
-        setupPageLoadTransition();
-    }
+  // Page load transition is handled for all pages (except index.html if it has its own)
+  if (!document.getElementById('logo-landing')) { // Don't run general page load on index.html
+    setupPageLoadTransition();
+  }
 
     // The injectAnimatedBackground() is called from inline scripts of HTML pages
     // after DOMContentLoaded and after main.js has set the theme.

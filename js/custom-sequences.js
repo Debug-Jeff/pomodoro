@@ -102,34 +102,34 @@ function closeSequencesModal() {
 }
 
 function transitionToListingView() {
-    if (!sequenceModalElement || !savedSequencesContainerElement) return;
-    if (sequenceEditorViewElement) sequenceEditorViewElement.classList.add('hidden');
-    if (sequenceListViewElement) sequenceListViewElement.classList.remove('hidden');
-    renderSavedSequencesListToModal();
+  if (!sequenceModalElement || !savedSequencesContainerElement) return;
+  if (sequenceEditorViewElement) sequenceEditorViewElement.classList.add('hidden');
+  if (sequenceListViewElement) sequenceListViewElement.classList.remove('hidden');
+  renderSavedSequencesListToModal();
 }
 
 function transitionToEditorForNew() {
-    sequenceBeingEdited = null;
-    stepsForCurrentEdit = [];
-    if (sequenceNameInputElement) sequenceNameInputElement.value = '';
-    if (sequenceEditorTitleElement) sequenceEditorTitleElement.textContent = 'Create New Sequence';
-    renderStepsInEditor();
-    switchToEditorView();
+  sequenceBeingEdited = null;
+  stepsForCurrentEdit = [];
+  if (sequenceNameInputElement) sequenceNameInputElement.value = '';
+  if (sequenceEditorTitleElement) sequenceEditorTitleElement.textContent = 'Create New Sequence';
+  renderStepsInEditor();
+  switchToEditorView();
 }
 
 function transitionToEditorForExisting(sequenceToEdit) {
-    sequenceBeingEdited = { ...sequenceToEdit }; // Clone
-    stepsForCurrentEdit = [...sequenceToEdit.steps]; // Deep copy steps
-    if (sequenceNameInputElement) sequenceNameInputElement.value = sequenceBeingEdited.name;
-    if (sequenceEditorTitleElement) sequenceEditorTitleElement.textContent = 'Edit Sequence';
-    renderStepsInEditor();
-    switchToEditorView();
+  sequenceBeingEdited = { ...sequenceToEdit }; // Clone
+  stepsForCurrentEdit = [...sequenceToEdit.steps]; // Deep copy steps
+  if (sequenceNameInputElement) sequenceNameInputElement.value = sequenceBeingEdited.name;
+  if (sequenceEditorTitleElement) sequenceEditorTitleElement.textContent = 'Edit Sequence';
+  renderStepsInEditor();
+  switchToEditorView();
 }
 
 function switchToEditorView() {
-    if (!sequenceModalElement) return;
-    if (sequenceListViewElement) sequenceListViewElement.classList.add('hidden');
-    if (sequenceEditorViewElement) sequenceEditorViewElement.classList.remove('hidden');
+  if (!sequenceModalElement) return;
+  if (sequenceListViewElement) sequenceListViewElement.classList.add('hidden');
+  if (sequenceEditorViewElement) sequenceEditorViewElement.classList.remove('hidden');
 }
 
 function renderSavedSequencesListToModal() {
@@ -143,8 +143,8 @@ function renderSavedSequencesListToModal() {
     const item = document.createElement('div');
     item.className = 'bg-[rgba(var(--card-background-rgb),0.5)] hover:bg-[rgba(var(--primary-rgb),0.1)] rounded-lg p-4 mb-3 flex justify-between items-center transition-colors duration-150';
     const stepsHtml = seq.steps.map(s => {
-        const iconMap = { focus: '🎯', shortBreak: '☕', longBreak: '🛌' };
-        return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-[rgba(var(--foreground-rgb),0.1)] text-xs mx-0.5" title="${s.type} (${s.duration}m)">${iconMap[s.type]}</span>`;
+      const iconMap = { focus: '🎯', shortBreak: '☕', longBreak: '🛌' };
+      return `<span class="inline-flex items-center justify-center h-7 w-7 rounded-full bg-[rgba(var(--foreground-rgb),0.1)] text-xs mx-0.5" title="${s.type} (${s.duration}m)">${iconMap[s.type]}</span>`;
     }).join('');
     item.innerHTML = `
       <div class="flex-grow min-w-0">
@@ -206,58 +206,58 @@ function renderStepsInEditor() {
 
 let draggedStepElement = null;
 function makeEditorStepsDraggable() {
-    if (!sequenceStepsEditorListElement) return;
-    const items = sequenceStepsEditorListElement.querySelectorAll('.draggable-item');
-    items.forEach(item => {
-        item.addEventListener('dragstart', e => {
-            draggedStepElement = item;
-            setTimeout(() => item.classList.add('opacity-50', 'ring-2', 'ring-[rgb(var(--primary-rgb))]'), 0);
-            e.dataTransfer.effectAllowed = 'move';
-        });
-        item.addEventListener('dragend', () => {
-            draggedStepElement.classList.remove('opacity-50', 'ring-2', 'ring-[rgb(var(--primary-rgb))]');
-            draggedStepElement = null;
-            reorderStepsArrayBasedOnDOM();
-        });
-        item.addEventListener('dragover', e => {
-            e.preventDefault();
-            const target = e.target.closest('.draggable-item');
-            if (target && draggedStepElement && target !== draggedStepElement) {
-                const rect = target.getBoundingClientRect();
-                const isAfter = (e.clientY - rect.top) > (rect.height / 2);
-                if (isAfter) sequenceStepsEditorListElement.insertBefore(draggedStepElement, target.nextSibling);
-                else sequenceStepsEditorListElement.insertBefore(draggedStepElement, target);
-            }
-        });
+  if (!sequenceStepsEditorListElement) return;
+  const items = sequenceStepsEditorListElement.querySelectorAll('.draggable-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', e => {
+      draggedStepElement = item;
+      setTimeout(() => item.classList.add('opacity-50', 'ring-2', 'ring-[rgb(var(--primary-rgb))]'), 0);
+      e.dataTransfer.effectAllowed = 'move';
     });
+    item.addEventListener('dragend', () => {
+      draggedStepElement.classList.remove('opacity-50', 'ring-2', 'ring-[rgb(var(--primary-rgb))]');
+      draggedStepElement = null;
+      reorderStepsArrayBasedOnDOM();
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      const target = e.target.closest('.draggable-item');
+      if (target && draggedStepElement && target !== draggedStepElement) {
+        const rect = target.getBoundingClientRect();
+        const isAfter = (e.clientY - rect.top) > (rect.height / 2);
+        if (isAfter) sequenceStepsEditorListElement.insertBefore(draggedStepElement, target.nextSibling);
+        else sequenceStepsEditorListElement.insertBefore(draggedStepElement, target);
+      }
+    });
+  });
 }
 
 function reorderStepsArrayBasedOnDOM() {
-    const newOrderedSteps = [];
-    const domOrder = Array.from(sequenceStepsEditorListElement.querySelectorAll('.draggable-item'));
-    domOrder.forEach(domEl => {
-        const originalIndex = parseInt(domEl.dataset.index); // This assumes dataset.index maps to the old stepsForCurrentEdit
-        // A more robust way would be to give each step a unique temp ID during edit
-        newOrderedSteps.push(stepsForCurrentEdit[originalIndex]); // This is a simplified reorder
-    });
-    // If reordering complex, verify newOrderedSteps integrity before assigning
-    if (newOrderedSteps.length === stepsForCurrentEdit.length) {
-        stepsForCurrentEdit = newOrderedSteps;
-        // Re-render to update dataset.index values for next drag operation
-        renderStepsInEditor();
-    } else {
-        console.warn("Step reordering failed, array lengths mismatch. Re-rendering old order.");
-        renderStepsInEditor(); // Re-render with old order to be safe
-    }
+  const newOrderedSteps = [];
+  const domOrder = Array.from(sequenceStepsEditorListElement.querySelectorAll('.draggable-item'));
+  domOrder.forEach(domEl => {
+    const originalIndex = parseInt(domEl.dataset.index); // This assumes dataset.index maps to the old stepsForCurrentEdit
+    // A more robust way would be to give each step a unique temp ID during edit
+    newOrderedSteps.push(stepsForCurrentEdit[originalIndex]); // This is a simplified reorder
+  });
+  // If reordering complex, verify newOrderedSteps integrity before assigning
+  if (newOrderedSteps.length === stepsForCurrentEdit.length) {
+    stepsForCurrentEdit = newOrderedSteps;
+    // Re-render to update dataset.index values for next drag operation
+    renderStepsInEditor();
+  } else {
+    console.warn("Step reordering failed, array lengths mismatch. Re-rendering old order.");
+    renderStepsInEditor(); // Re-render with old order to be safe
+  }
 }
 
 
 function commitEditedSequence() {
   if (!sequenceNameInputElement || !sequenceNameInputElement.value.trim()) {
-    if(window.showToast) window.showToast('Please enter a sequence name.', 'error'); return;
+    if (window.showToast) window.showToast('Please enter a sequence name.', 'error'); return;
   }
   if (stepsForCurrentEdit.length === 0) {
-    if(window.showToast) window.showToast('Sequence must have at least one step.', 'error'); return;
+    if (window.showToast) window.showToast('Sequence must have at least one step.', 'error'); return;
   }
   const name = sequenceNameInputElement.value.trim();
   if (sequenceBeingEdited) {
@@ -272,7 +272,7 @@ function commitEditedSequence() {
   }
   saveSequencesStateToStorage();
   transitionToListingView();
-  if(window.showToast) window.showToast(`Sequence "${name}" saved successfully.`, 'success');
+  if (window.showToast) window.showToast(`Sequence "${name}" saved successfully.`, 'success');
 }
 
 function activateSequence(sequenceId) {
@@ -283,7 +283,7 @@ function activateSequence(sequenceId) {
   if (sequence && sequence.steps.length > 0 && window.timerJsSwitchToSequenceStep) {
     window.timerJsSwitchToSequenceStep(0); // Start sequence on timer
   }
-  if(window.showToast && sequence) window.showToast(`Sequence "${sequence.name}" is now active.`, 'success');
+  if (window.showToast && sequence) window.showToast(`Sequence "${sequence.name}" is now active.`, 'success');
 }
 
 function deleteSequenceFromList(sequenceId) {
@@ -296,13 +296,13 @@ function deleteSequenceFromList(sequenceId) {
   }
   saveSequencesStateToStorage();
   renderSavedSequencesListToModal();
-  if(window.showToast) window.showToast('Sequence deleted.', 'info');
+  if (window.showToast) window.showToast('Sequence deleted.', 'info');
 }
 
 function updateActiveSequenceDisplayOnPage() {
   if (!activeSequenceDisplayElement || !activeSequenceStepsContainerElement) {
-      if(activeSequenceDisplayElement) activeSequenceDisplayElement.classList.add('hidden');
-      return;
+    if (activeSequenceDisplayElement) activeSequenceDisplayElement.classList.add('hidden');
+    return;
   }
   const sequence = allSequences.find(s => s.id === currentActiveSequenceId);
   if (!sequence) {
@@ -315,63 +315,63 @@ function updateActiveSequenceDisplayOnPage() {
 }
 
 function renderActiveSequenceStepIndicators(sequence) {
-    if (!activeSequenceStepsContainerElement) return;
-    activeSequenceStepsContainerElement.innerHTML = '';
-    const currentTimerStepIdx = window.getCurrentSequenceStepIndex ? window.getCurrentSequenceStepIndex() : 0;
+  if (!activeSequenceStepsContainerElement) return;
+  activeSequenceStepsContainerElement.innerHTML = '';
+  const currentTimerStepIdx = window.getCurrentSequenceStepIndex ? window.getCurrentSequenceStepIndex() : 0;
 
-    sequence.steps.forEach((step, index) => {
-        const item = document.createElement('div');
-        item.className = 'flex-shrink-0 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold';
-        item.dataset.index = index;
-        item.title = `${step.type.replace(/([A-Z])/g, ' $1').trim()} (${step.duration} min)`;
-        const colors = { focus: 'bg-indigo-500', shortBreak: 'bg-green-500', longBreak: 'bg-blue-500' };
-        item.classList.add(colors[step.type] || 'bg-gray-600', 'text-white');
-        if (index === currentTimerStepIdx) {
-            item.classList.add('ring-2', 'ring-offset-2', 'ring-offset-[rgb(var(--card-background-rgb))]', 'ring-white', 'scale-110', 'shadow-md');
-        } else {
-            item.classList.add('opacity-60', 'hover:opacity-100', 'hover:scale-105');
-        }
-        item.textContent = index + 1;
-        item.addEventListener('click', () => {
-            if (window.timerJsSwitchToSequenceStep) window.timerJsSwitchToSequenceStep(index);
-        });
-        activeSequenceStepsContainerElement.appendChild(item);
+  sequence.steps.forEach((step, index) => {
+    const item = document.createElement('div');
+    item.className = 'flex-shrink-0 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold';
+    item.dataset.index = index;
+    item.title = `${step.type.replace(/([A-Z])/g, ' $1').trim()} (${step.duration} min)`;
+    const colors = { focus: 'bg-indigo-500', shortBreak: 'bg-green-500', longBreak: 'bg-blue-500' };
+    item.classList.add(colors[step.type] || 'bg-gray-600', 'text-white');
+    if (index === currentTimerStepIdx) {
+      item.classList.add('ring-2', 'ring-offset-2', 'ring-offset-[rgb(var(--card-background-rgb))]', 'ring-white', 'scale-110', 'shadow-md');
+    } else {
+      item.classList.add('opacity-60', 'hover:opacity-100', 'hover:scale-105');
+    }
+    item.textContent = index + 1;
+    item.addEventListener('click', () => {
+      if (window.timerJsSwitchToSequenceStep) window.timerJsSwitchToSequenceStep(index);
     });
+    activeSequenceStepsContainerElement.appendChild(item);
+  });
 }
 // Called by timer.js when sequence step changes internally
 window.updateCustomSequenceUI = updateActiveSequenceDisplayOnPage;
 
 function handleEditActiveSequence() {
-    if (!currentActiveSequenceId) { if(window.showToast) window.showToast('No sequence is active.', 'info'); return; }
-    const seqToEdit = allSequences.find(s => s.id === currentActiveSequenceId);
-    if (seqToEdit) { openSequencesModal(); transitionToEditorForExisting(seqToEdit); }
+  if (!currentActiveSequenceId) { if (window.showToast) window.showToast('No sequence is active.', 'info'); return; }
+  const seqToEdit = allSequences.find(s => s.id === currentActiveSequenceId);
+  if (seqToEdit) { openSequencesModal(); transitionToEditorForExisting(seqToEdit); }
 }
 
 function handleClearActiveSequence() {
-    if (!currentActiveSequenceId) { if(window.showToast) window.showToast('No sequence to clear.', 'info'); return; }
-    if (confirm('Deactivate current sequence and return to standard Pomodoro mode?')) {
-        currentActiveSequenceId = null;
-        saveSequencesStateToStorage();
-        updateActiveSequenceDisplayOnPage();
-        if (window.timerJsSwitchMode) window.timerJsSwitchMode('focus'); // Revert timer
-        if(window.showToast) window.showToast('Sequence deactivated.', 'success');
-    }
+  if (!currentActiveSequenceId) { if (window.showToast) window.showToast('No sequence to clear.', 'info'); return; }
+  if (confirm('Deactivate current sequence and return to standard Pomodoro mode?')) {
+    currentActiveSequenceId = null;
+    saveSequencesStateToStorage();
+    updateActiveSequenceDisplayOnPage();
+    if (window.timerJsSwitchMode) window.timerJsSwitchMode('focus'); // Revert timer
+    if (window.showToast) window.showToast('Sequence deactivated.', 'success');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if relevant controls are on the page
-    if (document.getElementById('manage-custom-sequences') || document.getElementById('custom-sequence-selector')) {
-        initCustomSequencesModule();
-    }
-    if (window.globalUpdatePopOutTimerDisplayStatus) {
-        globalUpdatePopOutTimerDisplayStatus();
-    }
+  // Only initialize if relevant controls are on the page
+  if (document.getElementById('manage-custom-sequences') || document.getElementById('custom-sequence-selector')) {
+    initCustomSequencesModule();
+  }
+  if (window.globalUpdatePopOutTimerDisplayStatus) {
+    globalUpdatePopOutTimerDisplayStatus();
+  }
 });
 
 // Listen for timer events if it dispatches sequence step changes
 window.addEventListener('timerSequenceStepChanged', (event) => {
-    if (currentActiveSequenceId) { // Only if a sequence is active
-        const sequence = allSequences.find(s => s.id === currentActiveSequenceId);
-        if (sequence) renderActiveSequenceStepIndicators(sequence); // event.detail.currentStepIndex can be used
-    }
+  if (currentActiveSequenceId) { // Only if a sequence is active
+    const sequence = allSequences.find(s => s.id === currentActiveSequenceId);
+    if (sequence) renderActiveSequenceStepIndicators(sequence); // event.detail.currentStepIndex can be used
+  }
 });

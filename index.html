@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A professional Pomodoro timer application to boost your productivity">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;">
-  <meta name="theme-color" content="#0A0A0C">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A professional Pomodoro timer application to boost your productivity" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;" />
+  <meta name="theme-color" content="#0A0A0C" />
   <title>Pomodoro Timer - Focus & Achieve</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="assets/logo.png">
-  <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.png" />
+  <link rel="apple-touch-icon" href="assets/icons/clock-3.png" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script type="module">
     import { inject } from "@vercel/analytics";
@@ -18,8 +20,8 @@
   </script>
   <style>
     body {
-      background-color: #0A0A0C;
-      color: #E5E7EB;
+      background-color: #0a0a0c;
+      color: #e5e7eb;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -28,7 +30,8 @@
       position: relative;
     }
 
-    #particles-landing, #animated-background-landing {
+    #particles-landing,
+    #animated-background-landing {
       position: fixed;
       top: 0;
       left: 0;
@@ -42,27 +45,46 @@
       position: absolute;
       border-radius: 50%;
       opacity: 0;
-      background-color: rgba(129, 140, 248, 0.25); /* Slightly more visible */
-      animation: float-landing 20s infinite ease-in-out alternate; /* Added alternate for smoother loops */
+      background-color: rgba(129, 140, 248, 0.25);
+      /* Slightly more visible */
+      animation: float-landing 20s infinite ease-in-out alternate;
+      /* Added alternate for smoother loops */
     }
 
     @keyframes float-landing {
-      0% { transform: translateY(0px) translateX(0px) scale(0.8); opacity: 0.05; }
-      25% { transform: translateY(-50px) translateX(30px) scale(1.1); opacity: 0.3; }
-      50% { transform: translateY(-25px) translateX(-30px) scale(0.9); opacity: 0.5; }
-      75% { transform: translateY(50px) translateX(20px) scale(1.2); opacity: 0.2; }
-      100% { transform: translateY(0px) translateX(0px) scale(0.8); opacity: 0.05;}
+      0% {
+        transform: translateY(0px) translateX(0px) scale(0.8);
+        opacity: 0.05;
+      }
+
+      25% {
+        transform: translateY(-50px) translateX(30px) scale(1.1);
+        opacity: 0.3;
+      }
+
+      50% {
+        transform: translateY(-25px) translateX(-30px) scale(0.9);
+        opacity: 0.5;
+      }
+
+      75% {
+        transform: translateY(50px) translateX(20px) scale(1.2);
+        opacity: 0.2;
+      }
+
+      100% {
+        transform: translateY(0px) translateX(0px) scale(0.8);
+        opacity: 0.05;
+      }
     }
-    
+
     .floating-bubble-landing {
       position: absolute;
       border-radius: 50%;
-      background: radial-gradient(
-        circle at 30% 30%,
-        rgba(165, 180, 252, 0.25),
-        rgba(129, 140, 248, 0.15) 40%,
-        rgba(99, 102, 241, 0.08) 70%
-      );
+      background: radial-gradient(circle at 30% 30%,
+          rgba(165, 180, 252, 0.25),
+          rgba(129, 140, 248, 0.15) 40%,
+          rgba(99, 102, 241, 0.08) 70%);
       box-shadow: 0 0 20px rgba(129, 140, 248, 0.2);
       opacity: 0;
       animation: float-bubble-landing var(--duration, 25s) infinite ease-in-out;
@@ -70,8 +92,17 @@
     }
 
     @keyframes float-bubble-landing {
-      0%, 100% { transform: translate(var(--x-start, 0px), var(--y-start, 0px)) scale(var(--s-start, 1)); opacity: 0.05;}
-      50% { transform: translate(var(--x-mid, 50px), var(--y-mid, -50px)) scale(var(--s-mid, 1.2)); opacity: var(--opacity-mid, 0.3);}
+
+      0%,
+      100% {
+        transform: translate(var(--x-start, 0px), var(--y-start, 0px)) scale(var(--s-start, 1));
+        opacity: 0.05;
+      }
+
+      50% {
+        transform: translate(var(--x-mid, 50px), var(--y-mid, -50px)) scale(var(--s-mid, 1.2));
+        opacity: var(--opacity-mid, 0.3);
+      }
     }
 
     #landing-content {
@@ -84,26 +115,33 @@
       text-align: center;
       padding: 20px;
     }
-    
+
     #logo-landing .logo-circle-landing,
     #logo-landing .logo-hand-landing {
-        stroke: #F0F0F5; /* Brighter white for logo strokes */
-        filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.5));
+      stroke: #f0f0f5;
+      /* Brighter white for logo strokes */
+      filter: drop-shadow(0 0 3px rgba(165, 180, 252, 0.5));
     }
 
     h1.landing-title {
-        font-size: clamp(2.5rem, 6vw, 3.5rem); /* Responsive font size */
-        color: #FFFFFF; /* Pure white for max contrast */
-        text-shadow: 0 0 15px rgba(129, 140, 248, 0.4), 0 0 5px rgba(200, 200, 255, 0.3);
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
+      /* Responsive font size */
+      color: #ffffff;
+      /* Pure white for max contrast */
+      text-shadow: 0 0 15px rgba(129, 140, 248, 0.4),
+        0 0 5px rgba(200, 200, 255, 0.3);
     }
+
     p.landing-subtext {
-        font-size: clamp(1rem, 3vw, 1.25rem);
-        color: #D1D5DB;
-        text-shadow: 0 0 8px rgba(129, 140, 248, 0.2);
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      color: #d1d5db;
+      text-shadow: 0 0 8px rgba(129, 140, 248, 0.2);
     }
 
     #enter-app-btn {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+      background: linear-gradient(135deg,
+          rgba(99, 102, 241, 0.9) 0%,
+          rgba(139, 92, 246, 0.9) 100%);
       color: white;
       border: none; /* Remove border, use shadow for depth */
       box-shadow: 0 6px 25px rgba(99, 102, 241, 0.45), 
@@ -119,44 +157,62 @@
       opacity: 0; /* Start invisible for animation */
       transform: translateY(20px); /* Start position for animation */
     }
+
     #enter-app-btn:hover {
-      transform: translateY(15px) scale(1.07); /* More pronounced hover */
-      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.55), 
-                  0 0 20px rgba(165, 180, 252, 0.35) inset,
-                  0 0 40px rgba(139, 92, 246, 0.3);
+      transform: translateY(15px) scale(1.07);
+      /* More pronounced hover */
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.55),
+        0 0 20px rgba(165, 180, 252, 0.35) inset,
+        0 0 40px rgba(139, 92, 246, 0.3);
     }
+
     #enter-app-btn:active {
-        transform: translateY(18px) scale(1.04);
+      transform: translateY(18px) scale(1.04);
     }
 
     .page-transition {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #0A0A0C;
-      z-index: 9999; pointer-events: none; opacity: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0a0a0c;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
       transition: opacity 0.35s ease-in-out;
     }
-    .page-transition.active { opacity: 1; }
+
+    .page-transition.active {
+      opacity: 1;
+    }
   </style>
 </head>
+
 <body>
   <div id="page-transition"></div>
   <div id="particles-landing" aria-hidden="true"></div>
   <div id="animated-background-landing" aria-hidden="true"></div>
-  
+
   <div id="landing-content">
     <div class="logo-container mb-6 sm:mb-8">
-      <svg id="logo-landing" class="w-28 h-28 sm:w-32 sm:h-32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg id="logo-landing" class="w-28 h-28 sm:w-32 sm:h-32" viewBox="0 0 100 100" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
         <circle class="logo-circle-landing" cx="50" cy="50" r="45" stroke-width="2.5" />
         <line class="logo-hand-landing" x1="50" y1="50" x2="50" y2="18" stroke-width="3.5" stroke-linecap="round" />
         <line class="logo-hand-landing" x1="50" y1="50" x2="82" y2="50" stroke-width="3.5" stroke-linecap="round" />
       </svg>
     </div>
-    <h1 class="landing-title font-bold mb-3 sm:mb-4 tracking-wider">POMODORO</h1>
-    <p class="landing-subtext text-gray-300 mb-8 sm:mb-10">Focus. Break. Repeat. Achieve.</p>
+    <h1 class="landing-title font-bold mb-3 sm:mb-4 tracking-wider">
+      POMODORO
+    </h1>
+    <p class="landing-subtext text-gray-300 mb-8 sm:mb-10">
+      Focus. Break. Repeat. Achieve.
+    </p>
 
-    <button id="enter-app-btn" 
-          class="rounded-full font-semibold focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-40"
-          aria-label="Enter application">
+    <button id="enter-app-btn"
+      class="rounded-full font-semibold focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-40"
+      aria-label="Enter application">
       Get Started
     </button>
   </div>
@@ -164,68 +220,109 @@
   <script src="js/main.js"></script>
   <script src="js/animations.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('Service worker registered:', reg))
-          .catch(err => console.error('Service worker registration failed:', err));
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then((reg) => console.log("Service worker registered:", reg))
+          .catch((err) =>
+            console.error("Service worker registration failed:", err)
+          );
       });
     }
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      const logoElement = document.getElementById('logo-landing');
-      const enterAppBtnElement = document.getElementById('enter-app-btn');
-      const titleElement = document.querySelector('h1.landing-title');
-      const subtextElement = document.querySelector('p.landing-subtext');
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoElement = document.getElementById("logo-landing");
+      const enterAppBtnElement = document.getElementById("enter-app-btn");
+      const titleElement = document.querySelector("h1.landing-title");
+      const subtextElement = document.querySelector("p.landing-subtext");
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
 
       if (logoElement && enterAppBtnElement && window.gsap && !reduceMotion) {
-        const logoCircle = logoElement.querySelector('.logo-circle-landing');
-        const logoHands = logoElement.querySelectorAll('.logo-hand-landing');
+        const logoCircle = logoElement.querySelector(".logo-circle-landing");
+        const logoHands = logoElement.querySelectorAll(".logo-hand-landing");
 
-        gsap.set([logoCircle, ...logoHands, titleElement, subtextElement, enterAppBtnElement], { autoAlpha: 0 });
+        gsap.set(
+          [
+            logoCircle,
+            ...logoHands,
+            titleElement,
+            subtextElement,
+            enterAppBtnElement,
+          ],
+          { autoAlpha: 0 }
+        );
         gsap.set(logoCircle, { strokeDasharray: 283, strokeDashoffset: 283 });
         gsap.set(enterAppBtnElement, { y: 30 }); // Start button further down for more impact
 
         const tl = gsap.timeline({ delay: 0.4 });
 
-        tl.to(logoCircle, { strokeDashoffset: 0, autoAlpha: 1, duration: 1.3, ease: "power2.inOut" })
-          .to(logoHands, { autoAlpha: 1, duration: 0.9, stagger: 0.2, ease: "elastic.out(1, 0.7)" }, "-=0.7")
-          .to(titleElement, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" }, "-=0.6")
-          .to(subtextElement, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" }, "-=0.6")
-          .to(enterAppBtnElement, { y: 0, autoAlpha: 1, duration: 0.6, ease: "back.out(1.7)" }, "-=0.4");
-      } else { 
-          if(logoElement) logoElement.style.opacity = 1;
-          if(titleElement) titleElement.style.opacity = 1;
-          if(subtextElement) subtextElement.style.opacity = 1;
-          if (enterAppBtnElement) {
-            enterAppBtnElement.style.opacity = 1;
-            enterAppBtnElement.style.transform = 'translateY(0px)';
-          }
+        tl.to(logoCircle, {
+          strokeDashoffset: 0,
+          autoAlpha: 1,
+          duration: 1.3,
+          ease: "power2.inOut",
+        })
+          .to(
+            logoHands,
+            {
+              autoAlpha: 1,
+              duration: 0.9,
+              stagger: 0.2,
+              ease: "elastic.out(1, 0.7)",
+            },
+            "-=0.7"
+          )
+          .to(
+            titleElement,
+            { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" },
+            "-=0.6"
+          )
+          .to(
+            subtextElement,
+            { y: 0, autoAlpha: 1, duration: 0.8, ease: "power2.out" },
+            "-=0.6"
+          )
+          .to(
+            enterAppBtnElement,
+            { y: 0, autoAlpha: 1, duration: 0.6, ease: "back.out(1.7)" },
+            "-=0.4"
+          );
+      } else {
+        if (logoElement) logoElement.style.opacity = 1;
+        if (titleElement) titleElement.style.opacity = 1;
+        if (subtextElement) subtextElement.style.opacity = 1;
+        if (enterAppBtnElement) {
+          enterAppBtnElement.style.opacity = 1;
+          enterAppBtnElement.style.transform = "translateY(0px)";
+        }
       }
 
-      if (enterAppBtnElement) { // Ensure button functionality is always attached
-        enterAppBtnElement.addEventListener('click', () => {
+      if (enterAppBtnElement) {
+        // Ensure button functionality is always attached
+        enterAppBtnElement.addEventListener("click", () => {
           if (window.navigateWithTransition) {
-            window.navigateWithTransition('home.html');
+            window.navigateWithTransition("home.html");
           } else {
-            window.location.href = 'home.html';
+            window.location.href = "home.html";
           }
         });
       }
-      
+
       if (!reduceMotion) {
         createLandingParticles(50); // More particles
         createLandingBubbles(20); // More bubbles
       }
     });
-    
+
     function createLandingParticles(count = 30) {
-      const container = document.getElementById('particles-landing');
+      const container = document.getElementById("particles-landing");
       if (!container) return;
       for (let i = 0; i < count; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle-landing');
+        const p = document.createElement("div");
+        p.classList.add("particle-landing");
         const size = Math.random() * 3.5 + 1; // 1px to 4.5px
         p.style.width = `${size}px`;
         p.style.height = `${size}px`;
@@ -234,40 +331,64 @@
         const duration = 15 + Math.random() * 10;
         p.style.animationDelay = `-${Math.random() * duration}s`; // Start at random points in animation
         p.style.animationDuration = `${duration}s`;
-        gsap.to(p, { autoAlpha: Math.random() * 0.25 + 0.05, delay: Math.random() * 1.5 + 0.5 });
+        gsap.to(p, {
+          autoAlpha: Math.random() * 0.25 + 0.05,
+          delay: Math.random() * 1.5 + 0.5,
+        });
         container.appendChild(p);
       }
     }
 
     function createLandingBubbles(count = 15) {
-      const background = document.getElementById('animated-background-landing');
+      const background = document.getElementById(
+        "animated-background-landing"
+      );
       if (!background) return;
       for (let i = 0; i < count; i++) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('floating-bubble-landing');
+        const bubble = document.createElement("div");
+        bubble.classList.add("floating-bubble-landing");
         const size = Math.floor(Math.random() * 120) + 50; // 50px to 170px
         bubble.style.width = `${size}px`;
         bubble.style.height = `${size}px`;
-        bubble.style.left = `${Math.random() * 100 - size/4}%`; // Allow partial off-screen
-        bubble.style.top = `${Math.random() * 100 - size/4}%`;
-        
-        const duration = Math.random() * 30 + 20; // 20s to 50s
-        bubble.style.setProperty('--duration', `${duration}s`);
-        bubble.style.setProperty('--delay', `-${Math.random() * duration}s`);
-        
-        // Randomize animation parameters for variety
-        bubble.style.setProperty('--x-start', `${(Math.random() - 0.5) * 50}px`);
-        bubble.style.setProperty('--y-start', `${(Math.random() - 0.5) * 50}px`);
-        bubble.style.setProperty('--s-start', `${Math.random() * 0.3 + 0.7}`);
-        bubble.style.setProperty('--x-mid', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--y-mid', `${(Math.random() - 0.5) * 200}px`);
-        bubble.style.setProperty('--s-mid', `${Math.random() * 0.5 + 0.8}`);
-        bubble.style.setProperty('--opacity-mid', `${Math.random() * 0.2 + 0.15}`);
+        bubble.style.left = `${Math.random() * 100 - size / 4}%`; // Allow partial off-screen
+        bubble.style.top = `${Math.random() * 100 - size / 4}%`;
 
-        gsap.to(bubble, { autoAlpha: Math.random() * 0.1 + 0.03, delay: Math.random() * 2.5 + 1 });
+        const duration = Math.random() * 30 + 20; // 20s to 50s
+        bubble.style.setProperty("--duration", `${duration}s`);
+        bubble.style.setProperty("--delay", `-${Math.random() * duration}s`);
+
+        // Randomize animation parameters for variety
+        bubble.style.setProperty(
+          "--x-start",
+          `${(Math.random() - 0.5) * 50}px`
+        );
+        bubble.style.setProperty(
+          "--y-start",
+          `${(Math.random() - 0.5) * 50}px`
+        );
+        bubble.style.setProperty("--s-start", `${Math.random() * 0.3 + 0.7}`);
+        bubble.style.setProperty(
+          "--x-mid",
+          `${(Math.random() - 0.5) * 200}px`
+        );
+        bubble.style.setProperty(
+          "--y-mid",
+          `${(Math.random() - 0.5) * 200}px`
+        );
+        bubble.style.setProperty("--s-mid", `${Math.random() * 0.5 + 0.8}`);
+        bubble.style.setProperty(
+          "--opacity-mid",
+          `${Math.random() * 0.2 + 0.15}`
+        );
+
+        gsap.to(bubble, {
+          autoAlpha: Math.random() * 0.1 + 0.03,
+          delay: Math.random() * 2.5 + 1,
+        });
         background.appendChild(bubble);
       }
     }
   </script>
 </body>
+
 </html>

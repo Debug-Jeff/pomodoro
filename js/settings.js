@@ -19,28 +19,28 @@ const settingsFeedbackElement = document.getElementById('settings-feedback');
 
 
 function initSettingsModule() {
-    if (!document.querySelector('body[data-page="settings"]')) return; // Check if on settings page
+  if (!document.querySelector('body[data-page="settings"]')) return; // Check if on settings page
 
-    const settings = loadData('settings', SCHEMAS.settings);
+  const settings = loadData('settings', SCHEMAS.settings);
 
-    updateSliderUI(focusDurationSlider, 'focus-duration-display', settings.focusDuration, ' min');
-    updateSliderUI(shortBreakDurationSlider, 'short-break-duration-display', settings.shortBreakDuration, ' min');
-    updateSliderUI(longBreakDurationSlider, 'long-break-duration-display', settings.longBreakDuration, ' min');
-    updateSliderUI(sessionsBeforeLongBreakSlider, 'sessions-before-long-break-display', settings.sessionsBeforeLongBreak, ' sessions');
+  updateSliderUI(focusDurationSlider, 'focus-duration-display', settings.focusDuration, ' min');
+  updateSliderUI(shortBreakDurationSlider, 'short-break-duration-display', settings.shortBreakDuration, ' min');
+  updateSliderUI(longBreakDurationSlider, 'long-break-duration-display', settings.longBreakDuration, ' min');
+  updateSliderUI(sessionsBeforeLongBreakSlider, 'sessions-before-long-break-display', settings.sessionsBeforeLongBreak, ' sessions');
 
-    if (enableNotificationsToggle) enableNotificationsToggle.checked = settings.enableNotifications;
-    if (enableSoundsToggle) enableSoundsToggle.checked = settings.enableSounds;
-    if (notificationSoundSelect) notificationSoundSelect.value = settings.notificationSound || 'default_alarm';
+  if (enableNotificationsToggle) enableNotificationsToggle.checked = settings.enableNotifications;
+  if (enableSoundsToggle) enableSoundsToggle.checked = settings.enableSounds;
+  if (notificationSoundSelect) notificationSoundSelect.value = settings.notificationSound || 'default_alarm';
 
-    setupVolumeGridUI(settings.soundVolume, settings.enableSounds);
-    setActiveThemePreviewUI(settings.theme);
-    setupSettingsEventListeners();
+  setupVolumeGridUI(settings.soundVolume, settings.enableSounds);
+  setActiveThemePreviewUI(settings.theme);
+  setupSettingsEventListeners();
 
-    // Ensure current theme from localStorage is applied visually if different from default
-    const currentTheme = getCurrentTheme();
-    if (currentTheme !== settings.theme) { // settings.theme is from loadData which could be default
-        setActiveThemePreviewUI(currentTheme);
-    }
+  // Ensure current theme from localStorage is applied visually if different from default
+  const currentTheme = getCurrentTheme();
+  if (currentTheme !== settings.theme) { // settings.theme is from loadData which could be default
+    setActiveThemePreviewUI(currentTheme);
+  }
 }
 
 function updateSliderUI(sliderEl, displayId, value, unit) {
@@ -82,7 +82,7 @@ function setupSettingsEventListeners() {
         if (!granted) {
           enableNotificationsToggle.checked = false;
           feedbackMsg = 'Desktop notification permission denied by browser.';
-          if(window.showToast) window.showToast(feedbackMsg, 'error');
+          if (window.showToast) window.showToast(feedbackMsg, 'error');
         } else {
           feedbackMsg = 'Desktop notifications enabled.';
         }
@@ -96,11 +96,11 @@ function setupSettingsEventListeners() {
 
   if (notificationSoundSelect) {
     notificationSoundSelect.addEventListener('change', () => {
-        saveCurrentSettingsToStorage();
-        announceFeedback(`Notification sound set to ${notificationSoundSelect.options[notificationSoundSelect.selectedIndex].text}.`);
-        if (enableSoundsToggle && enableSoundsToggle.checked && window.playSound) {
-            window.playSound(notificationSoundSelect.value); // Play selected sound as preview
-        }
+      saveCurrentSettingsToStorage();
+      announceFeedback(`Notification sound set to ${notificationSoundSelect.options[notificationSoundSelect.selectedIndex].text}.`);
+      if (enableSoundsToggle && enableSoundsToggle.checked && window.playSound) {
+        window.playSound(notificationSoundSelect.value); // Play selected sound as preview
+      }
     });
   }
 
@@ -120,15 +120,15 @@ function setupSettingsEventListeners() {
   if (resetAllDataBtn) resetAllDataBtn.addEventListener('click', window.resetAllAppData); // Uses global from storage.js
   if (exportDataBtn) exportDataBtn.addEventListener('click', window.exportAllAppData);
   if (importDataBtn && importFileInput) {
-      importDataBtn.addEventListener('click', () => importFileInput.click());
-      importFileInput.addEventListener('change', (event) => {
-          const file = event.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = (e) => window.importAllAppData(e.target.result);
-          reader.readAsText(file);
-          importFileInput.value = ''; // Reset for next import
-      });
+    importDataBtn.addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => window.importAllAppData(e.target.result);
+      reader.readAsText(file);
+      importFileInput.value = ''; // Reset for next import
+    });
   }
 }
 
@@ -141,11 +141,11 @@ function setActiveThemePreviewUI(activeTheme) {
   });
 }
 function getCurrentThemeEffective() { // Gets effective theme if 'auto' is selected
-    const storedPref = getCurrentTheme();
-    if (storedPref === 'auto') {
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dim';
-    }
-    return storedPref;
+  const storedPref = getCurrentTheme();
+  if (storedPref === 'auto') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dim';
+  }
+  return storedPref;
 }
 
 
@@ -190,7 +190,7 @@ function saveVolumeSettingToStorage(value) {
   settings.enableSounds = enableSoundsToggle ? enableSoundsToggle.checked : settings.enableSounds;
   saveData('settings', settings); // This will trigger 'appStorageChange'
 
-  if(window.setMasterVolume) window.setMasterVolume(value / 100);
+  if (window.setMasterVolume) window.setMasterVolume(value / 100);
   setupVolumeGridUI(value, settings.enableSounds);
   announceFeedback(`Volume set to ${value}%.`);
 }
@@ -226,16 +226,16 @@ function announceFeedback(message) {
 // function requestPushPermission() { ... } // As before, if implementing
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.querySelector('body[data-page="settings"]')) { // Example check
-        initSettingsModule();
-    }
-    if (window.globalUpdatePopOutTimerDisplayStatus) {
-        globalUpdatePopOutTimerDisplayStatus();
-    }
+  if (document.querySelector('body[data-page="settings"]')) { // Example check
+    initSettingsModule();
+  }
+  if (window.globalUpdatePopOutTimerDisplayStatus) {
+    globalUpdatePopOutTimerDisplayStatus();
+  }
 });
 
 window.addEventListener('themeChanged', (event) => {
-    if (document.querySelector('body[data-page="settings"]')) {
-        setActiveThemePreviewUI(event.detail.theme); // Update previews if theme changed elsewhere
-    }
+  if (document.querySelector('body[data-page="settings"]')) {
+    setActiveThemePreviewUI(event.detail.theme); // Update previews if theme changed elsewhere
+  }
 });

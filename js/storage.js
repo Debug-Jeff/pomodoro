@@ -23,13 +23,13 @@ function saveData(key, data) {
     // Dispatch a storage event for other parts of the app to listen to
     // This is useful if a component needs to react to data change without polling
     window.dispatchEvent(new CustomEvent('appStorageChange', {
-        detail: { key: key, newValue: data }
+      detail: { key: key, newValue: data }
     }));
     return true;
   } catch (error) {
     console.error(`Error saving ${key} data:`, error);
     if (error.name === 'QuotaExceededError') {
-        alert('Storage quota exceeded. Please clear some browser data or export your settings and reset the app.');
+      alert('Storage quota exceeded. Please clear some browser data or export your settings and reset the app.');
     }
     return false;
   }
@@ -40,12 +40,12 @@ function loadData(key, defaultValue = undefined) {
   try {
     const data = localStorage.getItem(`${window.APP_NAME}_${key}`);
     if (data !== null) {
-        const parsedData = JSON.parse(data);
-        // Merge with schema defaults to ensure new settings keys are present
-        if (SCHEMAS[key] && typeof SCHEMAS[key] === 'object' && !Array.isArray(SCHEMAS[key])) {
-            return { ...SCHEMAS[key], ...parsedData };
-        }
-        return parsedData;
+      const parsedData = JSON.parse(data);
+      // Merge with schema defaults to ensure new settings keys are present
+      if (SCHEMAS[key] && typeof SCHEMAS[key] === 'object' && !Array.isArray(SCHEMAS[key])) {
+        return { ...SCHEMAS[key], ...parsedData };
+      }
+      return parsedData;
     }
     // If defaultValue is explicitly provided (not undefined), use it
     // Otherwise, use the schema default.
@@ -61,7 +61,7 @@ function clearData(key) {
   try {
     localStorage.removeItem(`${window.APP_NAME}_${key}`);
     window.dispatchEvent(new CustomEvent('appStorageChange', {
-        detail: { key: key, newValue: SCHEMAS[key] } // Notify with default value
+      detail: { key: key, newValue: SCHEMAS[key] } // Notify with default value
     }));
     return true;
   } catch (error) {
@@ -74,20 +74,20 @@ function clearData(key) {
 function resetAllAppData() {
   try {
     if (confirm("Are you sure you want to reset ALL application data? This action cannot be undone.")) {
-        Object.keys(SCHEMAS).forEach(key => {
-            // For settings, ensure we use a fresh copy of DEFAULT_SETTINGS
-            if (key === 'settings') {
-                saveData(key, { ...window.DEFAULT_SETTINGS });
-            } else if (SCHEMAS[key] !== undefined) {
-                // Deep copy arrays and objects from schema to avoid modifying schema itself
-                const schemaDefault = SCHEMAS[key];
-                const defaultValue = Array.isArray(schemaDefault) ? [...schemaDefault] : (typeof schemaDefault === 'object' && schemaDefault !== null ? {...schemaDefault} : schemaDefault);
-                saveData(key, defaultValue);
-            }
-        });
-        alert('All app data has been reset. The page will now reload.');
-        window.location.reload();
-        return true;
+      Object.keys(SCHEMAS).forEach(key => {
+        // For settings, ensure we use a fresh copy of DEFAULT_SETTINGS
+        if (key === 'settings') {
+          saveData(key, { ...window.DEFAULT_SETTINGS });
+        } else if (SCHEMAS[key] !== undefined) {
+          // Deep copy arrays and objects from schema to avoid modifying schema itself
+          const schemaDefault = SCHEMAS[key];
+          const defaultValue = Array.isArray(schemaDefault) ? [...schemaDefault] : (typeof schemaDefault === 'object' && schemaDefault !== null ? { ...schemaDefault } : schemaDefault);
+          saveData(key, defaultValue);
+        }
+      });
+      alert('All app data has been reset. The page will now reload.');
+      window.location.reload();
+      return true;
     }
     return false;
   } catch (error) {
@@ -141,22 +141,22 @@ function importAllAppData(jsonData) {
         const dataType = data[key] !== null ? typeof data[key] : null;
 
         if (schemaType === null || dataType === null || schemaType === dataType || (Array.isArray(SCHEMAS[key]) && Array.isArray(data[key]))) {
-            let valueToSave = data[key];
-            if (key === 'settings') {
-                // Merge imported settings with defaults to ensure all keys exist
-                valueToSave = { ...window.DEFAULT_SETTINGS, ...data[key] };
-                settingsImported = true;
-                if(valueToSave.theme) importedTheme = valueToSave.theme;
-            }
-            saveData(key, valueToSave);
+          let valueToSave = data[key];
+          if (key === 'settings') {
+            // Merge imported settings with defaults to ensure all keys exist
+            valueToSave = { ...window.DEFAULT_SETTINGS, ...data[key] };
+            settingsImported = true;
+            if (valueToSave.theme) importedTheme = valueToSave.theme;
+          }
+          saveData(key, valueToSave);
         } else {
-            console.warn(`Skipping import for key '${key}': type mismatch. Schema: ${schemaType}, Data: ${dataType}`);
+          console.warn(`Skipping import for key '${key}': type mismatch. Schema: ${schemaType}, Data: ${dataType}`);
         }
       }
     });
 
     if (settingsImported && importedTheme && window.setAndApplyTheme) {
-        window.setAndApplyTheme(importedTheme); // Apply imported theme immediately
+      window.setAndApplyTheme(importedTheme); // Apply imported theme immediately
     }
     if (window.showToast) window.showToast("Data imported successfully! Reloading...", "success");
     setTimeout(() => window.location.reload(), 1500);
@@ -207,6 +207,17 @@ function getMonthSessions() {
 }
 window.getMonthSessions = getMonthSessions;
 
+function saveData(key, data) {
+  try {
+    const encryptedData = encryptData(JSON.stringify(data)); // Add encryption
+    localStorage.setItem(`${window.APP_NAME}_${key}`, encryptedData);
+    return true;
+  } catch (error) {
+    console.error(`Error saving ${key} data:`, error);
+    return false;
+  }
+}
+
 function initStorage() {
   Object.keys(SCHEMAS).forEach(key => {
     const existingData = localStorage.getItem(`${window.APP_NAME}_${key}`);
@@ -215,21 +226,21 @@ function initStorage() {
       if (key === 'settings') {
         saveData(key, { ...window.DEFAULT_SETTINGS });
       } else if (SCHEMAS[key] !== undefined) {
-         const schemaDefault = SCHEMAS[key];
-         const defaultValue = Array.isArray(schemaDefault) ? [...schemaDefault] : (typeof schemaDefault === 'object' && schemaDefault !== null ? {...schemaDefault} : schemaDefault);
-         saveData(key, defaultValue);
+        const schemaDefault = SCHEMAS[key];
+        const defaultValue = Array.isArray(schemaDefault) ? [...schemaDefault] : (typeof schemaDefault === 'object' && schemaDefault !== null ? { ...schemaDefault } : schemaDefault);
+        saveData(key, defaultValue);
       }
     } else {
-        // If data exists, especially for settings, merge with defaults to add any new default keys
-        if (key === 'settings') {
-            try {
-                const parsedSettings = JSON.parse(existingData);
-                saveData(key, { ...window.DEFAULT_SETTINGS, ...parsedSettings });
-            } catch (e) {
-                console.error("Error parsing existing settings, resetting to default:", e);
-                saveData(key, { ...window.DEFAULT_SETTINGS });
-            }
+      // If data exists, especially for settings, merge with defaults to add any new default keys
+      if (key === 'settings') {
+        try {
+          const parsedSettings = JSON.parse(existingData);
+          saveData(key, { ...window.DEFAULT_SETTINGS, ...parsedSettings });
+        } catch (e) {
+          console.error("Error parsing existing settings, resetting to default:", e);
+          saveData(key, { ...window.DEFAULT_SETTINGS });
         }
+      }
     }
   });
   // Load initial settings to apply them (e.g. theme) after ensuring defaults are set

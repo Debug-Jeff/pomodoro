@@ -67,10 +67,10 @@ self.addEventListener('fetch', (event) => {
         if (response) {
           return response;
         }
-        
+
         // Clone the request
         const fetchRequest = event.request.clone();
-        
+
         // Make network request
         return fetch(fetchRequest)
           .then((response) => {
@@ -78,16 +78,16 @@ self.addEventListener('fetch', (event) => {
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-            
+
             // Clone the response
             const responseToCache = response.clone();
-            
+
             // Cache the response
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-            
+
             return response;
           })
           .catch(() => {
@@ -95,12 +95,12 @@ self.addEventListener('fetch', (event) => {
             if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
               return caches.match('/assets/logo.svg');
             }
-            
+
             // Return a basic offline page for HTML requests
             if (event.request.headers.get('Accept').includes('text/html')) {
               return caches.match('/index.html');
             }
-            
+
             // Otherwise, just return the error
             return new Response('Network error', {
               status: 408,
@@ -121,7 +121,7 @@ self.addEventListener('sync', (event) => {
 // Push notification event
 self.addEventListener('push', (event) => {
   const data = event.data.json();
-  
+
   const title = data.title || 'Pomodoro Timer';
   const options = {
     body: data.body || 'Time to focus!',
@@ -132,7 +132,7 @@ self.addEventListener('push', (event) => {
       url: data.url || '/'
     }
   };
-  
+
   event.waitUntil(
     self.registration.showNotification(title, options)
   );
@@ -141,7 +141,7 @@ self.addEventListener('push', (event) => {
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then((clientList) => {
       // If a window client is already open, focus it
@@ -150,7 +150,7 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      
+
       // Otherwise open a new window
       if (clients.openWindow) {
         return clients.openWindow(event.notification.data.url);
@@ -163,12 +163,12 @@ self.addEventListener('notificationclick', (event) => {
 async function syncSessions() {
   // In a real app, this would send data to a server
   console.log('Syncing sessions in background');
-  
+
   // Get sessions from localStorage
   const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions')) || [];
-  
+
   // Mark sessions as synced
   localStorage.setItem('pomodoro_sessions_synced', JSON.stringify(sessions.length));
-  
+
   return Promise.resolve();
 }

@@ -50,7 +50,7 @@ function setupDashboardEventListeners() {
     }
   });
   // Also listen to standard storage event for cross-tab updates
-   window.addEventListener('storage', (event) => {
+  window.addEventListener('storage', (event) => {
     const relevantKeys = [`${APP_NAME}_sessions`, `${APP_NAME}_streak`, `${APP_NAME}_tasks`];
     if (relevantKeys.includes(event.key)) {
       loadDashboardData();
@@ -59,8 +59,8 @@ function setupDashboardEventListeners() {
 
   window.addEventListener('themeChanged', () => {
     if (weeklyChartCanvas || taskChartCanvas) { // Only if charts are on the page
-        createOrUpdateWeeklyChart();
-        createOrUpdateTaskCompletionChart();
+      createOrUpdateWeeklyChart();
+      createOrUpdateTaskCompletionChart();
     }
   });
 }
@@ -95,17 +95,17 @@ function loadStreakData() {
 }
 
 function getChartThemeColors() {
-    const cs = getComputedStyle(document.body);
-    return {
-        primary: `rgb(${cs.getPropertyValue('--primary-rgb').trim()})`,
-        primaryTransparent: `rgba(${cs.getPropertyValue('--primary-rgb').trim()}, 0.65)`,
-        success: `rgb(${cs.getPropertyValue('--success-rgb').trim()})`,
-        muted: `rgba(${cs.getPropertyValue('--muted-foreground-rgb').trim()}, 0.4)`,
-        text: `rgb(${cs.getPropertyValue('--muted-foreground-rgb').trim()})`,
-        grid: `rgba(${cs.getPropertyValue('--muted-foreground-rgb').trim()}, 0.1)`,
-        tooltipBg: `rgba(${cs.getPropertyValue('--card-background-rgb').trim()}, 0.9)`,
-        tooltipText: `rgb(${cs.getPropertyValue('--card-foreground-rgb').trim()})`,
-    };
+  const cs = getComputedStyle(document.body);
+  return {
+    primary: `rgb(${cs.getPropertyValue('--primary-rgb').trim()})`,
+    primaryTransparent: `rgba(${cs.getPropertyValue('--primary-rgb').trim()}, 0.65)`,
+    success: `rgb(${cs.getPropertyValue('--success-rgb').trim()})`,
+    muted: `rgba(${cs.getPropertyValue('--muted-foreground-rgb').trim()}, 0.4)`,
+    text: `rgb(${cs.getPropertyValue('--muted-foreground-rgb').trim()})`,
+    grid: `rgba(${cs.getPropertyValue('--muted-foreground-rgb').trim()}, 0.1)`,
+    tooltipBg: `rgba(${cs.getPropertyValue('--card-background-rgb').trim()}, 0.9)`,
+    tooltipText: `rgb(${cs.getPropertyValue('--card-foreground-rgb').trim()})`,
+  };
 }
 
 function createOrUpdateWeeklyChart() {
@@ -120,8 +120,8 @@ function createOrUpdateWeeklyChart() {
     const date = new Date(today);
     date.setDate(today.getDate() - currentDayOfWeek + i);
     labels.push(date.toLocaleDateString(undefined, { weekday: 'short' }));
-    const startOfDay = new Date(date); startOfDay.setHours(0,0,0,0);
-    const endOfDay = new Date(date); endOfDay.setHours(23,59,59,999);
+    const startOfDay = new Date(date); startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date); endOfDay.setHours(23, 59, 59, 999);
     data.push(getSessionsByDateRange(startOfDay, endOfDay).filter(s => s.mode === 'focus' && s.completed).length);
   }
 
@@ -163,7 +163,7 @@ function createOrUpdateTaskCompletionChart() {
     taskChartInstance.data.datasets[0].data = data;
     taskChartInstance.data.datasets[0].backgroundColor = [chartColors.success, chartColors.muted];
     taskChartInstance.options.plugins.legend.labels.color = chartColors.text;
-     taskChartInstance.options.plugins.tooltip.backgroundColor = chartColors.tooltipBg;
+    taskChartInstance.options.plugins.tooltip.backgroundColor = chartColors.tooltipBg;
     taskChartInstance.options.plugins.tooltip.titleColor = chartColors.tooltipText;
     taskChartInstance.options.plugins.tooltip.bodyColor = chartColors.tooltipText;
     taskChartInstance.update();
@@ -244,12 +244,12 @@ function loadRecentSessionsTable() {
 
 // Initialize on specific page
 document.addEventListener('DOMContentLoaded', () => {
-    // Add a unique ID to dashboard.html's body or a main container
-    if (document.querySelector('body[data-page="dashboard"]')) { // Example check
-        initDashboardModule();
-    }
-    // Pop-out timer display update for dashboard page
-    if (window.globalUpdatePopOutTimerDisplayStatus) {
-        globalUpdatePopOutTimerDisplayStatus();
-    }
+  // Add a unique ID to dashboard.html's body or a main container
+  if (document.querySelector('body[data-page="dashboard"]')) { // Example check
+    initDashboardModule();
+  }
+  // Pop-out timer display update for dashboard page
+  if (window.globalUpdatePopOutTimerDisplayStatus) {
+    globalUpdatePopOutTimerDisplayStatus();
+  }
 });

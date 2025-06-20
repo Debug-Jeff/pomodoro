@@ -1,32 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A professional Pomodoro timer application to boost your productivity">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;">
-  <meta name="theme-color" content="#121214">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A professional Pomodoro timer application to boost your productivity" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;" />
+  <meta name="theme-color" content="#121214" />
   <title>Settings - Pomodoro Timer</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="assets/logo.png">
-  <link rel="apple-touch-icon" href="assets/icons/clock-3.png">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/themes.css">
-  <link rel="stylesheet" href="css/animated-background.css">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.png" />
+  <link rel="apple-touch-icon" href="assets/icons/clock-3.png" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/animated-background.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script type="module">
     import { inject } from "@vercel/analytics";
     inject();
   </script>
   <style>
-    body { transition: background-color 0.4s ease, color 0.4s ease, background-image 0.4s ease; }
-    .page-transition { /* ... */ }
-    .settings-section { transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; } /* Smoother hover */
-    .settings-section:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 3px 8px rgba(0,0,0,0.07); }
-    @keyframes float-nav { 0% { transform: translateY(0px); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0px); } }
-    nav#main-navbar { animation: float-nav 7s ease-in-out infinite; }
+    body {
+      transition: background-color 0.4s ease, color 0.4s ease,
+        background-image 0.4s ease;
+    }
+
+    .page-transition {
+      /* ... */
+    }
+
+    .settings-section {
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+
+    /* Smoother hover */
+    .settings-section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1),
+        0 3px 8px rgba(0, 0, 0, 0.07);
+    }
+
+    @keyframes float-nav {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-3px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    nav#main-navbar {
+      animation: float-nav 7s ease-in-out infinite;
+    }
   </style>
 </head>
+
 <body class="min-h-screen flex flex-col" data-page="settings">
   <div id="page-transition"></div>
   <div id="dynamic-animated-background"></div>
@@ -34,7 +68,7 @@
 
   <nav class="glass-nav fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" id="main-navbar">
     <!-- ... Navbar HTML as in home.html ... -->
-     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <a href="index.html" class="flex items-center group">
           <div class="flex flex-col">
@@ -45,32 +79,43 @@
         <div class="hidden md:flex items-center space-x-1">
           <a href="home.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg"><span>Timer</span></a>
           <a href="dashboard.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg"><span>Dashboard</span></a>
-          <a href="settings.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg" aria-current="page"><span>Settings</span></a>
+          <a href="settings.html" class="nav-link px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg"
+            aria-current="page"><span>Settings</span></a>
         </div>
         <div class="flex items-center">
-            <div class="relative group ml-2 sm:ml-4">
-                <select id="theme-select" class="p-1.5 sm:p-2 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-7 sm:pr-8" aria-label="Select Theme">
-                  <option value="dark">Dark</option>
-                  <option value="dim">Dim</option>
-                  <option value="purple">Purple</option>
-                  <option value="ocean">Ocean</option>
-                  <option value="sunset">Sunset</option>
-                  <option value="auto">Auto (System)</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                    <svg class="fill-current h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
+          <div class="relative group ml-2 sm:ml-4">
+            <select id="theme-select"
+              class="p-1.5 sm:p-2 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-7 sm:pr-8"
+              aria-label="Select Theme">
+              <option value="dark">Dark</option>
+              <option value="dim">Dim</option>
+              <option value="purple">Purple</option>
+              <option value="ocean">Ocean</option>
+              <option value="sunset">Sunset</option>
+              <option value="auto">Auto (System)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+              <svg class="fill-current h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
             </div>
-            <button class="md:hidden focus:outline-none ml-2 sm:ml-3 p-1" id="mobile-menu-button" aria-label="Open menu" aria-expanded="false">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </button>
+          </div>
+          <button class="md:hidden focus:outline-none ml-2 sm:ml-3 p-1" id="mobile-menu-button" aria-label="Open menu"
+            aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
     <div id="mobile-menu" class="md:hidden hidden bg-[var(--nav-bg)] border-t border-[var(--nav-border)] shadow-lg">
-        <a href="home.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Timer</a>
-        <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Dashboard</a>
-        <a href="settings.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]" aria-current="page">Settings</a>
+      <a href="home.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Timer</a>
+      <a href="dashboard.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]">Dashboard</a>
+      <a href="settings.html" class="block px-4 py-3 text-sm hover:bg-[rgba(var(--primary-rgb),0.1)]"
+        aria-current="page">Settings</a>
     </div>
     <div class="h-px bg-gradient-to-r from-transparent via-[rgba(var(--primary-rgb),0.25)] to-transparent"></div>
   </nav>
@@ -81,7 +126,10 @@
 
       <div class="glass-card animated-border rounded-xl p-5 sm:p-6 mb-6 sm:mb-8 settings-section">
         <h2 class="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 flex items-center gap-2.5">
-          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-[rgb(var(--primary-rgb))]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-[rgb(var(--primary-rgb))]" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           Timer Durations
         </h2>
         <div class="space-y-5 sm:space-y-6">
@@ -90,57 +138,78 @@
               <label for="focus-duration" class="text-[rgb(var(--foreground-rgb))] text-sm">Focus Duration</label>
               <span id="focus-duration-display" class="text-[rgb(var(--primary-rgb))] font-medium text-sm">25 min</span>
             </div>
-            <div class="slider-container"><input type="range" id="focus-duration" min="1" max="90" step="1" value="25" class="slider"></div>
+            <div class="slider-container">
+              <input type="range" id="focus-duration" min="1" max="90" step="1" value="25" class="slider" />
+            </div>
           </div>
           <div>
             <div class="flex justify-between items-center mb-1">
               <label for="short-break-duration" class="text-[rgb(var(--foreground-rgb))] text-sm">Short Break</label>
               <span id="short-break-duration-display" class="text-green-400 font-medium text-sm">5 min</span>
             </div>
-            <div class="slider-container"><input type="range" id="short-break-duration" min="1" max="30" step="1" value="5" class="slider"></div>
+            <div class="slider-container">
+              <input type="range" id="short-break-duration" min="1" max="30" step="1" value="5" class="slider" />
+            </div>
           </div>
           <div>
             <div class="flex justify-between items-center mb-1">
               <label for="long-break-duration" class="text-[rgb(var(--foreground-rgb))] text-sm">Long Break</label>
               <span id="long-break-duration-display" class="text-blue-400 font-medium text-sm">15 min</span>
             </div>
-            <div class="slider-container"><input type="range" id="long-break-duration" min="5" max="45" step="1" value="15" class="slider"></div>
+            <div class="slider-container">
+              <input type="range" id="long-break-duration" min="5" max="45" step="1" value="15" class="slider" />
+            </div>
           </div>
           <div>
             <div class="flex justify-between items-center mb-1">
-              <label for="sessions-before-long-break" class="text-[rgb(var(--foreground-rgb))] text-sm">Sessions for Long Break</label>
-              <span id="sessions-before-long-break-display" class="text-purple-400 font-medium text-sm">4 sessions</span>
+              <label for="sessions-before-long-break" class="text-[rgb(var(--foreground-rgb))] text-sm">Sessions for
+                Long Break</label>
+              <span id="sessions-before-long-break-display" class="text-purple-400 font-medium text-sm">4
+                sessions</span>
             </div>
-            <div class="slider-container"><input type="range" id="sessions-before-long-break" min="1" max="8" step="1" value="4" class="slider"></div>
+            <div class="slider-container">
+              <input type="range" id="sessions-before-long-break" min="1" max="8" step="1" value="4" class="slider" />
+            </div>
           </div>
         </div>
       </div>
 
       <div class="glass-card animated-border rounded-xl p-5 sm:p-6 mb-6 sm:mb-8 settings-section">
         <h2 class="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 flex items-center gap-2.5">
-          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-green-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
           Notifications & Sound
         </h2>
         <div class="space-y-4 sm:space-y-5">
           <div class="flex items-center justify-between">
-            <label for="enable-notifications" class="text-[rgb(var(--foreground-rgb))] text-sm">Desktop Notifications</label>
-            <label class="toggle-container"><input type="checkbox" id="enable-notifications" checked><span class="toggle-slider"></span></label>
+            <label for="enable-notifications" class="text-[rgb(var(--foreground-rgb))] text-sm">Desktop
+              Notifications</label>
+            <label class="toggle-container"><input type="checkbox" id="enable-notifications" checked /><span
+                class="toggle-slider"></span></label>
           </div>
           <div class="flex items-center justify-between">
             <label for="enable-sounds" class="text-[rgb(var(--foreground-rgb))] text-sm">Sound Effects</label>
-            <label class="toggle-container"><input type="checkbox" id="enable-sounds" checked><span class="toggle-slider"></span></label>
+            <label class="toggle-container"><input type="checkbox" id="enable-sounds" checked /><span
+                class="toggle-slider"></span></label>
           </div>
           <div>
-            <label for="notification-sound" class="block text-[rgb(var(--foreground-rgb))] text-sm mb-1.5">Notification Sound</label>
+            <label for="notification-sound" class="block text-[rgb(var(--foreground-rgb))] text-sm mb-1.5">Notification
+              Sound</label>
             <div class="relative">
-                <select id="notification-sound" class="w-full p-2.5 rounded-md text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-8">
-                  <option value="default_alarm">Classic Alarm</option>
-                  <option value="retro_notify">Retro Notify</option>
-                  <option value="soft_chime">Soft Chime</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
+              <select id="notification-sound"
+                class="w-full p-2.5 rounded-md text-sm focus:outline-none focus:ring-2 ring-inset focus:ring-[rgb(var(--primary-rgb))] glass-dropdown appearance-none pr-8">
+                <option value="default_alarm">Classic Alarm</option>
+                <option value="retro_notify">Retro Notify</option>
+                <option value="soft_chime">Soft Chime</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
             </div>
           </div>
           <div>
@@ -155,75 +224,150 @@
 
       <div class="glass-card animated-border rounded-xl p-5 sm:p-6 mb-6 sm:mb-8 settings-section">
         <h2 class="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 flex items-center gap-2.5">
-          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
           Appearance
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4" id="theme-previews-container">
-           <div class="theme-preview p-3 text-center" data-theme="dark" aria-label="Dark theme" title="Dark Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: #6366f1; width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Dark</span>
+          <div class="theme-preview p-3 text-center" data-theme="dark" aria-label="Dark theme" title="Dark Theme">
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="background: #6366f1; width: 80%; height: 30px"></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Dark</span>
           </div>
-           <div class="theme-preview p-3 text-center" data-theme="dim" aria-label="Dim theme" title="Dim Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: #7c3aed; width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Dim</span>
+          <div class="theme-preview p-3 text-center" data-theme="dim" aria-label="Dim theme" title="Dim Theme">
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="background: #7c3aed; width: 80%; height: 30px"></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Dim</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="purple" aria-label="Purple theme" title="Purple Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: #8b5cf6; width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Purple</span>
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="background: #8b5cf6; width: 80%; height: 30px"></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Purple</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="ocean" aria-label="Ocean theme" title="Ocean Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: #0ea5e9; width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Ocean</span>
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="background: #0ea5e9; width: 80%; height: 30px"></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Ocean</span>
           </div>
           <div class="theme-preview p-3 text-center" data-theme="sunset" aria-label="Sunset theme" title="Sunset Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: #f97316; width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Sunset</span>
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="background: #f97316; width: 80%; height: 30px"></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Sunset</span>
           </div>
-           <div class="theme-preview p-3 text-center" data-theme="auto" aria-label="Auto theme" title="Auto (System) Theme">
-            <div class="theme-preview-check"><svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
-            <div class="theme-color-box mx-auto" style="background: linear-gradient(90deg,#6366f1 0%,#7c3aed 100%); width: 80%; height: 30px;"></div><span class="text-xs sm:text-sm font-medium mt-1.5 block">Auto</span>
+          <div class="theme-preview p-3 text-center" data-theme="auto" aria-label="Auto theme"
+            title="Auto (System) Theme">
+            <div class="theme-preview-check">
+              <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" fill="none" stroke="currentColor" stroke-width="3"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <div class="theme-color-box mx-auto" style="
+                  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
+                  width: 80%;
+                  height: 30px;
+                "></div>
+            <span class="text-xs sm:text-sm font-medium mt-1.5 block">Auto</span>
           </div>
         </div>
       </div>
 
       <div class="glass-card animated-border rounded-xl p-5 sm:p-6 settings-section">
         <h2 class="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 flex items-center gap-2.5">
-          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10m16-5H4m16 0l-3.464 3.464M20 12l-3.464-3.464M4 7h16v10H4V7z" /></svg>
+          <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 7v10m16-5H4m16 0l-3.464 3.464M20 12l-3.464-3.464M4 7h16v10H4V7z" />
+          </svg>
           Data Management
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <button id="import-data-btn" class="btn-secondary text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                Import Data
-            </button>
-            <input type="file" id="import-file" class="hidden" accept=".json,application/json">
-            <button id="export-data-btn" class="btn-secondary text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                Export Data
-            </button>
+          <button id="import-data-btn"
+            class="btn-secondary text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Import Data
+          </button>
+          <input type="file" id="import-file" class="hidden" accept=".json,application/json" />
+          <button id="export-data-btn"
+            class="btn-secondary text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Export Data
+          </button>
         </div>
-        <button id="reset-settings" class="mt-4 bg-red-600 hover:bg-red-700 text-white text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2 transition-colors duration-150 ease-out hover:shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            Reset All App Data
+        <button id="reset-settings"
+          class="mt-4 bg-red-600 hover:bg-red-700 text-white text-sm w-full py-2.5 rounded-md flex items-center justify-center gap-2 transition-colors duration-150 ease-out hover:shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Reset All App Data
         </button>
       </div>
     </div>
   </main>
-  
+
   <!-- Pop-out timer structure for JS to manage its state across pages -->
-  <div id="pop-out-timer" class="pop-out-timer hidden flex flex-col glass-card backdrop-blur-md border border-[rgba(var(--primary-rgb),0.3)] shadow-2xl">
-    <div class="pop-out-header flex items-center justify-between px-3 py-1.5 sm:px-4 sm:py-2 cursor-move border-b border-[rgba(var(--primary-rgb),0.15)]">
+  <div id="pop-out-timer"
+    class="pop-out-timer hidden flex flex-col glass-card backdrop-blur-md border border-[rgba(var(--primary-rgb),0.3)] shadow-2xl">
+    <div
+      class="pop-out-header flex items-center justify-between px-3 py-1.5 sm:px-4 sm:py-2 cursor-move border-b border-[rgba(var(--primary-rgb),0.15)]">
       <span class="font-semibold text-xs sm:text-sm">Floating Timer</span>
-      <button id="close-pop-out" aria-label="Close floating timer" class="p-1 rounded-full hover:bg-[rgba(var(--foreground-rgb),0.1)]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      <button id="close-pop-out" aria-label="Close floating timer"
+        class="p-1 rounded-full hover:bg-[rgba(var(--foreground-rgb),0.1)]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="flex-grow flex flex-col items-center justify-center p-3 sm:p-4">
       <span id="pop-timer-display" class="text-3xl sm:text-4xl font-bold">25:00</span>
-      <span id="pop-timer-label" class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-2 sm:mb-3">Focus Time</span>
+      <span id="pop-timer-label" class="text-xs sm:text-sm text-[rgb(var(--muted-foreground-rgb))] mb-2 sm:mb-3">Focus
+        Time</span>
       <div class="flex space-x-1.5 sm:space-x-2">
-        <button id="pop-start-btn" class="btn-primary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">Start</button>
-        <button id="pop-reset-btn" class="btn-secondary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">Reset</button>
+        <button id="pop-start-btn" class="btn-primary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">
+          Start
+        </button>
+        <button id="pop-reset-btn" class="btn-secondary text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-1.5 rounded-md">
+          Reset
+        </button>
       </div>
     </div>
   </div>
@@ -235,35 +379,62 @@
   <script src="js/settings.js"></script>
   <script src="js/animations.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener("DOMContentLoaded", function () {
       if (window.injectAnimatedBackground) injectAnimatedBackground();
       if (window.gsap && !prefersReducedMotion()) {
-        gsap.from('#main-navbar', { y: -70, opacity: 0, duration: 0.6, ease: 'power2.out', delay: 0.1 });
-         gsap.from(".settings-section", {
-            opacity: 0, y: 20, duration: 0.45, stagger: 0.1, delay: 0.25, ease: "power1.out"
+        gsap.from("#main-navbar", {
+          y: -70,
+          opacity: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          delay: 0.1,
+        });
+        gsap.from(".settings-section", {
+          opacity: 0,
+          y: 20,
+          duration: 0.45,
+          stagger: 0.1,
+          delay: 0.25,
+          ease: "power1.out",
         });
       }
-      
-             // Mobile menu toggle
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
+
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
       if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-          const isHidden = mobileMenu.classList.contains('hidden');
-           if (window.gsap && !prefersReducedMotion()){
-            if(isHidden) {
-                mobileMenu.classList.remove('hidden');
-                gsap.fromTo(mobileMenu, {height: 0, opacity: 0}, {height: 'auto', opacity: 1, duration: 0.3, ease: 'power1.out'});
+        mobileMenuButton.addEventListener("click", () => {
+          const isHidden = mobileMenu.classList.contains("hidden");
+          if (window.gsap && !prefersReducedMotion()) {
+            if (isHidden) {
+              mobileMenu.classList.remove("hidden");
+              gsap.fromTo(
+                mobileMenu,
+                { height: 0, opacity: 0 },
+                {
+                  height: "auto",
+                  opacity: 1,
+                  duration: 0.3,
+                  ease: "power1.out",
+                }
+              );
             } else {
-                gsap.to(mobileMenu, {height: 0, opacity: 0, duration: 0.3, ease: 'power1.in', onComplete: () => mobileMenu.classList.add('hidden')});
+              gsap.to(mobileMenu, {
+                height: 0,
+                opacity: 0,
+                duration: 0.3,
+                ease: "power1.in",
+                onComplete: () => mobileMenu.classList.add("hidden"),
+              });
             }
           } else {
-            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle("hidden");
           }
-           mobileMenuButton.setAttribute('aria-expanded', !isHidden);
+          mobileMenuButton.setAttribute("aria-expanded", !isHidden);
         });
       }
     });
   </script>
 </body>
+
 </html>

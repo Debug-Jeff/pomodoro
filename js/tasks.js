@@ -80,7 +80,7 @@ function renderTaskList() {
 
 
     const pomodorosDisplay = task.pomodoros > 0 ?
-      `<span class="text-xs font-medium text-amber-400 mr-2 flex items-center" title="${task.pomodoros} Pomodoros">${'🍅'.repeat(Math.min(task.pomodoros, 5))}${task.pomodoros > 5 ? `+${task.pomodoros-5}`:''}</span>` : '';
+      `<span class="text-xs font-medium text-amber-400 mr-2 flex items-center" title="${task.pomodoros} Pomodoros">${'🍅'.repeat(Math.min(task.pomodoros, 5))}${task.pomodoros > 5 ? `+${task.pomodoros - 5}` : ''}</span>` : '';
 
     taskItem.innerHTML = `
       <div class="flex items-center flex-grow min-w-0">  <!--min-w-0 for text truncation-->
@@ -106,14 +106,14 @@ function renderTaskList() {
       if (!task.completed) selectTaskForSession(task.id); // Only allow selecting non-completed tasks
     });
     taskItem.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            if (document.activeElement === taskItem && !task.completed) {
-                e.preventDefault();
-                selectTaskForSession(task.id);
-            } else if (document.activeElement.type === 'checkbox') {
-                // Let checkbox handle its own space/enter
-            }
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (document.activeElement === taskItem && !task.completed) {
+          e.preventDefault();
+          selectTaskForSession(task.id);
+        } else if (document.activeElement.type === 'checkbox') {
+          // Let checkbox handle its own space/enter
         }
+      }
     });
     taskListElement.appendChild(taskItem);
   });
@@ -143,7 +143,7 @@ function deleteTask(taskId) {
   const taskItem = taskListElement.querySelector(`[data-id="${taskId}"]`);
   if (window.gsap && taskItem && !prefersReducedMotion()) {
     gsap.to(taskItem, {
-      height: 0, paddingBlock: 0, marginBlock:0, opacity: 0, duration: 0.3, ease: "power2.in",
+      height: 0, paddingBlock: 0, marginBlock: 0, opacity: 0, duration: 0.3, ease: "power2.in",
       onComplete: () => {
         tasksState.splice(taskIndex, 1);
         if (currentSelectedTaskId === taskId) currentSelectedTaskId = null;
@@ -167,7 +167,7 @@ function clearCompletedTasks() {
 
   if (window.gsap && !prefersReducedMotion()) {
     gsap.to(completedTaskItems, {
-      height: 0, paddingBlock: 0, marginBlock:0, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in",
+      height: 0, paddingBlock: 0, marginBlock: 0, opacity: 0, duration: 0.3, stagger: 0.05, ease: "power2.in",
       onComplete: () => {
         tasksState = tasksState.filter(task => !task.completed);
         // No need to deselect current task if it was completed, as it's gone.
@@ -197,9 +197,9 @@ function selectTaskForSession(taskId) {
   } else {
     const taskToSelect = tasksState.find(t => t.id === taskId);
     if (taskToSelect && !taskToSelect.completed) { // Can only select non-completed tasks
-        currentSelectedTaskId = taskId;
+      currentSelectedTaskId = taskId;
     } else {
-        currentSelectedTaskId = null; // Ensure no selection if task is completed
+      currentSelectedTaskId = null; // Ensure no selection if task is completed
     }
   }
   renderTaskList(); // Re-render to update selection highlight

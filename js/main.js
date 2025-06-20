@@ -95,9 +95,9 @@ function setAndApplyTheme(themeName) {
   const themeColorMeta = document.querySelector('meta[name="theme-color"]');
   if (themeColorMeta) {
     setTimeout(() => {
-        const computedStyle = getComputedStyle(body);
-        const bgColorValue = computedStyle.getPropertyValue('--background-rgb').trim();
-        themeColorMeta.content = bgColorValue ? `rgb(${bgColorValue})` : '#0A0A0C'; // Fallback
+      const computedStyle = getComputedStyle(body);
+      const bgColorValue = computedStyle.getPropertyValue('--background-rgb').trim();
+      themeColorMeta.content = bgColorValue ? `rgb(${bgColorValue})` : '#0A0A0C'; // Fallback
     }, 60); // Increased delay slightly
   }
 
@@ -107,29 +107,29 @@ function setAndApplyTheme(themeName) {
 window.setAndApplyTheme = setAndApplyTheme;
 
 function updateThemeBackground(effectiveThemeName) {
-    const body = document.body;
-    // This function relies on themes.css setting:
-    // body.theme-xxx { --bg-image-current: var(--bg-image-xxx-clouds); background-image: var(--bg-image-current); }
-    // So, just applying the class theme-xxx should trigger the CSS to set the background.
-    // The JS part is mainly for the starfield on dark theme.
+  const body = document.body;
+  // This function relies on themes.css setting:
+  // body.theme-xxx { --bg-image-current: var(--bg-image-xxx-clouds); background-image: var(--bg-image-current); }
+  // So, just applying the class theme-xxx should trigger the CSS to set the background.
+  // The JS part is mainly for the starfield on dark theme.
 
-    // Handle starfield for dark theme
-    const dynamicBgContainer = document.getElementById('dynamic-animated-background'); // A dedicated div for stars
-    if (effectiveThemeName === 'dark') {
-        if (window.injectAnimatedBackground && !document.querySelector('.background-container')) {
-            window.injectAnimatedBackground(); // This function should create '.background-container' with stars
-        } else if (document.querySelector('.background-container')) {
-            document.querySelector('.background-container').style.display = 'block'; // Ensure visible
-        }
-    } else {
-        const existingStarContainer = document.querySelector('.background-container');
-        if (existingStarContainer) existingStarContainer.style.display = 'none'; // Hide for other themes
+  // Handle starfield for dark theme
+  const dynamicBgContainer = document.getElementById('dynamic-animated-background'); // A dedicated div for stars
+  if (effectiveThemeName === 'dark') {
+    if (window.injectAnimatedBackground && !document.querySelector('.background-container')) {
+      window.injectAnimatedBackground(); // This function should create '.background-container' with stars
+    } else if (document.querySelector('.background-container')) {
+      document.querySelector('.background-container').style.display = 'block'; // Ensure visible
     }
+  } else {
+    const existingStarContainer = document.querySelector('.background-container');
+    if (existingStarContainer) existingStarContainer.style.display = 'none'; // Hide for other themes
+  }
 }
 
 
 function getCurrentTheme() {
-    return localStorage.getItem(`${APP_NAME}_theme`) || DEFAULT_SETTINGS.theme;
+  return localStorage.getItem(`${APP_NAME}_theme`) || DEFAULT_SETTINGS.theme;
 }
 window.getCurrentTheme = getCurrentTheme;
 
@@ -147,55 +147,55 @@ function setActiveNavLink() {
 }
 
 function initAnalogClock(clockId) {
-    const clock = document.getElementById(clockId);
-    if (!clock) return;
+  const clock = document.getElementById(clockId);
+  if (!clock) return;
 
-    // Create hands if they don't exist (more robust)
-    let hourHand = clock.querySelector('.hour-hand');
-    if (!hourHand) { hourHand = document.createElement('div'); hourHand.className = 'hand hour-hand'; clock.appendChild(hourHand); }
-    let minuteHand = clock.querySelector('.minute-hand');
-    if (!minuteHand) { minuteHand = document.createElement('div'); minuteHand.className = 'hand minute-hand'; clock.appendChild(minuteHand); }
-    let secondHand = clock.querySelector('.second-hand');
-    if (!secondHand) { secondHand = document.createElement('div'); secondHand.className = 'hand second-hand'; clock.appendChild(secondHand); }
-    let centerDot = clock.querySelector('.center-dot');
-    if (!centerDot) { centerDot = document.createElement('div'); centerDot.className = 'center-dot'; clock.appendChild(centerDot); }
+  // Create hands if they don't exist (more robust)
+  let hourHand = clock.querySelector('.hour-hand');
+  if (!hourHand) { hourHand = document.createElement('div'); hourHand.className = 'hand hour-hand'; clock.appendChild(hourHand); }
+  let minuteHand = clock.querySelector('.minute-hand');
+  if (!minuteHand) { minuteHand = document.createElement('div'); minuteHand.className = 'hand minute-hand'; clock.appendChild(minuteHand); }
+  let secondHand = clock.querySelector('.second-hand');
+  if (!secondHand) { secondHand = document.createElement('div'); secondHand.className = 'hand second-hand'; clock.appendChild(secondHand); }
+  let centerDot = clock.querySelector('.center-dot');
+  if (!centerDot) { centerDot = document.createElement('div'); centerDot.className = 'center-dot'; clock.appendChild(centerDot); }
 
-    function setClock() {
-        const now = new Date();
-        const seconds = now.getSeconds();
-        const secondsDegrees = ((seconds / 60) * 360) - 90; // Offset for 12 at top
-        secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
+  function setClock() {
+    const now = new Date();
+    const seconds = now.getSeconds();
+    const secondsDegrees = ((seconds / 60) * 360) - 90; // Offset for 12 at top
+    secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
 
-        const minutes = now.getMinutes();
-        const minutesDegrees = ((minutes / 60) * 360) + ((seconds / 60) * 6) - 90;
-        minuteHand.style.transform = `rotate(${minutesDegrees}deg)`;
+    const minutes = now.getMinutes();
+    const minutesDegrees = ((minutes / 60) * 360) + ((seconds / 60) * 6) - 90;
+    minuteHand.style.transform = `rotate(${minutesDegrees}deg)`;
 
-        const hours = now.getHours();
-        const hoursDegrees = ((hours / 12) * 360) + ((minutes / 60) * 30) - 90;
-        hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+    const hours = now.getHours();
+    const hoursDegrees = ((hours / 12) * 360) + ((minutes / 60) * 30) - 90;
+    hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+  }
+
+  // Add clock markings only once
+  if (!clock.dataset.markingsAdded) {
+    for (let i = 1; i <= 12; i++) {
+      const mark = document.createElement('div');
+      mark.classList.add('marking', 'hour-mark');
+      // Position calculation needs to account for hand transform-origin (bottom center)
+      // and clock center. Simpler: use absolute positioning with rotation.
+      const angle = i * 30; // 30 degrees per hour
+      mark.style.position = 'absolute';
+      mark.style.left = '50%';
+      mark.style.top = '0%'; // Start from top edge of clock for rotation
+      mark.style.transformOrigin = '0% 65px'; // Rotate around center (65px is radius for 130px clock)
+      mark.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+      clock.appendChild(mark);
     }
+    clock.dataset.markingsAdded = 'true';
+  }
 
-    // Add clock markings only once
-    if (!clock.dataset.markingsAdded) {
-        for (let i = 1; i <= 12; i++) {
-            const mark = document.createElement('div');
-            mark.classList.add('marking', 'hour-mark');
-            // Position calculation needs to account for hand transform-origin (bottom center)
-            // and clock center. Simpler: use absolute positioning with rotation.
-            const angle = i * 30; // 30 degrees per hour
-            mark.style.position = 'absolute';
-            mark.style.left = '50%';
-            mark.style.top = '0%'; // Start from top edge of clock for rotation
-            mark.style.transformOrigin = '0% 65px'; // Rotate around center (65px is radius for 130px clock)
-            mark.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-            clock.appendChild(mark);
-        }
-        clock.dataset.markingsAdded = 'true';
-    }
-
-    setClock();
-    if (clock.updateInterval) clearInterval(clock.updateInterval); // Clear existing interval if any
-    clock.updateInterval = setInterval(setClock, 1000);
+  setClock();
+  if (clock.updateInterval) clearInterval(clock.updateInterval); // Clear existing interval if any
+  clock.updateInterval = setInterval(setClock, 1000);
 }
 window.initAnalogClock = initAnalogClock;
 
@@ -216,13 +216,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function showQuote(index) {
     if (!quoteTextElement) return;
     if (window.gsap && !prefersReducedMotion()) {
-        gsap.to(quoteTextElement, { autoAlpha: 0, y: 10, duration: 0.35, ease: 'power2.in', onComplete: () => {
-            quoteTextElement.textContent = quotes[index];
-            gsap.to(quoteTextElement, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' });
-        }});
+      gsap.to(quoteTextElement, {
+        autoAlpha: 0, y: 10, duration: 0.35, ease: 'power2.in', onComplete: () => {
+          quoteTextElement.textContent = quotes[index];
+          gsap.to(quoteTextElement, { autoAlpha: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+        }
+      });
     } else {
-        quoteTextElement.textContent = quotes[index];
-        quoteTextElement.style.opacity = 1; // Ensure visible if no GSAP
+      quoteTextElement.textContent = quotes[index];
+      quoteTextElement.style.opacity = 1; // Ensure visible if no GSAP
     }
   }
   if (quoteTextElement) {
@@ -233,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 12000); // Slower quote change
   }
 
-  window.pulseTimerDisplay = function() {
+  window.pulseTimerDisplay = function () {
     const timerDisplay = document.getElementById('timer-display');
     if (timerDisplay && !prefersReducedMotion()) {
       timerDisplay.classList.add('animate-timer-pulse');
@@ -243,11 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const themeSelectDropdowns = document.querySelectorAll('select#theme-select');
   themeSelectDropdowns.forEach(select => {
-      select.value = getCurrentTheme();
-      select.addEventListener('change', function() { setAndApplyTheme(this.value); });
+    select.value = getCurrentTheme();
+    select.addEventListener('change', function () { setAndApplyTheme(this.value); });
   });
   window.addEventListener('themeChanged', (event) => {
-      themeSelectDropdowns.forEach(select => { select.value = event.detail.theme; });
+    themeSelectDropdowns.forEach(select => { select.value = event.detail.theme; });
   });
 
   // Mobile Menu Toggle
