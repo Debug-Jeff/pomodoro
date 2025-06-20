@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="A professional Pomodoro timer application to boost your productivity" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net;" />
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;" />
   <meta name="theme-color" content="#121214" />
   <title>Dashboard - Pomodoro Timer</title>
   <link rel="manifest" href="manifest.json" />
@@ -15,27 +15,19 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="css/themes.css" />
   <link rel="stylesheet" href="css/animated-background.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-  <script type="module">
-    import { inject } from "@vercel/analytics";
-    inject();
-  </script>
   <style>
     body {
       transition: background-color 0.4s ease, color 0.4s ease,
         background-image 0.4s ease;
     }
 
-    .page-transition {
-      /* ... */
-    }
-
     .gauge {
       position: relative;
       width: 140px;
       height: 70px;
-      /* Half circle */
       overflow: hidden;
       margin: 0 auto;
     }
@@ -45,9 +37,7 @@
       height: 140px;
       border-radius: 50%;
       background: conic-gradient(rgba(var(--primary-rgb), 0.15) 0deg 180deg,
-          /* Active part range */
           rgba(var(--foreground-rgb), 0.1) 180deg 360deg
-          /* Inactive part */
         );
       position: absolute;
       top: 0;
@@ -55,34 +45,27 @@
     }
 
     .gauge-fill {
-      /* The moving part */
       width: 140px;
       height: 140px;
       border-radius: 50%;
       background: rgb(var(--primary-rgb));
       clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%);
-      /* Left half */
       position: absolute;
       top: 0;
       left: 0;
       transform-origin: 50% 50%;
-      /* Rotate around center */
       transform: rotate(0deg);
-      /* Starts at 0 */
       transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
 
     .gauge-cover {
-      /* Hides the top half of the circle and creates the inner circle */
       width: 110px;
       height: 110px;
-      /* Smaller than gauge-bg/fill */
       background-color: rgb(var(--card-background-rgb));
       border-radius: 50%;
       position: absolute;
       top: 15px;
       left: 15px;
-      /* (140-110)/2 */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -91,16 +74,13 @@
     }
 
     .gauge-mask {
-      /* Hides the top part of the gauge */
       width: 140px;
       height: 70px;
       background-color: rgb(var(--card-background-rgb));
-      /* Match parent card's bg */
       position: absolute;
       top: 0;
       left: 0;
       z-index: 0;
-      /* Below fill but above bg, to hide top of bg circle */
     }
 
     .task-chart-container {
@@ -133,7 +113,6 @@
   <div id="dynamic-animated-background"></div>
 
   <nav class="glass-nav fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" id="main-navbar">
-    <!-- ... Navbar HTML as in home.html ... -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <a href="index.html" class="flex items-center group">
