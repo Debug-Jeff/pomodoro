@@ -109,11 +109,15 @@
       box-shadow: 0 6px 25px rgba(99, 102, 241, 0.45), 
                   0 0 15px rgba(165, 180, 252, 0.25) inset,
                   0 0 30px rgba(139, 92, 246, 0.2);
-      opacity: 0; 
-      transform: translateY(20px);
       padding: 0.85rem 2.5rem; /* sm:px-10 sm:py-3.5 */
       font-size: 1.1rem; /* sm:text-lg */
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
+      border-radius: 9999px; /* Ensure rounded button */
+      font-weight: 600; /* Make text bold */
+      cursor: pointer; /* Show pointer cursor */
+      display: block; /* Ensure button is visible */
+      opacity: 0; /* Start invisible for animation */
+      transform: translateY(20px); /* Start position for animation */
     }
     #enter-app-btn:hover {
       transform: translateY(15px) scale(1.07); /* More pronounced hover */

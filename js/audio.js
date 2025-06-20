@@ -24,11 +24,9 @@ async function initAudioSystem() {
       const soundsToLoad = {
         'default_alarm': 'assets/audio/classic-alarm.wav',
         'retro_notify': 'assets/audio/retro-game-notification.wav',
-        // Add other sounds defined in settings UI (e.g., 'soft_chime')
-        'soft_chime': 'assets/audio/soft-chime.wav', // Example, ensure file exists
-        // Timer specific sounds if not covered by notificationSound setting
-        'timer_start': 'assets/audio/intro-transition.wav', // Renamed from 'start' for clarity
-        'timer_break_end': 'assets/audio/retro-game-notification.wav' // Renamed from 'break'
+        'soft_chime': 'assets/audio/intro-transition.wav',
+        'timer_start': 'assets/audio/intro-transition.wav',
+        'timer_break_end': 'assets/audio/retro-game-notification.wav'
       };
 
       const loadPromises = Object.entries(soundsToLoad).map(([key, path]) => loadSoundIntoBuffer(key, path));
@@ -104,10 +102,8 @@ window.playSound = playSound;
 
 function setMasterVolume(volumeLevel) { // Volume 0-1
   if (masterGainNode) {
-    masterGainNode.gain.setValueAtTime(Math.max(0, Math.min(1, volumeLevel)), audioContext.currentTime);
+    masterGainNode.gain.setValueAtTime(Math.max(0, Math.min(1, volumeLevel)), audioContext ? audioContext.currentTime : 0);
   }
-  // This function is primarily for internal use by audio.js
-  // Settings save should happen in settings.js
 }
 window.setMasterVolume = setMasterVolume; // Expose for settings.js
 

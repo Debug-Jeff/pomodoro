@@ -65,7 +65,7 @@ function showNotification(title, options = {}) {
   if (Notification.permission === 'granted') {
     const notification = new Notification(title, {
       icon: 'assets/logo.png', // Ensure this path is correct
-      badge: 'assets/icons/clock-badge.png', // Optional: for Android notifications
+      badge: 'assets/icons/clock-3.png', // Optional: for Android notifications
       silent: false, // Explicitly not silent unless overridden
       ...options
     });
@@ -260,32 +260,66 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.gsap && !prefersReducedMotion()) {
         if (isHidden) {
             mobileMenu.classList.remove('hidden');
-            gsap.fromTo(mobileMenu, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.3, ease: 'power1.out' });
+            gsap.fromTo(mobileMenu, { height: 0, opacity: 0, y: -10}, { height: 'auto', opacity: 1, y:0, duration: 0.25, ease: 'power1.out'});
         } else {
-            gsap.to(mobileMenu, { height: 0, opacity: 0, duration: 0.3, ease: 'power1.in', onComplete: () => mobileMenu.classList.add('hidden') });
+            gsap.to(mobileMenu, { height: 0, opacity: 0, y: -10, duration: 0.25, ease: 'power1.in', onComplete: () => mobileMenu.classList.add('hidden') });
         }
-      } else {
-        mobileMenu.classList.toggle('hidden');
-      }
+      } else { mobileMenu.classList.toggle('hidden'); }
     });
   }
 });
 
-// Timer pulse animation CSS (ensure it uses theme variables)
-const pulseStyle = document.createElement('style');
-pulseStyle.innerHTML = `
-@keyframes timer-pulse-anim {
-  0% { text-shadow: 0 0 0 rgba(var(--primary-rgb), 0.6), 0 0 0 rgb(var(--foreground-rgb)); }
-  50% { text-shadow: 0 0 10px rgba(var(--primary-rgb), 0.8), 0 0 6px rgb(var(--foreground-rgb)); }
-  100% { text-shadow: 0 0 0 rgba(var(--primary-rgb), 0.6), 0 0 0 rgb(var(--foreground-rgb)); }
+// Add toast notification functionality
+function showToast(message, type = 'info', duration = 3000) {
+  // Remove any existing toasts
+  const existingToast = document.getElementById('toast-notification');
+  if (existingToast) {
+    existingToast.remove();
+  }
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.id = 'toast-notification';
+  toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 text-white text-sm font-medium';
+  
+  // Set background color based on type
+  switch (type) {
+    case 'success':
+      toast.classList.add('bg-green-500');
+      break;
+    case 'error':
+      toast.classList.add('bg-red-500');
+      break;
+    case 'warning':
+      toast.classList.add('bg-yellow-500');
+      break;
+    default:
+      toast.classList.add('bg-blue-500');
+  }
+  
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  // Animate in
+  if (window.gsap && !prefersReducedMotion()) {
+    gsap.fromTo(toast, 
+      { y: 20, opacity: 0 }, 
+      { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' }
+    );
+    
+    // Animate out after duration
+    setTimeout(() => {
+      gsap.to(toast, { 
+        y: 20, 
+        opacity: 0, 
+        duration: 0.3, 
+        ease: 'power2.in',
+        onComplete: () => toast.remove()
+      });
+    }, duration);
+  } else {
+    // Simple fade for reduced motion
+    setTimeout(() => toast.remove(), duration);
+  }
 }
-.animate-timer-pulse {
-  animation: timer-pulse-anim 0.35s cubic-bezier(.4,0,.2,1);
-}
-`;
-document.head.appendChild(pulseStyle);
-
-// This was in main.js before, for the landing page.
-// It's better called from index.html's inline script if it's specific to that page.
-// If initLandingPageAnimations uses elements not on other pages, it might error.
-// For now, I've removed the auto-call from main.js. index.html's inline script handles it.
+window.showToast = showToast;
